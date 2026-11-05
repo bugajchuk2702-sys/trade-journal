@@ -7,7 +7,7 @@ import ShotCard from '../components/ShotCard.jsx'
 // Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
 // остаются в базе нетронутыми, просто не показываются на странице.
 const FIELDS = [
-  'symbol', 'bias',
+  'symbol', 'result',
   'w1Img', 'w1Text', 'd1Img', 'd1Text', 'h4Img', 'h4Text',
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
 ]
@@ -59,11 +59,11 @@ function PlanEditor({ plan, onDelete }) {
           onChange={(e) => update({ symbol: e.target.value.toUpperCase() })}
           placeholder="Инструмент: BTCUSDT, EUR/USD…"
         />
-        <select style={{ maxWidth: 200 }} value={p.bias} onChange={(e) => update({ bias: e.target.value })}>
-          <option value="">Без направления</option>
-          <option value="long">Лонг</option>
-          <option value="short">Шорт</option>
-          <option value="neutral">Нейтрально</option>
+        <select style={{ maxWidth: 220 }} value={p.result} onChange={(e) => update({ result: e.target.value })}>
+          <option value="">Итог недели: не выбран</option>
+          <option value="profit">Неделя прибыльная</option>
+          <option value="loss">Неделя убыточная</option>
+          <option value="be">Неделя безубыточная</option>
         </select>
         <span className="spacer" />
         <button className="danger" onClick={() => confirm('Удалить этот план?') && onDelete()}>Удалить план</button>

@@ -4,7 +4,8 @@ import { db } from '../db.js'
 import { mondayOf, weekLabel } from '../week.js'
 import Dashboard from '../components/Dashboard.jsx'
 
-const BIAS = { long: ['Лонг', 'long'], short: ['Шорт', 'short'], neutral: ['Нейтрально', ''] }
+// Итог недели по инструменту (второй элемент — цвет значка)
+const RESULT = { profit: ['Прибыльная', 'long'], loss: ['Убыточная', 'short'], be: ['Безубыточная', ''] }
 
 // Главная: сверху планы текущей недели по инструментам, ниже метрики и кривая капитала
 export default function Home({ go }) {
@@ -27,7 +28,7 @@ export default function Home({ go }) {
         {plans.map((p) => {
           const items = p.checklist || []
           const done = items.filter((x) => x.done).length
-          const bias = BIAS[p.bias]
+          const bias = RESULT[p.result]
           const text = [p.beforeText, p.h4Text, p.d1Text, p.w1Text, p.focus, p.levels]
             .map((s) => (s || '').trim())
             .find(Boolean)
