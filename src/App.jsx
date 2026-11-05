@@ -85,6 +85,7 @@ export default function App() {
           {online ? 'Онлайн' : 'Офлайн'}
           {pending > 0 && ` · не синхронизировано: ${pending}`}
           {persisted === false && ' · хранилище не защищено'}
+          <span title="Время сборки этой версии"> · версия от {new Date(__BUILD_TIME__).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</span>
         </div>
       </header>
 
