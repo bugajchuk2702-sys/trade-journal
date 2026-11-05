@@ -59,11 +59,16 @@ function PlanEditor({ plan, onDelete }) {
           onChange={(e) => update({ symbol: e.target.value.toUpperCase() })}
           placeholder="Инструмент: BTCUSDT, EUR/USD…"
         />
-        <select style={{ maxWidth: 220 }} value={p.result} onChange={(e) => update({ result: e.target.value })}>
-          <option value="">Итог недели: не выбран</option>
-          <option value="profit">Неделя прибыльная</option>
-          <option value="loss">Неделя убыточная</option>
-          <option value="be">Неделя безубыточная</option>
+        <select
+          className={'res ' + p.result}
+          style={{ maxWidth: 200 }}
+          value={p.result}
+          onChange={(e) => update({ result: e.target.value })}
+        >
+          <option value="">Итог: не выбран</option>
+          <option value="profit">Прибыльная</option>
+          <option value="loss">Убыточная</option>
+          <option value="be">Безубыточная</option>
         </select>
         <span className="spacer" />
         <button className="danger" onClick={() => confirm('Удалить этот план?') && onDelete()}>Удалить план</button>
@@ -137,6 +142,7 @@ export default function WeeklyPlan({ params = {} }) {
               setAdding(false)
             }}
           >
+            {p.result && <span className={'rdot ' + p.result} />}
             {p.symbol || 'Общий'}
           </button>
         ))}

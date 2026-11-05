@@ -5,7 +5,7 @@ import { mondayOf, weekLabel } from '../week.js'
 import Dashboard from '../components/Dashboard.jsx'
 
 // Итог недели по инструменту (второй элемент — цвет значка)
-const RESULT = { profit: ['Прибыльная', 'long'], loss: ['Убыточная', 'short'], be: ['Безубыточная', ''] }
+const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
 
 // Главная: сверху планы текущей недели по инструментам, ниже метрики и кривая капитала
 export default function Home({ go }) {
