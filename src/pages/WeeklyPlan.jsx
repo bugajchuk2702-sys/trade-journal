@@ -4,7 +4,7 @@ import { db, createPlan, savePlan, removePlan, uuid } from '../db.js'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import WeeklyRecap from '../components/WeeklyRecap.jsx'
-import NoteCard from '../components/NoteCard.jsx'
+import NotesCard from '../components/NotesCard.jsx'
 
 // Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
 // остаются в базе нетронутыми, просто не показываются на странице.
@@ -14,15 +14,13 @@ const FIELDS = [
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
   'recapD1Img', // скриншот D1 в блоке Weekly Recap
-  'mistakesImgs', 'mistakesText', // «Какие ошибки я могу выделить?»
-  'weekNotes', // общие заметки недели, только текст
-  'goodImgs', 'goodText', // «В чём я молодец и сделал правильно?»
+  'weekNotes', // «Заметки недели»: текст
+  'weekNotesImgs', // скриншоты к заметкам недели (вставляются скрыто, Ctrl+V)
 ]
 const blank = {
   ...Object.fromEntries(FIELDS.map((k) => [k, ''])),
   updates: [],
-  mistakesImgs: [],
-  goodImgs: [],
+  weekNotesImgs: [],
 }
 
 // Название карточки-обновления: день, в который её создали
@@ -68,15 +66,10 @@ function PlanEditor({ plan, onDelete }) {
     onImg: (v) => update({ [key + 'Img']: v }),
   })
 
-  // Карточки-вопросы: несколько скриншотов + текст. Список берём из latest,
-  // чтобы быстрая вставка нескольких картинок не затирала друг друга.
-  const note = (key) => ({
-    imgs: p[key + 'Imgs'],
-    text: p[key + 'Text'],
-    onAdd: (urls) => update({ [key + 'Imgs']: [...latest.current[key + 'Imgs'], ...urls] }),
-    onRemoveAt: (i) => update({ [key + 'Imgs']: latest.current[key + 'Imgs'].filter((_, j) => j !== i) }),
-    onText: (v) => update({ [key + 'Text']: v }),
-  })
+  // Скриншоты заметок недели. Список берём из latest, чтобы быстрая вставка
+  // нескольких картинок подряд не затирала друг друга.
+  const addNoteImgs = (urls) => update({ weekNotesImgs: [...latest.current.weekNotesImgs, ...urls] })
+  const removeNoteImg = (i) => update({ weekNotesImgs: latest.current.weekNotesImgs.filter((_, j) => j !== i) })
 
   // Updates: всегда читаем свежий список из latest, чтобы быстрые правки не затирали друг друга
   const addUpdate = () =>
@@ -154,28 +147,15 @@ function PlanEditor({ plan, onDelete }) {
       </div>
 
       <h4 className="subhead">Заметки и наблюдения в течение недели:</h4>
-      <section className="card weeknotes">
-        <h2>Заметки недели</h2>
-        <textarea
-          value={p.weekNotes}
-          onChange={(e) => update({ weekNotes: e.target.value })}
-          placeholder="Любые заметки по неделе"
-        />
-      </section>
-      <div className="row2">
-        <NoteCard
-          title="Какие ошибки я могу выделить? Привели ли они к убыткам?"
-          tone="bad"
-          {...note('mistakes')}
-          placeholder="Твой ответ: что пошло не так и во сколько это обошлось"
-        />
-        <NoteCard
-          title="В чём я молодец и сделал правильно? Это дало заработать?"
-          tone="good"
-          {...note('good')}
-          placeholder="Твой ответ: что сработало и принесло результат"
-        />
-      </div>
+      <NotesCard
+        title="Заметки недели"
+        text={p.weekNotes}
+        imgs={p.weekNotesImgs}
+        onText={(v) => update({ weekNotes: v })}
+        onAdd={addNoteImgs}
+        onRemoveAt={removeNoteImg}
+        placeholder="Любые заметки по неделе"
+      />
     </>
   )
 }
