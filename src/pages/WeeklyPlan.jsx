@@ -15,6 +15,7 @@ const FIELDS = [
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
   'recapD1Img', // скриншот D1 в блоке Weekly Recap
   'mistakesImgs', 'mistakesText', // «Какие ошибки я могу выделить?»
+  'weekNotes', // общие заметки недели, только текст
   'goodImgs', 'goodText', // «В чём я молодец и сделал правильно?»
 ]
 const blank = {
@@ -153,6 +154,14 @@ function PlanEditor({ plan, onDelete }) {
       </div>
 
       <h4 className="subhead">Заметки и наблюдения в течение недели:</h4>
+      <section className="card weeknotes">
+        <h2>Заметки недели</h2>
+        <textarea
+          value={p.weekNotes}
+          onChange={(e) => update({ weekNotes: e.target.value })}
+          placeholder="Любые заметки по неделе"
+        />
+      </section>
       <div className="row2">
         <NoteCard
           title="Какие ошибки я могу выделить? Привели ли они к убыткам?"
