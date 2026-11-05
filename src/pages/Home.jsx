@@ -19,7 +19,8 @@ export default function Home({ go }) {
   return (
     <>
       <div className="page-title">
-        <h2 className="section-title" style={{ margin: 0 }}>Планы недели · {weekLabel(ws)}</h2>
+        <h2>Планы недели</h2>
+        <span className="subtle">{weekLabel(ws)}</span>
         <span className="spacer" />
         <button className="ghost small" onClick={() => go('plan', { weekStart: ws })}>Все планы →</button>
       </div>

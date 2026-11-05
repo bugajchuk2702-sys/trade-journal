@@ -29,8 +29,26 @@ function useOnline() {
   return online
 }
 
+const THEMES = ['auto', 'light', 'dark']
+const THEME_ICON = { auto: 'Авто', light: 'Светлая', dark: 'Тёмная' }
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    try { return localStorage.getItem('theme') || 'auto' } catch { return 'auto' }
+  })
+  useEffect(() => {
+    const el = document.documentElement
+    if (theme === 'auto') el.removeAttribute('data-theme')
+    else el.dataset.theme = theme
+    try { localStorage.setItem('theme', theme) } catch {}
+  }, [theme])
+  const next = () => setTheme(THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length])
+  return [theme, next]
+}
+
 export default function App() {
   const online = useOnline()
+  const [theme, nextTheme] = useTheme()
   // Приложение всегда открывается на главной. params нужны, чтобы с карточки плана
   // сразу попасть в нужный план на странице Weekly Plan.
   const [view, setView] = useState({ tab: 'home', params: {} })
@@ -60,7 +78,10 @@ export default function App() {
     <div className="shell">
       <header className="nav">
         <button className={'brand' + (view.tab === 'home' ? ' active' : '')} onClick={() => go('home')} title="Главная">
-          📈 Журнал
+          <span className="logo">
+            <svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M15 7h6v6" /></svg>
+          </span>
+          Журнал
         </button>
         <nav className="tabs">
           {TABS.map((t) => (
@@ -77,6 +98,9 @@ export default function App() {
           {persisted === false && ' · хранилище не защищено'}
           <span title="Время сборки этой версии"> · версия от {new Date(__BUILD_TIME__).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</span>
         </div>
+        <button className="icon-btn" onClick={nextTheme} title={'Тема: ' + ({ auto: 'как в системе', light: 'светлая', dark: 'тёмная' })[theme]}>
+          {THEME_ICON[theme]}
+        </button>
       </header>
 
       <main className="main">
