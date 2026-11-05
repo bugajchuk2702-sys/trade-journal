@@ -16,9 +16,9 @@
   --line: rgba(0, 0, 0, 0.08);
   --line-2: rgba(0, 0, 0, 0.16);
 
-  --accent: #0071e3;
+  --accent: #3f78bd;
   --accent-text: #ffffff;
-  --accent-soft: rgba(0, 113, 227, 0.14);
+  --accent-soft: rgba(63, 120, 189, 0.16);
 
   /* текст / заливка / фон-подсветка для прибыли, убытка, безубытка */
   --green: #248a3d;
@@ -49,8 +49,8 @@
     --text-3: #636366;
     --line: rgba(255, 255, 255, 0.1);
     --line-2: rgba(255, 255, 255, 0.22);
-    --accent: #0a84ff;
-    --accent-soft: rgba(10, 132, 255, 0.24);
+    --accent: #6a9bd8;
+    --accent-soft: rgba(106, 155, 216, 0.24);
     --green: #30d158;
     --green-fill: #30d158;
     --green-soft: rgba(48, 209, 88, 0.18);
@@ -78,8 +78,8 @@
   --text-3: #636366;
   --line: rgba(255, 255, 255, 0.1);
   --line-2: rgba(255, 255, 255, 0.22);
-  --accent: #0a84ff;
-  --accent-soft: rgba(10, 132, 255, 0.24);
+  --accent: #6a9bd8;
+  --accent-soft: rgba(106, 155, 216, 0.24);
   --green: #30d158;
   --green-fill: #30d158;
   --green-soft: rgba(48, 209, 88, 0.18);
@@ -134,8 +134,8 @@ body {
 .brand:hover { background: var(--surface-3); }
 .logo {
   width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center;
-  background: linear-gradient(140deg, #5ac8fa, #0a84ff 58%, #5e5ce6);
-  box-shadow: 0 1px 3px rgba(10, 132, 255, 0.4);
+  background: linear-gradient(140deg, #8fb8e8, #5f8fcf 60%, #7a7fcf);
+  box-shadow: 0 1px 3px rgba(95, 143, 207, 0.35);
 }
 .logo svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 
