@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 
 // Уменьшаем скриншот до 1600px по ширине и сохраняем как JPEG (строка data URL):
 // так он весит сотни КБ, лежит прямо в записи плана и попадает в JSON-бэкап.
-async function toDataUrl(file, maxW = 1600) {
+export async function toDataUrl(file, maxW = 1600) {
   const url = URL.createObjectURL(file)
   try {
     const img = await new Promise((resolve, reject) => {

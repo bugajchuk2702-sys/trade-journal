@@ -4,6 +4,7 @@ import { db, createPlan, savePlan, removePlan, uuid } from '../db.js'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import WeeklyRecap from '../components/WeeklyRecap.jsx'
+import NoteCard from '../components/NoteCard.jsx'
 
 // Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
 // остаются в базе нетронутыми, просто не показываются на странице.
@@ -13,8 +14,15 @@ const FIELDS = [
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
   'recapD1Img', // скриншот D1 в блоке Weekly Recap
+  'mistakesImgs', 'mistakesText', // «Какие ошибки я могу выделить?»
+  'goodImgs', 'goodText', // «В чём я молодец и сделал правильно?»
 ]
-const blank = { ...Object.fromEntries(FIELDS.map((k) => [k, ''])), updates: [] }
+const blank = {
+  ...Object.fromEntries(FIELDS.map((k) => [k, ''])),
+  updates: [],
+  mistakesImgs: [],
+  goodImgs: [],
+}
 
 // Название карточки-обновления: день, в который её создали
 const dayTitle = (ts) => {
@@ -57,6 +65,16 @@ function PlanEditor({ plan, onDelete }) {
   const shot = (key) => ({
     img: p[key + 'Img'],
     onImg: (v) => update({ [key + 'Img']: v }),
+  })
+
+  // Карточки-вопросы: несколько скриншотов + текст. Список берём из latest,
+  // чтобы быстрая вставка нескольких картинок не затирала друг друга.
+  const note = (key) => ({
+    imgs: p[key + 'Imgs'],
+    text: p[key + 'Text'],
+    onAdd: (urls) => update({ [key + 'Imgs']: [...latest.current[key + 'Imgs'], ...urls] }),
+    onRemoveAt: (i) => update({ [key + 'Imgs']: latest.current[key + 'Imgs'].filter((_, j) => j !== i) }),
+    onText: (v) => update({ [key + 'Text']: v }),
   })
 
   // Updates: всегда читаем свежий список из latest, чтобы быстрые правки не затирали друг друга
@@ -132,6 +150,22 @@ function PlanEditor({ plan, onDelete }) {
       <div className="row2">
         <ShotCard title="D1" {...shot('recapD1')} />
         <WeeklyRecap symbol={p.symbol} weekStart={plan.weekStart} />
+      </div>
+
+      <h4 className="subhead">Заметки и наблюдения в течение недели:</h4>
+      <div className="row2">
+        <NoteCard
+          title="Какие ошибки я могу выделить? Привели ли они к убыткам?"
+          tone="bad"
+          {...note('mistakes')}
+          placeholder="Твой ответ: что пошло не так и во сколько это обошлось"
+        />
+        <NoteCard
+          title="В чём я молодец и сделал правильно? Это дало заработать?"
+          tone="good"
+          {...note('good')}
+          placeholder="Твой ответ: что сработало и принесло результат"
+        />
       </div>
     </>
   )
