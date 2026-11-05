@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, createPlan, savePlan, removePlan } from '../db.js'
+import { db, createPlan, savePlan, removePlan, uuid } from '../db.js'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 
@@ -10,8 +10,16 @@ const FIELDS = [
   'symbol', 'result',
   'w1Img', 'w1Text', 'd1Img', 'd1Text', 'h4Img', 'h4Text',
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
+  'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
 ]
-const blank = Object.fromEntries(FIELDS.map((k) => [k, '']))
+const blank = { ...Object.fromEntries(FIELDS.map((k) => [k, ''])), updates: [] }
+
+// Название карточки-обновления: день, в который её создали
+const dayTitle = (ts) => {
+  const s = new Date(ts).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+const timeOf = (ts) => new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
 const pick = (p) => Object.fromEntries(FIELDS.map((k) => [k, p[k] ?? blank[k]]))
 
 function PlanEditor({ plan, onDelete }) {
@@ -50,6 +58,13 @@ function PlanEditor({ plan, onDelete }) {
     onText: (v) => update({ [key + 'Text']: v }),
   })
 
+  // Updates: всегда читаем свежий список из latest, чтобы быстрые правки не затирали друг друга
+  const addUpdate = () =>
+    update({ updates: [{ id: uuid(), createdAt: Date.now(), img: '', text: '' }, ...latest.current.updates] })
+  const patchUpdate = (id, patch) =>
+    update({ updates: latest.current.updates.map((u) => (u.id === id ? { ...u, ...patch } : u)) })
+  const removeUpdate = (id) => update({ updates: latest.current.updates.filter((u) => u.id !== id) })
+
   return (
     <>
       <div className="toolbar">
@@ -86,6 +101,31 @@ function PlanEditor({ plan, onDelete }) {
         <ShotCard title="До" {...shot('before')} placeholder="План до сессии: сценарии, вход, стоп, цель" />
         <ShotCard title="После" {...shot('after')} placeholder="Что произошло на самом деле, выводы" />
       </div>
+
+      <div className="section-row">
+        <h3 className="section-title">Updates</h3>
+        <button onClick={addUpdate}>+ Update</button>
+        <span className="hint">карточка создаётся с названием сегодняшнего дня</span>
+      </div>
+      {p.updates.length === 0 ? (
+        <div className="card empty">Обновлений пока нет. Нажми Update, чтобы добавить скриншот и заметку за сегодня.</div>
+      ) : (
+        <div className="row2">
+          {p.updates.map((u) => (
+            <ShotCard
+              key={u.id}
+              title={dayTitle(u.createdAt)}
+              subtitle={timeOf(u.createdAt)}
+              img={u.img}
+              text={u.text}
+              onImg={(v) => patchUpdate(u.id, { img: v })}
+              onText={(v) => patchUpdate(u.id, { text: v })}
+              onRemove={() => confirm('Удалить это обновление?') && removeUpdate(u.id)}
+              placeholder="Что изменилось, что видишь сейчас, план на сегодня"
+            />
+          ))}
+        </div>
+      )}
     </>
   )
 }

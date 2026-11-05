@@ -32,7 +32,7 @@ function imageFromClipboard(e) {
 
 // Карточка: заголовок, скриншот, текст.
 // Скриншот можно вставить Ctrl+V (когда курсор в карточке), перетащить файлом или выбрать.
-export default function ShotCard({ title, img, text, onImg, onText, placeholder }) {
+export default function ShotCard({ title, subtitle, onRemove, img, text, onImg, onText, placeholder }) {
   const fileRef = useRef(null)
   const [big, setBig] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -59,7 +59,12 @@ export default function ShotCard({ title, img, text, onImg, onText, placeholder 
 
   return (
     <section className="card shotcard" onPaste={onPaste}>
-      <h2>{title}</h2>
+      <div className="shot-head">
+        <h2>{title}</h2>
+        {subtitle && <span className="hint">{subtitle}</span>}
+        <span className="spacer" />
+        {onRemove && <button type="button" className="danger small" title="Удалить карточку" onClick={onRemove}>✕</button>}
+      </div>
       <div
         className={'shot' + (img ? ' has' : '')}
         onDragOver={(e) => e.preventDefault()}

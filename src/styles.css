@@ -191,3 +191,9 @@ select.res option { background: #1e2731; color: var(--text); }
 select.res option[value="profit"] { color: var(--green); }
 select.res option[value="loss"] { color: var(--red); }
 select.res option[value="be"] { color: var(--orange); }
+
+/* ===== Updates ===== */
+.shot-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.shot-head h2 { margin: 0; }
+.section-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0 10px; }
+.section-row .section-title { margin: 0; }

@@ -42,6 +42,7 @@ export default function Home({ go }) {
               {thumb && <img className="thumb" src={thumb} alt="" />}
               <div className="ex">{text || 'План ещё не написан'}</div>
               {items.length > 0 && <div className="hint">Чек-лист: {done}/{items.length}</div>}
+              {(p.updates || []).length > 0 && <div className="hint">Updates: {p.updates.length}</div>}
             </button>
           )
         })}
