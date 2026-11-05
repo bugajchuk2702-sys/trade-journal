@@ -40,8 +40,8 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --bg: #000000;
-    --surface: #1c1c1e;
+    --bg: #1c1c1e;
+    --surface: #2c2c2e;
     --surface-2: rgba(118, 118, 128, 0.24);
     --surface-3: rgba(118, 118, 128, 0.14);
     --text: #f5f5f7;
@@ -60,8 +60,8 @@
     --orange: #ff9f0a;
     --orange-fill: #ff9f0a;
     --orange-soft: rgba(255, 159, 10, 0.2);
-    --seg-active: #636366;
-    --nav-bg: rgba(0, 0, 0, 0.72);
+    --seg-active: #5a5a5f;
+    --nav-bg: rgba(28, 28, 30, 0.74);
     --shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.07);
     --shadow-hover: 0 0 0 0.5px rgba(255, 255, 255, 0.16), 0 16px 36px rgba(0, 0, 0, 0.6);
   }
@@ -69,8 +69,8 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #000000;
-  --surface: #1c1c1e;
+  --bg: #1c1c1e;
+  --surface: #2c2c2e;
   --surface-2: rgba(118, 118, 128, 0.24);
   --surface-3: rgba(118, 118, 128, 0.14);
   --text: #f5f5f7;
@@ -89,8 +89,8 @@
   --orange: #ff9f0a;
   --orange-fill: #ff9f0a;
   --orange-soft: rgba(255, 159, 10, 0.2);
-  --seg-active: #636366;
-  --nav-bg: rgba(0, 0, 0, 0.72);
+  --seg-active: #5a5a5f;
+  --nav-bg: rgba(28, 28, 30, 0.74);
   --shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.07);
   --shadow-hover: 0 0 0 0.5px rgba(255, 255, 255, 0.16), 0 16px 36px rgba(0, 0, 0, 0.6);
 }
