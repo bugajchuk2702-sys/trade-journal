@@ -16,6 +16,11 @@ db.version(2).stores({
   notes: 'id, updatedAt, deleted, synced',
 })
 
+// v3: планы теперь по инструментам (несколько планов на одну неделю)
+db.version(3).stores({
+  plans: 'id, weekStart, symbol, updatedAt, deleted, synced',
+})
+
 export const uuid = () =>
   crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)
 
@@ -44,22 +49,36 @@ export async function removeTrade(id) {
   await db.trades.update(id, { deleted: 1, updatedAt: Date.now(), synced: 0 })
 }
 
-/* ---------- Недельные планы (одна запись на неделю) ---------- */
+/* ---------- Недельные планы (по инструментам: BTC, EUR/USD и т.д.) ---------- */
 
-export async function savePlan(weekStart, data) {
-  const id = 'plan-' + weekStart
-  const existing = await db.plans.get(id)
+export async function createPlan(weekStart, symbol) {
   const now = Date.now()
-  await db.plans.put({
-    ...existing,
-    ...data,
-    id,
-    weekStart,
-    createdAt: existing?.createdAt ?? now,
-    deleted: 0,
+  const plan = {
+    id: uuid(),
+    weekStart, // понедельник недели, YYYY-MM-DD
+    symbol,
+    bias: '',
+    focus: '',
+    levels: '',
+    rules: '',
+    goals: '',
+    review: '',
+    checklist: [],
+    createdAt: now,
     updatedAt: now,
+    deleted: 0,
     synced: 0,
-  })
+  }
+  await db.plans.add(plan)
+  return plan
+}
+
+export async function savePlan(id, data) {
+  await db.plans.update(id, { ...data, updatedAt: Date.now(), synced: 0 })
+}
+
+export async function removePlan(id) {
+  await db.plans.update(id, { deleted: 1, updatedAt: Date.now(), synced: 0 })
 }
 
 /* ---------- Заметки ---------- */

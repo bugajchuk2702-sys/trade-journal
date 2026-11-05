@@ -125,3 +125,33 @@ body { overflow: hidden; }
 .note-item .s { font-size: 11px; color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .note-body { min-height: 260px; }
 @media (max-width: 800px) { .notes-layout { grid-template-columns: 1fr; } }
+
+/* ===== Главная и планы по инструментам ===== */
+.brand { background: transparent; color: var(--text); border: 0; padding: 12px 0; font-size: 15px; font-weight: 700; cursor: pointer; }
+.brand:hover { color: var(--accent); filter: none; }
+.brand.active { color: var(--accent); }
+
+.section-title { font-size: 15px; margin: 0 0 10px; }
+.plan-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.plan-card { text-align: left; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; font-weight: 400; min-height: 130px; cursor: pointer; }
+.plan-card:hover { border-color: var(--accent); filter: none; }
+.plan-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.plan-card .sym { font-size: 18px; font-weight: 700; }
+.plan-card .ex { color: var(--muted); font-size: 13px; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; white-space: pre-line; }
+.plan-card.add { align-items: center; justify-content: center; color: var(--muted); border-style: dashed; }
+.badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.badge.long { color: var(--green); border-color: var(--green); }
+.badge.short { color: var(--red); border-color: var(--red); }
+
+.dash { margin-top: 4px; }
+.dash-body { display: grid; grid-template-columns: minmax(380px, 5fr) 7fr; gap: 12px; height: 300px; }
+.dash-body .card { margin: 0; padding: 12px 14px; }
+@media (max-width: 900px) {
+  .dash-body { grid-template-columns: 1fr; height: auto; }
+}
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.chip { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; font-weight: 600; }
+.chip.active { border-color: var(--accent); color: var(--accent); }
+.chip.add { background: transparent; color: var(--muted); border-style: dashed; font-weight: 500; }
+.newplan .addrow { margin-top: 0; }

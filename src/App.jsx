@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, requestPersistentStorage } from './db.js'
-import Dashboard from './components/Dashboard.jsx'
+import Home from './pages/Home.jsx'
 import WeeklyPlan from './pages/WeeklyPlan.jsx'
 import Trades from './pages/Trades.jsx'
 import Mpa from './pages/Mpa.jsx'
@@ -13,16 +13,6 @@ const TABS = [
   { id: 'mpa', label: 'MPA', Page: Mpa },
   { id: 'notes', label: 'Notes', Page: Notes },
 ]
-
-function readTab() {
-  try {
-    const t = localStorage.getItem('tab')
-    if (TABS.some((x) => x.id === t)) return t
-  } catch {
-    /* ignore */
-  }
-  return TABS[0].id
-}
 
 function useOnline() {
   const [online, setOnline] = useState(navigator.onLine)
@@ -41,7 +31,9 @@ function useOnline() {
 
 export default function App() {
   const online = useOnline()
-  const [tab, setTab] = useState(readTab)
+  // Приложение всегда открывается на главной. params нужны, чтобы с карточки плана
+  // сразу попасть в нужный план на странице Weekly Plan.
+  const [view, setView] = useState({ tab: 'home', params: {} })
   const [persisted, setPersisted] = useState(null)
 
   useEffect(() => {
@@ -57,24 +49,22 @@ export default function App() {
     return a + b + c
   }, [], 0)
 
-  const go = (id) => {
-    setTab(id)
-    try {
-      localStorage.setItem('tab', id)
-    } catch {
-      /* ignore */
-    }
+  const go = (tab, params = {}) => {
+    setView({ tab, params })
+    document.querySelector('.main')?.scrollTo({ top: 0 })
   }
 
-  const { Page } = TABS.find((t) => t.id === tab)
+  const Page = view.tab === 'home' ? Home : TABS.find((t) => t.id === view.tab).Page
 
   return (
     <div className="shell">
       <header className="nav">
-        <div className="brand">📈 Журнал</div>
+        <button className={'brand' + (view.tab === 'home' ? ' active' : '')} onClick={() => go('home')} title="Главная">
+          📈 Журнал
+        </button>
         <nav className="tabs">
           {TABS.map((t) => (
-            <button key={t.id} className={'tab' + (t.id === tab ? ' active' : '')} onClick={() => go(t.id)}>
+            <button key={t.id} className={'tab' + (t.id === view.tab ? ' active' : '')} onClick={() => go(t.id)}>
               {t.label}
             </button>
           ))}
@@ -91,11 +81,9 @@ export default function App() {
 
       <main className="main">
         <div className="main-inner">
-          <Page />
+          <Page go={go} params={view.params} />
         </div>
       </main>
-
-      <Dashboard />
     </div>
   )
 }

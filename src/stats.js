@@ -25,7 +25,7 @@ export function summarize(trades) {
   const closed = trades
     .map((t) => ({ ...t, ...calcTrade(t) }))
     .filter((t) => t.closed)
-    .sort((a, b) => (a.closedAt || a.openedAt) - (b.closedAt || b.openedAt))
+    .sort((a, b) => (a.closedAt || a.openedAt) - (b.closedAt || b.openedAt) || (a.createdAt || 0) - (b.createdAt || 0))
 
   const wins = closed.filter((t) => t.pnl > 0)
   const losses = closed.filter((t) => t.pnl < 0)
