@@ -185,3 +185,9 @@ select.res.be { color: var(--orange); border-color: var(--orange); }
 .rdot.profit { background: var(--green); }
 .rdot.loss { background: var(--red); }
 .rdot.be { background: var(--orange); }
+
+/* Каждый пункт списка — своим цветом (иначе он наследует цвет выбранного) */
+select.res option { background: #1e2731; color: var(--text); }
+select.res option[value="profit"] { color: var(--green); }
+select.res option[value="loss"] { color: var(--red); }
+select.res option[value="be"] { color: var(--orange); }
