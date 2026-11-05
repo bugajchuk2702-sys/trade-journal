@@ -99,7 +99,7 @@ export default function ShotCard({ title, subtitle, onRemove, img, text, onImg, 
           }}
         />
       </div>
-      <textarea value={text} onChange={(e) => onText(e.target.value)} placeholder={placeholder} />
+      {onText && <textarea value={text} onChange={(e) => onText(e.target.value)} placeholder={placeholder} />}
       {big && img && (
         <div className="lightbox" onClick={() => setBig(false)}>
           <img src={img} alt={title} />

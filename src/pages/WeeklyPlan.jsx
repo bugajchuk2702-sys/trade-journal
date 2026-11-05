@@ -50,12 +50,11 @@ function PlanEditor({ plan, onDelete }) {
     }, 500)
   }
 
-  // Пропсы для карточки: ключ-префикс (w1, d1, h4, before, after)
+  // Карточки W1, D1, H4, До, После — только скриншот (без текста).
+  // Текстовые поля остаются только в карточках Updates.
   const shot = (key) => ({
     img: p[key + 'Img'],
-    text: p[key + 'Text'],
     onImg: (v) => update({ [key + 'Img']: v }),
-    onText: (v) => update({ [key + 'Text']: v }),
   })
 
   // Updates: всегда читаем свежий список из latest, чтобы быстрые правки не затирали друг друга
@@ -91,15 +90,15 @@ function PlanEditor({ plan, onDelete }) {
 
       <h3 className="section-title">Pre-Session</h3>
       <div className="row3">
-        <ShotCard title="W1" {...shot('w1')} placeholder="Недельный график: структура, ключевые уровни, контекст" />
-        <ShotCard title="D1" {...shot('d1')} placeholder="Дневной график: структура, зоны, куда идёт цена" />
-        <ShotCard title="H4" {...shot('h4')} placeholder="H4: ближайшие уровни, где ищу вход" />
+        <ShotCard title="W1" {...shot('w1')} />
+        <ShotCard title="D1" {...shot('d1')} />
+        <ShotCard title="H4" {...shot('h4')} />
       </div>
 
       <h3 className="section-title">Plan</h3>
       <div className="row2">
-        <ShotCard title="До" {...shot('before')} placeholder="План до сессии: сценарии, вход, стоп, цель" />
-        <ShotCard title="После" {...shot('after')} placeholder="Что произошло на самом деле, выводы" />
+        <ShotCard title="До" {...shot('before')} />
+        <ShotCard title="После" {...shot('after')} />
       </div>
 
       <div className="section-row">

@@ -29,7 +29,8 @@ export default function Home({ go }) {
           const items = p.checklist || []
           const done = items.filter((x) => x.done).length
           const bias = RESULT[p.result]
-          const text = [p.beforeText, p.h4Text, p.d1Text, p.w1Text, p.focus, p.levels]
+          // Заметка с карточки: сначала самое свежее обновление, потом старые текстовые поля
+          const text = [p.updates?.[0]?.text, p.beforeText, p.h4Text, p.d1Text, p.w1Text, p.focus, p.levels]
             .map((s) => (s || '').trim())
             .find(Boolean)
           const thumb = p.beforeImg || p.h4Img || p.d1Img || p.w1Img
@@ -40,7 +41,7 @@ export default function Home({ go }) {
                 {bias && <span className={'badge ' + bias[1]}>{bias[0]}</span>}
               </div>
               {thumb && <img className="thumb" src={thumb} alt="" />}
-              <div className="ex">{text || 'План ещё не написан'}</div>
+              {(text || !thumb) && <div className="ex">{text || 'Скриншотов и заметок пока нет'}</div>}
               {items.length > 0 && <div className="hint">Чек-лист: {done}/{items.length}</div>}
               {(p.updates || []).length > 0 && <div className="hint">Updates: {p.updates.length}</div>}
             </button>
