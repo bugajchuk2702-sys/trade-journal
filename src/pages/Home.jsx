@@ -28,13 +28,17 @@ export default function Home({ go }) {
           const items = p.checklist || []
           const done = items.filter((x) => x.done).length
           const bias = BIAS[p.bias]
-          const text = (p.focus || '').trim() || (p.levels || '').trim()
+          const text = [p.beforeText, p.h4Text, p.d1Text, p.w1Text, p.focus, p.levels]
+            .map((s) => (s || '').trim())
+            .find(Boolean)
+          const thumb = p.beforeImg || p.h4Img || p.d1Img || p.w1Img
           return (
             <button key={p.id} className="plan-card" onClick={() => go('plan', { weekStart: ws, planId: p.id })}>
               <div className="plan-card-head">
                 <span className="sym">{p.symbol || 'Общий план'}</span>
                 {bias && <span className={'badge ' + bias[1]}>{bias[0]}</span>}
               </div>
+              {thumb && <img className="thumb" src={thumb} alt="" />}
               <div className="ex">{text || 'План ещё не написан'}</div>
               {items.length > 0 && <div className="hint">Чек-лист: {done}/{items.length}</div>}
             </button>

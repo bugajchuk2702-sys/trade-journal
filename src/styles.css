@@ -155,3 +155,20 @@ body { overflow: hidden; }
 .chip.active { border-color: var(--accent); color: var(--accent); }
 .chip.add { background: transparent; color: var(--muted); border-style: dashed; font-weight: 500; }
 .newplan .addrow { margin-top: 0; }
+
+/* ===== Weekly Plan: Pre-Session и Plan ===== */
+.row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
+.row2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 22px; }
+.row3 .card, .row2 .card { margin: 0; min-width: 0; }
+@media (max-width: 900px) { .row3, .row2 { grid-template-columns: 1fr; } }
+
+.shotcard textarea { min-height: 78px; }
+.shot { border: 1px dashed var(--border); border-radius: 8px; min-height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 10px; background: var(--panel2); }
+.shot.has { border-style: solid; padding: 6px; }
+.shot img { width: 100%; max-height: 280px; object-fit: contain; cursor: zoom-in; border-radius: 6px; }
+.shot-empty { text-align: center; color: var(--muted); padding: 16px; width: 100%; min-height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border-radius: 8px; }
+.shot-empty:focus { outline: 2px solid var(--accent); outline-offset: -2px; color: var(--text); }
+.shot-actions { display: flex; gap: 6px; margin-top: 6px; align-self: flex-end; }
+.lightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88); display: flex; align-items: center; justify-content: center; z-index: 50; cursor: zoom-out; padding: 20px; }
+.lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.plan-card .thumb { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }

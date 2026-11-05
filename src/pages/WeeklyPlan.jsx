@@ -1,15 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, createPlan, savePlan, removePlan, uuid } from '../db.js'
+import { db, createPlan, savePlan, removePlan } from '../db.js'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
+import ShotCard from '../components/ShotCard.jsx'
 
-const FIELDS = ['symbol', 'bias', 'focus', 'levels', 'rules', 'goals', 'review', 'checklist']
-const blank = { symbol: '', bias: '', focus: '', levels: '', rules: '', goals: '', review: '', checklist: [] }
+// Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
+// остаются в базе нетронутыми, просто не показываются на странице.
+const FIELDS = [
+  'symbol', 'bias',
+  'w1Img', 'w1Text', 'd1Img', 'd1Text', 'h4Img', 'h4Text',
+  'beforeImg', 'beforeText', 'afterImg', 'afterText',
+]
+const blank = Object.fromEntries(FIELDS.map((k) => [k, '']))
 const pick = (p) => Object.fromEntries(FIELDS.map((k) => [k, p[k] ?? blank[k]]))
 
 function PlanEditor({ plan, onDelete }) {
   const [p, setP] = useState(() => pick(plan))
-  const [newItem, setNewItem] = useState('')
   const latest = useRef(p)
   const timer = useRef(null)
 
@@ -36,16 +42,13 @@ function PlanEditor({ plan, onDelete }) {
     }, 500)
   }
 
-  const text = (key) => ({ value: p[key], onChange: (e) => update({ [key]: e.target.value }) })
-
-  const addItem = () => {
-    const t = newItem.trim()
-    if (!t) return
-    update({ checklist: [...p.checklist, { id: uuid(), text: t, done: false }] })
-    setNewItem('')
-  }
-
-  const done = p.checklist.filter((x) => x.done).length
+  // Пропсы для карточки: ключ-префикс (w1, d1, h4, before, after)
+  const shot = (key) => ({
+    img: p[key + 'Img'],
+    text: p[key + 'Text'],
+    onImg: (v) => update({ [key + 'Img']: v }),
+    onText: (v) => update({ [key + 'Text']: v }),
+  })
 
   return (
     <>
@@ -66,50 +69,17 @@ function PlanEditor({ plan, onDelete }) {
         <button className="danger" onClick={() => confirm('Удалить этот план?') && onDelete()}>Удалить план</button>
       </div>
 
-      <div className="grid2">
-        <section className="card">
-          <h2>Фокус недели / идея</h2>
-          <textarea {...text('focus')} placeholder="Что главное по этому инструменту на неделю? Какой взгляд?" />
-        </section>
-        <section className="card">
-          <h2>Ключевые уровни и сценарии</h2>
-          <textarea {...text('levels')} placeholder="Уровни, зоны, если/то сценарии" />
-        </section>
-        <section className="card">
-          <h2>Правила</h2>
-          <textarea {...text('rules')} placeholder="Чего не делаю, лимиты на сделки и убыток" />
-        </section>
-        <section className="card">
-          <h2>Цели</h2>
-          <textarea {...text('goals')} placeholder="Процессные цели, не только деньги" />
-        </section>
-        <section className="card">
-          <h2>Чек-лист {p.checklist.length > 0 && <span className="hint">({done}/{p.checklist.length})</span>}</h2>
-          {p.checklist.map((it) => (
-            <div className={'check' + (it.done ? ' done' : '')} key={it.id}>
-              <input
-                type="checkbox"
-                checked={it.done}
-                onChange={() => update({ checklist: p.checklist.map((x) => (x.id === it.id ? { ...x, done: !x.done } : x)) })}
-              />
-              <span>{it.text}</span>
-              <button className="danger small" onClick={() => update({ checklist: p.checklist.filter((x) => x.id !== it.id) })}>✕</button>
-            </div>
-          ))}
-          <div className="addrow">
-            <input
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addItem()}
-              placeholder="Новый пункт, Enter чтобы добавить"
-            />
-            <button onClick={addItem}>+</button>
-          </div>
-        </section>
-        <section className="card">
-          <h2>Итоги недели</h2>
-          <textarea {...text('review')} placeholder="Что получилось, какие ошибки, выводы" />
-        </section>
+      <h3 className="section-title">Pre-Session</h3>
+      <div className="row3">
+        <ShotCard title="W1" {...shot('w1')} placeholder="Недельный график: структура, ключевые уровни, контекст" />
+        <ShotCard title="D1" {...shot('d1')} placeholder="Дневной график: структура, зоны, куда идёт цена" />
+        <ShotCard title="H4" {...shot('h4')} placeholder="H4: ближайшие уровни, где ищу вход" />
+      </div>
+
+      <h3 className="section-title">Plan</h3>
+      <div className="row2">
+        <ShotCard title="До" {...shot('before')} placeholder="План до сессии: сценарии, вход, стоп, цель" />
+        <ShotCard title="После" {...shot('after')} placeholder="Что произошло на самом деле, выводы" />
       </div>
     </>
   )
