@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, createPlan, savePlan, removePlan, uuid } from '../db.js'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
+import WeeklyRecap from '../components/WeeklyRecap.jsx'
 
 // Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
 // остаются в базе нетронутыми, просто не показываются на странице.
@@ -11,6 +12,7 @@ const FIELDS = [
   'w1Img', 'w1Text', 'd1Img', 'd1Text', 'h4Img', 'h4Text',
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
+  'recapD1Img', // скриншот D1 в блоке Weekly Recap
 ]
 const blank = { ...Object.fromEntries(FIELDS.map((k) => [k, ''])), updates: [] }
 
@@ -125,6 +127,12 @@ function PlanEditor({ plan, onDelete }) {
           ))}
         </div>
       )}
+
+      <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Recap</h3>
+      <div className="row2">
+        <ShotCard title="D1" {...shot('recapD1')} />
+        <WeeklyRecap symbol={p.symbol} weekStart={plan.weekStart} />
+      </div>
     </>
   )
 }

@@ -197,3 +197,11 @@ select.res option[value="be"] { color: var(--orange); }
 .shot-head h2 { margin: 0; }
 .section-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0 10px; }
 .section-row .section-title { margin: 0; }
+
+/* ===== Weekly Recap ===== */
+.recap-metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px 14px; margin-bottom: 14px; }
+.recap-metrics .m { min-width: 0; }
+.recap-metrics .l { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recap-metrics .v { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.recap table { font-size: 13px; }
+.recap .empty { padding: 40px 0; }
