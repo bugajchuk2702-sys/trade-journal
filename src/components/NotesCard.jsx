@@ -3,11 +3,10 @@ import { toDataUrl } from './ShotCard.jsx'
 
 const isImage = (f) => f && f.type && f.type.startsWith('image/')
 
-// Карточка-заметка с «тихой» вставкой скриншотов: никакой видимой зоны загрузки.
-// Нажми Ctrl+V прямо в текстовом поле (или перетащи картинку в него) — скриншот
-// сохранится, а над полем появится кнопка «📎 Скриншоты: N», которая раскрывает галерею.
+// Карточка-заметка с «тихой» вставкой скриншотов: никакой зоны загрузки.
+// Нажми Ctrl+V прямо в текстовом поле (или перетащи картинку в него) —
+// скриншот появится под текстом в среднем размере.
 export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt, placeholder }) {
-  const [open, setOpen] = useState(false)
   const [big, setBig] = useState(null)
   const [busy, setBusy] = useState(false)
   const list = imgs || []
@@ -50,12 +49,7 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
     <section className="card weeknotes">
       <div className="shot-head">
         <h2>{title}</h2>
-        <span className="spacer" />
-        {(list.length > 0 || busy) && (
-          <button type="button" className="ghost small" onClick={() => setOpen((o) => !o)}>
-            {busy ? 'Добавляю…' : `📎 Скриншоты: ${list.length} ${open ? '▴' : '▾'}`}
-          </button>
-        )}
+        {busy && <span className="hint">Добавляю скриншот…</span>}
       </div>
 
       <textarea
@@ -67,8 +61,8 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
         placeholder={placeholder}
       />
 
-      {open && list.length > 0 && (
-        <div className="gallery" style={{ marginTop: 10, marginBottom: 0 }}>
+      {list.length > 0 && (
+        <div className="gallery-md">
           {list.map((src, i) => (
             <div className="g-item" key={i}>
               <img src={src} alt={`Скриншот ${i + 1}`} onClick={() => setBig(src)} title="Нажми, чтобы открыть крупно" />

@@ -222,3 +222,8 @@ select.res option[value="be"] { color: var(--orange); }
 /* Карточка «Заметки недели» — только текст, на всю ширину */
 .weeknotes { margin-bottom: 14px; }
 .weeknotes textarea { min-height: 130px; }
+
+/* Скриншоты под текстом заметок: всегда видны, средний размер (по 2 в ряд на широком экране) */
+.gallery-md { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 12px; margin-top: 12px; }
+.gallery-md .g-item { aspect-ratio: auto; background: var(--panel2); }
+.gallery-md .g-item img { width: 100%; height: auto; max-height: 380px; object-fit: contain; display: block; }
