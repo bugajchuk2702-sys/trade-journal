@@ -71,19 +71,17 @@ function TradeRow({ t, n, onOpen }) {
 // Трейды плана — компактный список в стиле Notion
 function TradesList({ trades, onAdd, onOpen }) {
   const ordered = [...trades].sort((a, b) => a.openedAt - b.openedAt || (a.createdAt || 0) - (b.createdAt || 0))
+  // Пока из плана не добавлено ни одного трейда, блок не показываем
+  if (ordered.length === 0) return null
   return (
     <section className="tlist" aria-label="Трейды плана">
       <div className="tlist-head">
         <span>Trades</span>
-        {ordered.length > 0 && <span className="tlist-count">{ordered.length}</span>}
+        <span className="tlist-count">{ordered.length}</span>
         <span className="spacer" />
         <button type="button" className="tlist-add" onClick={onAdd} title="Добавить трейд" aria-label="Добавить трейд">+</button>
       </div>
-      {ordered.length === 0 ? (
-        <div className="tlist-empty">Трейдов пока нет</div>
-      ) : (
-        ordered.map((t, i) => <TradeRow key={t.id} t={t} n={i + 1} onOpen={onOpen} />)
-      )}
+      {ordered.map((t, i) => <TradeRow key={t.id} t={t} n={i + 1} onOpen={onOpen} />)}
     </section>
   )
 }
