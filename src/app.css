@@ -1029,3 +1029,12 @@ select.res.profit { color: var(--green); } select.res.loss { color: var(--red); 
 form.trade .trade-shots { align-items: stretch; }
 .modal { max-width: 1100px; }
 @media (max-width: 760px) { .trade-shots { grid-template-columns: repeat(2, 1fr); } }
+
+/* Форма трейда: W1 / D1 / H4 в ряд, Result под ними шириной в половину ряда */
+.trade-shots { grid-template-columns: repeat(6, 1fr); }
+.trade-shots > .card { grid-column: span 2; }
+.trade-shots > .card:nth-child(4) { grid-column: 1 / span 3; }
+@media (max-width: 760px) {
+  .trade-shots { grid-template-columns: 1fr; }
+  .trade-shots > .card, .trade-shots > .card:nth-child(4) { grid-column: 1; }
+}
