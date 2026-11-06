@@ -1178,3 +1178,12 @@ form.trade label > .symbox input { font-weight: 500; }
 :root[data-style='cyber'] form.trade input::placeholder, :root[data-style='cyber'] form.trade .pbtn:not(.set) { color: var(--text-3); font-weight: 400; }
 form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
 .form-sec, .params-head, :root[data-style='cyber'] .params-head { font-size: 16px; }
+
+/* Cyber: плюс — зелёный, минус — красный (перебивает общий цвет текста ячеек и метрик) */
+:root[data-style='cyber'] td.pos, :root[data-style='cyber'] .metrics .v.pos, :root[data-style='cyber'] .recap-metrics .v.pos,
+:root[data-style='cyber'] .pos { color: var(--green); }
+:root[data-style='cyber'] td.neg, :root[data-style='cyber'] .metrics .v.neg, :root[data-style='cyber'] .recap-metrics .v.neg,
+:root[data-style='cyber'] .neg { color: var(--red); }
+
+/* Cyber: настоящий зелёный для плюса (не бирюзовый) */
+:root[data-style='cyber'] { --green: #5ccf7f; --green-fill: #5ccf7f; --green-soft: rgba(92, 207, 127, 0.15); }
