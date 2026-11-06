@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, createPlan, savePlan, removePlan, addTrade, updateTrade, uuid } from '../db.js'
-import { calcTrade, fmt } from '../stats.js'
+import { calcTrade, fmt, hasResult } from '../stats.js'
 import { emptyForm, tradeToForm } from './Trades.jsx'
 import TradeModal from '../components/TradeModal.jsx'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
@@ -42,7 +42,7 @@ const TAG_TINT = { BTC: '247,147,26', XAUUSD: '240,180,36', EURUSD: '70,110,220'
 
 function TradeRow({ t, n, onOpen }) {
   const c = calcTrade(t)
-  const hasNums = t.entry !== '' && t.entry != null
+  const hasNums = hasResult(t)
   const res = !c.closed ? 'open' : c.pnl > 0 ? 'win' : c.pnl < 0 ? 'loss' : 'be'
   const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]
   const tint = TAG_TINT[norm(t.symbol)]

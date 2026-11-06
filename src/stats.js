@@ -1,5 +1,19 @@
 // Расчёты по сделке. Универсальная формула: работает для крипты, акций, форекса (если size — в единицах актива)
+const has = (v) => v !== '' && v != null && isFinite(Number(v))
+
+// Есть ли у сделки результат: новый (PnL в $) или старый (цены входа / выхода)
+export const hasResult = (t) => has(t.pnlUsd) || has(t.entry)
+
 export function calcTrade(t) {
+  // Новая схема: PnL в долларах, риск в % от счёта, размер счёта запоминается в сделке
+  if (has(t.pnlUsd)) {
+    const pnl = Number(t.pnlUsd)
+    const acc = Number(t.accountSize)
+    const risk = Number(t.riskPct)
+    const netPct = acc > 0 ? (pnl / acc) * 100 : null
+    const r = acc > 0 && risk > 0 ? pnl / ((acc * risk) / 100) : null
+    return { closed: true, pnl, r, netPct }
+  }
   const entry = Number(t.entry)
   const exit = t.exit === '' || t.exit == null ? null : Number(t.exit)
   const size = Number(t.size)
@@ -8,7 +22,7 @@ export function calcTrade(t) {
   const dir = t.side === 'short' ? -1 : 1
 
   if (exit == null || !isFinite(exit)) {
-    return { closed: false, pnl: null, r: null }
+    return { closed: false, pnl: null, r: null, netPct: null }
   }
   const gross = (exit - entry) * size * dir
   const pnl = gross - fees
@@ -18,7 +32,7 @@ export function calcTrade(t) {
     const risk = Math.abs(entry - stop) * size
     if (risk > 0) r = pnl / risk
   }
-  return { closed: true, pnl, r }
+  return { closed: true, pnl, r, netPct: null }
 }
 
 export function summarize(trades) {

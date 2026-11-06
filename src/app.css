@@ -1106,3 +1106,14 @@ form.trade .trade-shots { align-items: stretch; }
 :root[data-style='cyber'] .popt.sel { color: var(--accent); background: var(--accent-soft); }
 :root[data-style='cyber'] .pbtn:focus-visible, :root[data-style='cyber'] .pbtn[aria-expanded='true'] { box-shadow: inset 0 -2px 0 var(--accent); }
 :root[data-style='cyber'] input:focus, :root[data-style='cyber'] select:focus, :root[data-style='cyber'] textarea:focus { box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* Net Result и пустое состояние списка счетов */
+.netres { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.netres-val { display: flex; align-items: center; gap: 8px; min-height: 41px; padding: 0 12px; border-radius: 10px; background: var(--surface-3); font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.netres-val i { font-style: normal; color: var(--text-3); }
+.netres-val.pos { color: var(--green); }
+.netres-val.neg { color: var(--red); }
+.pempty { padding: 10px; font-size: 13px; color: var(--text-3); }
+.psub { margin-left: 8px; font-size: 12.5px; color: var(--text-3); font-weight: 500; }
+:root[data-style='cyber'] .netres-val { border-radius: 0; background: rgba(255, 255, 255, 0.03); box-shadow: inset 0 -1px 0 var(--line); }
+:root[data-style='cyber'] .plabel { text-transform: none; }

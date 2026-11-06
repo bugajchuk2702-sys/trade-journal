@@ -24,7 +24,7 @@ export function useParamOptions() {
   return { get, save }
 }
 
-function ParamPicker({ label, value, options, onChange, onAdd, onRemove }) {
+export function ParamPicker({ label, value, options, onChange, onAdd, onRemove }) {
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState('')
   const wrap = useRef(null)
@@ -106,6 +106,90 @@ export default function ParamsBlock({ value, onChange }) {
               />
             )
           })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Стиль сделки — тот же выпадающий список, но вынесен в верхний ряд формы
+const STYLE = { key: 'style', label: 'Стиль', defaults: ['Swing', 'Intraweek'] }
+
+export function StylePicker({ value, onChange }) {
+  const { get, save } = useParamOptions()
+  const opts = get(STYLE)
+  return (
+    <ParamPicker
+      label={STYLE.label}
+      value={value || ''}
+      options={opts}
+      onChange={onChange}
+      onAdd={(x) => !opts.includes(x) && save(STYLE.key, [...opts, x])}
+      onRemove={(x) => save(STYLE.key, opts.filter((o) => o !== x))}
+    />
+  )
+}
+
+// Проп-счета: название + размер. Размер нужен, чтобы считать Net Result в % и Risk Reward.
+const ACC_KEY = 'accounts'
+
+export function AccountPicker({ value, onChange }) {
+  const row = useLiveQuery(() => db.meta.get(ACC_KEY), [], undefined)
+  const list = row?.value || []
+  const saveList = (v) => db.meta.put({ key: ACC_KEY, value: v })
+  const [open, setOpen] = useState(false)
+  const [name, setName] = useState('')
+  const [size, setSize] = useState('')
+  const wrap = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const off = (e) => { if (wrap.current && !wrap.current.contains(e.target)) setOpen(false) }
+    const esc = (e) => { if (e.key === 'Escape') { e.stopPropagation(); setOpen(false) } }
+    document.addEventListener('mousedown', off)
+    document.addEventListener('keydown', esc, true)
+    return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc, true) }
+  }, [open])
+
+  const pick = (a) => { onChange(a ? a.name : '', a ? a.size : ''); setOpen(false) }
+  const add = () => {
+    const n = name.trim()
+    const sz = Number(String(size).replace(',', '.'))
+    if (!n || !(sz > 0)) return
+    const acc = { name: n, size: sz }
+    saveList([...list.filter((a) => a.name !== n), acc])
+    setName('')
+    setSize('')
+    pick(acc)
+  }
+  const fmtSize = (n) => Number(n).toLocaleString('ru-RU') + ' $'
+
+  return (
+    <div className="pbox" ref={wrap}>
+      <span className="plabel">Account</span>
+      <button type="button" className={'pbtn' + (value ? ' set' : '')} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span>{value || 'Выбрать'}</span>
+        <svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      {open && (
+        <div className="plist" role="listbox">
+          <div className="plist-items">
+            {value && <button type="button" className="popt clear" onClick={() => pick(null)}>Очистить</button>}
+            {list.length === 0 && <div className="pempty">Счетов пока нет. Добавь первый ниже.</div>}
+            {list.map((a) => (
+              <div className="prow" key={a.name}>
+                <button type="button" role="option" aria-selected={a.name === value} className={'popt' + (a.name === value ? ' sel' : '')} onClick={() => pick(a)}>
+                  {a.name} <span className="psub">{fmtSize(a.size)}</span>
+                </button>
+                <button type="button" className="pdel" title="Удалить счёт" aria-label={'Удалить ' + a.name} onClick={() => saveList(list.filter((x) => x.name !== a.name))}>✕</button>
+              </div>
+            ))}
+          </div>
+          <div className="padd">
+            <input value={name} placeholder="Название" onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
+            <input value={size} placeholder="Размер, $" inputMode="decimal" style={{ maxWidth: 110 }} onChange={(e) => setSize(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
+            <button type="button" className="small" onClick={add} disabled={!name.trim() || !(Number(String(size).replace(',', '.')) > 0)}>+</button>
+          </div>
         </div>
       )}
     </div>

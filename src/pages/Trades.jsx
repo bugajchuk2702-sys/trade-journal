@@ -1,10 +1,10 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
-import { calcTrade, fmt } from '../stats.js'
+import { calcTrade, fmt, hasResult } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import ShotCard from '../components/ShotCard.jsx'
-import ParamsBlock from '../components/Params.jsx'
+import ParamsBlock, { StylePicker, AccountPicker } from '../components/Params.jsx'
 
 export const toLocalInput = (ts) => {
   const d = new Date(ts)
@@ -17,6 +17,11 @@ export const emptyForm = () => ({
   side: 'long',
   openedAt: toLocalInput(Date.now()),
   closedAt: '',
+  style: '',
+  account: '',
+  accountSize: '',
+  riskPct: '',
+  pnlUsd: '',
   params: {},
   w1: '',
   d1: '',
@@ -35,9 +40,12 @@ export const tradeToForm = (t) => ({
   closedAt: t.closedAt ? toLocalInput(t.closedAt) : '',
 })
 
+const signed = (n, d = 2, suffix = '') => (n == null || !isFinite(n) ? '—' : (n > 0 ? '+' : '') + fmt(n, d) + suffix)
+
 export function TradeForm({ initial, onSubmit, onCancel }) {
   const [f, setF] = useState(initial || emptyForm())
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
+  const net = calcTrade({ pnlUsd: f.pnlUsd, accountSize: f.accountSize, riskPct: f.riskPct })
 
   const submit = (e) => {
     e.preventDefault()
@@ -46,6 +54,11 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       side: f.side,
       openedAt: f.openedAt ? new Date(f.openedAt).getTime() : Date.now(),
       closedAt: f.closedAt ? new Date(f.closedAt).getTime() : null,
+      style: f.style,
+      account: f.account,
+      accountSize: f.accountSize,
+      riskPct: f.riskPct,
+      pnlUsd: f.pnlUsd,
       params: f.params || {},
       w1: f.w1,
       d1: f.d1,
@@ -73,6 +86,22 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       <label>Закрыта
         <input type="datetime-local" value={f.closedAt} onChange={set('closedAt')} />
       </label>
+      <StylePicker value={f.style} onChange={(v) => setF((x) => ({ ...x, style: v }))} />
+      <AccountPicker value={f.account} onChange={(name, size) => setF((x) => ({ ...x, account: name, accountSize: size }))} />
+      <label>Risk, %
+        <input type="number" step="any" min="0" value={f.riskPct} onChange={set('riskPct')} placeholder="0.5" />
+      </label>
+      <label>PNL, $
+        <input type="number" step="any" value={f.pnlUsd} onChange={set('pnlUsd')} placeholder="0" />
+      </label>
+      <div className="netres">
+        <span className="plabel">Net Result</span>
+        <div className={'netres-val ' + (net.pnl > 0 ? 'pos' : net.pnl < 0 ? 'neg' : '')}>
+          {signed(net.netPct, 2, '%')}
+          <i>·</i>
+          {net.r == null ? '—' : fmt(net.r, 2) + ' RR'}
+        </div>
+      </div>
       <ParamsBlock value={f.params} onChange={(v) => setF((x) => ({ ...x, params: v }))} />
       <div className="wide trade-shots">
         <ShotCard title="W1" img={f.w1} onImg={(v) => setF((x) => ({ ...x, w1: v }))} />
@@ -105,7 +134,7 @@ export default function Trades() {
   }, [trades, query])
 
   // Колонки PnL / R нужны только для старых сделок, где ещё были цены
-  const hasNums = filtered.some((t) => t.entry !== '' && t.entry != null)
+  const hasNums = filtered.some(hasResult)
 
   const doExport = async () => {
     const blob = new Blob([await exportJson()], { type: 'application/json' })
@@ -167,6 +196,7 @@ export default function Trades() {
                   <th className="left">Инструмент</th>
                   <th className="left">Сторона</th>
                   {hasNums && <th>PnL</th>}
+                  {hasNums && <th>Net</th>}
                   {hasNums && <th>R</th>}
                   <th className="left">Скриншоты</th>
                   <th />
@@ -181,6 +211,7 @@ export default function Trades() {
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) : '—'}</td>}
+                      {hasNums && <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>}
                       {hasNums && <td className={sign(c.r)}>{fmt(c.r)}</td>}
                       <td className="left">
                         {[['W1', t.w1], ['D1', t.d1], ['H4', t.h4], ['Result', t.resultImg]].filter(([, v]) => v).map(([k]) => (
