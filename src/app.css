@@ -824,3 +824,7 @@ button { white-space: nowrap; }
 .symbox-input::selection { background: transparent; }
 .symbox-chev { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; transition: transform 0.15s; }
 .symbox:focus-within .symbox-chev { color: var(--text-2); }
+
+/* Линия под названием карточки (W1, D1, H4, До, После…), отделяет заголовок от скриншота */
+.shot-head { padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+:root[data-style='cyber'] .shot-head { border-bottom-color: var(--line-2); }
