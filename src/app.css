@@ -1131,3 +1131,38 @@ form.trade .trade-shots { align-items: stretch; }
 
 .chip-n { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 2px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); font-size: 11.5px; font-weight: 700; letter-spacing: 0; }
 :root[data-style='cyber'] .chip-n { border-radius: 0; background: var(--accent); color: #1a1a14; }
+
+/* ===== Форма трейда: единая сетка 12 колонок (= три колонки, как у Parameters и скриншотов) ===== */
+form.trade { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; align-items: end; }
+form.trade > .c4 { grid-column: span 4; min-width: 0; }
+form.trade > .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: end; }
+form.trade > .pair label { min-width: 0; }
+.trade-shots { gap: 16px; }
+.params-grid { gap: 14px 16px; }
+
+.form-sec { display: flex; align-items: center; gap: 14px; margin-top: 10px; font-size: 14px; font-weight: 700; letter-spacing: 0; color: var(--text-2); }
+.form-sec::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+form.trade > .form-sec:first-child { margin-top: 0; }
+:root[data-style='cyber'] .form-sec { color: var(--accent); }
+
+/* Parameters — тот же вид заголовка раздела, но сворачивается */
+.params-head { display: flex; align-items: center; gap: 14px; width: 100%; margin: 10px 0 14px; padding: 0; }
+.params-head::after { content: ''; flex: 1; height: 1px; background: var(--line); order: 1; }
+.params-head svg { order: 0; }
+:root[data-style='cyber'] .params-head { width: 100%; padding: 0; margin: 10px 0 14px; }
+
+.netres-val { min-height: 41px; font-size: 16px; }
+.pbox, .netres { width: 100%; }
+
+@media (max-width: 760px) {
+  form.trade > .c4 { grid-column: span 12; }
+  form.trade > .pair { grid-template-columns: 1fr 1fr; }
+}
+
+/* Одинаковая высота всех полей формы — подписи и поля встают в одну линию */
+form.trade input:not([type='file']):not([type='checkbox']),
+form.trade select,
+form.trade .pbtn,
+form.trade .netres-val { height: 42px; min-height: 42px; box-sizing: border-box; }
+form.trade .symbox input { height: 42px; }
+form.trade .pbox, form.trade .netres, form.trade label { justify-content: flex-end; }

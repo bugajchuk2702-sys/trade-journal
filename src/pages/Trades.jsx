@@ -74,30 +74,39 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
 
   return (
     <form className="trade" onSubmit={submit}>
-      <label>Инструмент
+      <label className="c4">Инструмент
         <SymbolInput required value={f.symbol} onChange={(v) => set('symbol')({ target: { value: v } })} placeholder="Выбери" />
       </label>
-      <label>Направление
+      <label className="c4">Направление
         <select value={f.side} onChange={set('side')}>
           <option value="long">Лонг</option>
           <option value="short">Шорт</option>
         </select>
       </label>
-      <label>Открыта
+      <label className="c4">Открыта
         <input type="datetime-local" value={f.openedAt} onChange={set('openedAt')} />
       </label>
-      <label>Закрыта
+      <label className="c4">Закрыта
         <input type="datetime-local" value={f.closedAt} onChange={set('closedAt')} />
       </label>
-      <StylePicker value={f.style} onChange={(v) => setF((x) => ({ ...x, style: v }))} />
-      <AccountPicker value={f.account} onChange={(name, size) => setF((x) => ({ ...x, account: name, accountSize: size }))} />
-      <label>Risk, %
-        <input type="text" inputMode="decimal" autoComplete="off" value={f.riskPct} onChange={set('riskPct')} placeholder="0.5" />
-      </label>
-      <label>PNL, $
-        <input type="text" inputMode="decimal" autoComplete="off" value={f.pnlUsd} onChange={set('pnlUsd')} placeholder="0" />
-      </label>
-      <div className="netres">
+      <div className="c4"><StylePicker value={f.style} onChange={(v) => setF((x) => ({ ...x, style: v }))} /></div>
+      <div className="c4">
+        {hidePlan
+          ? <div className="pbox"><span className="plabel">План недели</span><div className="pbtn set" style={{ cursor: 'default' }}><span>Этот план</span></div></div>
+          : <PlanPicker value={f.planId} symbol={f.symbol} onChange={(v) => setF((x) => ({ ...x, planId: v }))} />}
+      </div>
+
+      <div className="wide form-sec">Результат</div>
+      <div className="c4"><AccountPicker value={f.account} onChange={(name, size) => setF((x) => ({ ...x, account: name, accountSize: size }))} /></div>
+      <div className="c4 pair">
+        <label>Risk, %
+          <input type="text" inputMode="decimal" autoComplete="off" value={f.riskPct} onChange={set('riskPct')} placeholder="0.5" />
+        </label>
+        <label>PNL, $
+          <input type="text" inputMode="decimal" autoComplete="off" value={f.pnlUsd} onChange={set('pnlUsd')} placeholder="0" />
+        </label>
+      </div>
+      <div className="c4 netres">
         <span className="plabel">Net Result</span>
         <div className={'netres-val ' + (net.pnl > 0 ? 'pos' : net.pnl < 0 ? 'neg' : '')}>
           {signed(net.netPct, 2, '%')}
@@ -105,8 +114,9 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
           {net.r == null ? '—' : fmt(net.r, 2) + ' RR'}
         </div>
       </div>
-      {!hidePlan && <PlanPicker value={f.planId} symbol={f.symbol} onChange={(v) => setF((x) => ({ ...x, planId: v }))} />}
+
       <ParamsBlock value={f.params} onChange={(v) => setF((x) => ({ ...x, params: v }))} />
+      <div className="wide form-sec">Скриншоты</div>
       <div className="wide trade-shots">
         <ShotCard title="W1" img={f.w1} onImg={(v) => setF((x) => ({ ...x, w1: v }))} />
         <ShotCard title="D1" img={f.d1} onImg={(v) => setF((x) => ({ ...x, d1: v }))} />
