@@ -1424,3 +1424,242 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
 .period-nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .period-nav strong { min-width: 150px; text-align: center; white-space: nowrap; }
 .toolbar .chip { padding-top: 6px; padding-bottom: 6px; }
+
+/* =====================================================================
+   Стиль «Gothic» (в духе интерфейса Diablo IV): data-style="d4".
+   Тёплый почти чёрный фон, тёмно-красный для кнопок и активных вкладок,
+   состаренное золото для линий и заголовков, цвет кости для текста.
+   Всегда тёмный. Без свечения и тяжёлых текстур, чтобы глаза не уставали.
+   ===================================================================== */
+:root[data-style='d4'] {
+  color-scheme: dark;
+  --font: 'Alegreya Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Cormorant SC', 'Alegreya Sans', Georgia, serif;
+
+  --bg: #0b0908;
+  --surface: #17120f;
+  --surface-2: rgba(200, 160, 100, 0.09);
+  --surface-3: rgba(200, 160, 100, 0.05);
+  --text: #ddd2c1;
+  --text-2: #b0a28d;
+  --text-3: #7b6e5d;
+  --line: rgba(176, 138, 78, 0.24);
+  --line-2: rgba(201, 165, 92, 0.55);
+
+  --accent: #cba35a;
+  --accent-text: #f2e5cb;
+  --accent-soft: rgba(176, 138, 78, 0.16);
+  --gold: #cba35a;
+  --crimson: #8a1c1c;
+  --crimson-deep: #4f0f0f;
+
+  --green: #7dbb7a;
+  --green-fill: #7dbb7a;
+  --green-soft: rgba(125, 187, 122, 0.15);
+  --red: #e5564f;
+  --red-fill: #e5564f;
+  --red-soft: rgba(229, 86, 79, 0.16);
+  --orange: #7ea7d4;
+  --orange-fill: #7ea7d4;
+  --orange-soft: rgba(126, 167, 212, 0.16);
+
+  --seg-active: #8a1c1c;
+  --nav-bg: rgba(10, 8, 7, 0.94);
+  --shadow: none;
+  --shadow-hover: none;
+}
+:root[data-style='d4'] body {
+  font-family: var(--font); font-size: 17px; letter-spacing: 0.005em;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -12%, #2b1511 0%, transparent 62%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, #1a0e0b 0%, transparent 70%),
+    #0a0807;
+  background-attachment: fixed;
+}
+:root[data-style='d4'] .theme-btn { display: none; }
+
+/* --- заголовки: засечки, заглавные, золото --- */
+:root[data-style='d4'] .page-title h2,
+:root[data-style='d4'] .section-title,
+:root[data-style='d4'] .card h2,
+:root[data-style='d4'] .form-sec,
+:root[data-style='d4'] .params-head,
+:root[data-style='d4'] .plan-card .sym,
+:root[data-style='d4'] .trow-title,
+:root[data-style='d4'] .brand,
+:root[data-style='d4'] .tlist-head,
+:root[data-style='d4'] th {
+  font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; font-style: normal;
+}
+:root[data-style='d4'] .page-title h2 { font-size: 38px; line-height: 1.05; color: var(--gold); }
+:root[data-style='d4'] .section-title { font-size: 27px; color: var(--gold); }
+:root[data-style='d4'] .card h2 { font-size: 20px; color: var(--gold); }
+:root[data-style='d4'] .form-sec, :root[data-style='d4'] .params-head { font-size: 21px; color: var(--gold); }
+:root[data-style='d4'] .form-sec::after, :root[data-style='d4'] .params-head::after { background: linear-gradient(90deg, var(--line-2), transparent); }
+
+/* ромб перед заголовками */
+:root[data-style='d4'] .page-title h2::before,
+:root[data-style='d4'] .section-title::before,
+:root[data-style='d4'] .card h2::before,
+:root[data-style='d4'] .form-sec::before,
+:root[data-style='d4'] .params-head::before {
+  content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 13px;
+  background: var(--crimson); box-shadow: 0 0 0 1px var(--gold); transform: rotate(45deg); vertical-align: 0.14em; flex: none;
+}
+:root[data-style='d4'] .form-sec::before, :root[data-style='d4'] .params-head::before { margin-right: 0; }
+:root[data-style='d4'] .form-sec, :root[data-style='d4'] .params-head { gap: 14px; }
+:root[data-style='d4'] .subtle { color: var(--text-2); font-size: 18px; }
+:root[data-style='d4'] .page-title strong, :root[data-style='d4'] .period-nav strong { color: var(--text); font-weight: 700; }
+
+/* --- шапка --- */
+:root[data-style='d4'] .nav { border-bottom: 1px solid var(--line); background-image: linear-gradient(180deg, rgba(60, 20, 16, 0.35), transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); gap: 18px; }
+:root[data-style='d4'] .brand { font-size: 23px; color: var(--gold); background: transparent; border-radius: 0; }
+:root[data-style='d4'] .brand:hover { background: transparent; color: #e6c37c; }
+:root[data-style='d4'] .logo { border-radius: 0; background: linear-gradient(180deg, #a02222, #4f0f0f); clip-path: polygon(50% 0, 100% 16%, 100% 66%, 50% 100%, 0 66%, 0 16%); box-shadow: none; }
+:root[data-style='d4'] .logo svg { stroke: var(--gold); }
+:root[data-style='d4'] .tabs { background: transparent; padding: 0; gap: 2px; border-radius: 0; }
+:root[data-style='d4'] .tab {
+  font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-2); background: transparent; border-radius: 0; padding: 7px 18px; box-shadow: none; clip-path: none;
+  border-bottom: 2px solid transparent;
+}
+:root[data-style='d4'] .tab:hover { color: var(--text); background: var(--surface-3); }
+:root[data-style='d4'] .tab.active { color: var(--gold); background: linear-gradient(180deg, transparent, rgba(138, 28, 28, 0.35)); border-bottom-color: #b02a2a; box-shadow: none; }
+:root[data-style='d4'] .stylesw .tab { font-size: 14.5px; padding: 4px 12px; letter-spacing: 0.08em; }
+:root[data-style='d4'] .status { color: var(--text-2); font-size: 13px; gap: 6px; }
+:root[data-style='d4'] .dot.ok { background: var(--green-fill); box-shadow: none; }
+
+/* --- карточки: двойная золотая рамка --- */
+:root[data-style='d4'] .card, :root[data-style='d4'] .plan-card {
+  background: linear-gradient(180deg, #1b1512, #130f0d);
+  border-radius: 2px; border: 0; clip-path: none;
+  box-shadow: inset 0 0 0 1px rgba(176, 138, 78, 0.42), inset 0 0 0 4px #130f0d, inset 0 0 0 5px rgba(176, 138, 78, 0.16);
+}
+:root[data-style='d4'] .card { padding: 24px 28px; }
+:root[data-style='d4'] .plan-card { transition: box-shadow 0.15s, background-color 0.15s; }
+:root[data-style='d4'] .plan-card:hover { transform: none; background: linear-gradient(180deg, #221915, #17110f); box-shadow: inset 0 0 0 1px var(--gold), inset 0 0 0 4px #17110f, inset 0 0 0 5px rgba(203, 163, 90, 0.35); }
+:root[data-style='d4'] .plan-card .sym { font-size: 27px; color: var(--text); }
+:root[data-style='d4'] .plan-card .ex { color: var(--text-2); font-size: 16.5px; }
+:root[data-style='d4'] .plan-card.add { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--gold); font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: 0.1em; text-transform: uppercase; }
+:root[data-style='d4'] .plan-card.add:hover { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--gold); }
+:root[data-style='d4'] .shot-head { border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, var(--line-2), transparent) 1; }
+:root[data-style='d4'] .plan-footer { border-top-color: var(--line); }
+:root[data-style='d4'] .badge { border-radius: 2px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 10px; }
+
+/* --- кнопки --- */
+:root[data-style='d4'] button:not([class]), :root[data-style='d4'] button.ghost, :root[data-style='d4'] button.danger,
+:root[data-style='d4'] .padd button.small, :root[data-style='d4'] .chip {
+  font-family: var(--font-display); font-weight: 700; font-size: 16.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  border-radius: 2px; padding: 8px 24px; clip-path: none; font-style: normal;
+}
+:root[data-style='d4'] button:not([class]) {
+  background: linear-gradient(180deg, #8f1f1f, #521010); color: var(--accent-text);
+  box-shadow: inset 0 0 0 1px #b48a45, inset 0 1px 0 rgba(255, 210, 160, 0.22);
+}
+:root[data-style='d4'] button:not([class]):hover { background: linear-gradient(180deg, #a82626, #631414); filter: none; }
+:root[data-style='d4'] button.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px rgba(176, 138, 78, 0.5); }
+:root[data-style='d4'] button.ghost:hover { background: var(--accent-soft); color: #f0e0c0; }
+:root[data-style='d4'] button.danger { background: transparent; color: var(--red); box-shadow: inset 0 0 0 1px rgba(229, 86, 79, 0.5); }
+:root[data-style='d4'] button.danger:hover { background: var(--red-soft); }
+:root[data-style='d4'] button.small { font-size: 14.5px; padding: 4px 16px; }
+:root[data-style='d4'] button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* вкладки планов и период (chips) */
+:root[data-style='d4'] .chip { background: transparent; color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); font-size: 17px; padding: 7px 22px; }
+:root[data-style='d4'] .chip:hover { background: var(--accent-soft); color: var(--text); }
+:root[data-style='d4'] .chip.active { background: linear-gradient(180deg, #8f1f1f, #521010); color: var(--accent-text); box-shadow: inset 0 0 0 1px #b48a45; }
+:root[data-style='d4'] .chip.add { background: transparent; color: var(--gold); box-shadow: none; }
+:root[data-style='d4'] .chip.add:hover { background: var(--accent-soft); }
+:root[data-style='d4'] .chip-n { border-radius: 2px; background: var(--gold); color: #1a120a; }
+:root[data-style='d4'] .chip.active .chip-n { background: var(--accent-text); color: #4f0f0f; }
+:root[data-style='d4'] .rdot { border-radius: 0; transform: rotate(45deg) scale(0.85); }
+
+/* --- поля --- */
+:root[data-style='d4'] input, :root[data-style='d4'] select, :root[data-style='d4'] textarea {
+  background-color: rgba(0, 0, 0, 0.42); border-radius: 2px; color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(176, 138, 78, 0.3); font-size: 16.5px;
+}
+:root[data-style='d4'] input:focus, :root[data-style='d4'] select:focus, :root[data-style='d4'] textarea:focus { box-shadow: inset 0 0 0 1.5px var(--gold); }
+:root[data-style='d4'] input::placeholder, :root[data-style='d4'] textarea::placeholder { color: var(--text-3); }
+:root[data-style='d4'] label { color: var(--text-2); font-weight: 500; }
+:root[data-style='d4'] select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23cba35a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+:root[data-style='d4'] select.res { background-image: none; }
+:root[data-style='d4'] select.res.profit { background-color: var(--green-soft); color: var(--green); }
+:root[data-style='d4'] select.res.loss { background-color: var(--red-soft); color: var(--red); }
+:root[data-style='d4'] select.res.be { background-color: var(--orange-soft); color: var(--orange); }
+:root[data-style='d4'] option { background: #17120f; color: var(--text); }
+:root[data-style='d4'] .tag { border-radius: 2px; background: var(--surface-2); color: var(--text); }
+:root[data-style='d4'] .netres-val { border-radius: 2px; background: rgba(0, 0, 0, 0.42); box-shadow: inset 0 0 0 1px rgba(176, 138, 78, 0.3); font-family: var(--font); font-weight: 700; font-size: 19px; }
+:root[data-style='d4'] form.trade label, :root[data-style='d4'] form.trade .plabel { color: var(--text); font-weight: 700; font-size: 15.5px; }
+:root[data-style='d4'] form.trade input::placeholder, :root[data-style='d4'] form.trade .pbtn:not(.set) { color: var(--text-3); }
+
+/* выпадающие списки */
+:root[data-style='d4'] .symlist, :root[data-style='d4'] .plist { background: #17120f; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--line-2), 0 18px 40px rgba(0, 0, 0, 0.65); }
+:root[data-style='d4'] .symopt, :root[data-style='d4'] .popt { border-radius: 2px; color: var(--text); font-weight: 500; }
+:root[data-style='d4'] .symopt:hover, :root[data-style='d4'] .symopt.hi, :root[data-style='d4'] .popt:hover { background: var(--accent-soft); }
+:root[data-style='d4'] .symopt.sel, :root[data-style='d4'] .popt.sel { background: linear-gradient(180deg, #8f1f1f, #521010); color: var(--accent-text); }
+:root[data-style='d4'] .popt.sel .psub { color: #d9c08f; }
+:root[data-style='d4'] .pbtn { border-radius: 2px; background: rgba(0, 0, 0, 0.42); box-shadow: inset 0 0 0 1px rgba(176, 138, 78, 0.3); clip-path: none; font-family: var(--font); text-transform: none; letter-spacing: 0; font-size: 16.5px; font-weight: 500; color: var(--text-3); padding: 10px 12px; }
+:root[data-style='d4'] .pbtn.set { color: var(--gold); font-weight: 700; }
+:root[data-style='d4'] .pbtn:hover { background: rgba(0, 0, 0, 0.6); }
+:root[data-style='d4'] .pbtn[aria-expanded='true'] { box-shadow: inset 0 0 0 1.5px var(--gold); }
+:root[data-style='d4'] .popt, :root[data-style='d4'] .pdel, :root[data-style='d4'] .params-head { clip-path: none; }
+:root[data-style='d4'] .padd { border-top-color: var(--line); }
+:root[data-style='d4'] .symbox-chev, :root[data-style='d4'] .pbtn svg { color: var(--gold); }
+
+/* --- окно и скриншоты --- */
+:root[data-style='d4'] .modal { background: linear-gradient(180deg, #1c1613, #110d0b); clip-path: none; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--line-2), inset 0 0 0 5px #110d0b, inset 0 0 0 6px rgba(176, 138, 78, 0.18), 0 30px 80px rgba(0, 0, 0, 0.7); }
+:root[data-style='d4'] .modal-back { background: rgba(5, 3, 2, 0.78); }
+:root[data-style='d4'] .lightbox img { border-radius: 2px; }
+:root[data-style='d4'] .shot { border-radius: 2px; background: rgba(0, 0, 0, 0.35); box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='d4'] .shot img, :root[data-style='d4'] .g-item { border-radius: 2px; }
+:root[data-style='d4'] .shot-empty { color: var(--text-2); border-radius: 2px; font-size: 17px; }
+:root[data-style='d4'] .shot-empty:focus { color: var(--text); box-shadow: inset 0 0 0 1.5px var(--gold); }
+
+/* --- таблицы и метрики --- */
+:root[data-style='d4'] th { font-size: 15px; color: var(--gold); border-bottom-color: var(--line-2); }
+:root[data-style='d4'] td { border-bottom-color: var(--line); font-size: 16.5px; }
+:root[data-style='d4'] tbody tr:hover td { background: var(--surface-3); }
+:root[data-style='d4'] td.pos, :root[data-style='d4'] .pos, :root[data-style='d4'] .long { color: var(--green); }
+:root[data-style='d4'] td.neg, :root[data-style='d4'] .neg, :root[data-style='d4'] .short { color: var(--red); }
+:root[data-style='d4'] .metrics .l, :root[data-style='d4'] .recap-metrics .l { color: var(--text-2); font-size: 14.5px; }
+:root[data-style='d4'] .metrics .v, :root[data-style='d4'] .recap-metrics .v { font-family: var(--font); font-weight: 700; font-style: normal; text-transform: none; letter-spacing: 0; color: var(--text); }
+:root[data-style='d4'] .metrics .v { font-size: 30px; }
+:root[data-style='d4'] .recap-metrics .v { font-size: 25px; }
+:root[data-style='d4'] .metrics .v.pos, :root[data-style='d4'] .recap-metrics .v.pos { color: var(--green); }
+:root[data-style='d4'] .metrics .v.neg, :root[data-style='d4'] .recap-metrics .v.neg { color: var(--red); }
+
+/* --- список трейдов плана --- */
+:root[data-style='d4'] .tlist-head { color: var(--gold); font-size: 19px; }
+:root[data-style='d4'] .tlist-count { color: var(--text-3); }
+:root[data-style='d4'] .tlist-add { border-radius: 2px; color: var(--gold); }
+:root[data-style='d4'] .tlist-add:hover { background: var(--accent-soft); color: #e6c37c; }
+:root[data-style='d4'] .trow { border-radius: 2px; background: rgba(200, 160, 100, 0.05); box-shadow: inset 0 0 0 1px var(--line); font-size: 16.5px; }
+:root[data-style='d4'] .trow:hover { background: rgba(200, 160, 100, 0.1); box-shadow: inset 0 0 0 1px var(--gold); }
+:root[data-style='d4'] .trow-title { font-size: 19px; color: var(--text); }
+:root[data-style='d4'] .tchip { border-radius: 2px; }
+:root[data-style='d4'] .tpill { border-radius: 2px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; }
+:root[data-style='d4'] .tpill i { border-radius: 0; transform: rotate(45deg) scale(0.85); }
+:root[data-style='d4'] .trow-icon { color: var(--gold); }
+
+/* --- заметки --- */
+:root[data-style='d4'] .note-item { border-radius: 2px; }
+:root[data-style='d4'] .note-item:hover { background: var(--surface-3); }
+:root[data-style='d4'] .note-item.active { background: rgba(138, 28, 28, 0.28); box-shadow: inset 3px 0 0 #b02a2a; }
+:root[data-style='d4'] .note-item .t { font-weight: 700; }
+
+:root[data-style='d4'] * { scrollbar-color: #5a4630 transparent; }
+
+/* Статус в шапке сжимается с многоточием, а не переносит переключатель стилей на вторую строку */
+.status { flex: 0 1 300px; min-width: 0; }
+.status-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.status .dot { flex: none; }
+:root[data-style='d4'] .tab { padding: 7px 15px; letter-spacing: 0.1em; }
+:root[data-style='d4'] .stylesw .tab { padding: 4px 10px; letter-spacing: 0.06em; font-size: 14px; }
+:root[data-style='d4'] .nav { gap: 12px; }
+:root[data-style='d4'] .brand { font-size: 21px; letter-spacing: 0.07em; }
+:root[data-style='d4'] .tab { padding: 7px 11px; font-size: 16px; letter-spacing: 0.07em; }
+:root[data-style='d4'] .stylesw .tab { padding: 4px 8px; font-size: 13px; letter-spacing: 0.04em; }
+:root[data-style='d4'] .status { flex-basis: 220px; }
