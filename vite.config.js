@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: './', // работает и на адресе вида user.github.io/trade-journal/
   define: {
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   },
