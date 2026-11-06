@@ -378,7 +378,7 @@ select.res option[value='be'] { color: var(--orange) !important; }
 /* Фон: едва заметная сетка и тёплое свечение сверху */
 :root[data-style='cyber'] body {
   background:
-    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255, 42, 85, 0.1), transparent 70%),
+    radial-gradient(ellipse 80% 36% at 50% -12%, rgba(0, 240, 255, 0.07), transparent 70%),
     linear-gradient(rgba(252, 238, 10, 0.025) 1px, transparent 1px) 0 0 / 100% 32px,
     linear-gradient(90deg, rgba(252, 238, 10, 0.025) 1px, transparent 1px) 0 0 / 32px 100%,
     var(--bg);
@@ -399,7 +399,7 @@ select.res option[value='be'] { color: var(--orange) !important; }
 :root[data-style='cyber'] .row2 .card { border-left-color: var(--line-2); }
 
 /* Шапка и меню */
-:root[data-style='cyber'] .nav { border-bottom: 1px solid var(--line-2); box-shadow: 0 1px 18px rgba(252, 238, 10, 0.1); }
+:root[data-style='cyber'] .nav { border-bottom: 1px solid var(--line-2); box-shadow: 0 1px 14px rgba(0, 240, 255, 0.08); }
 :root[data-style='cyber'] .tabs { background: transparent; padding: 0; gap: 4px; border-radius: 0; }
 :root[data-style='cyber'] .tab {
   border-radius: 0; text-transform: uppercase; letter-spacing: 0.1em; font-size: 12.5px; font-weight: 700;
@@ -495,3 +495,5 @@ select.res option[value='be'] { color: var(--orange) !important; }
 :root[data-style='cyber'] .plan-card .sym { text-transform: uppercase; letter-spacing: 0.06em; }
 :root[data-style='cyber'] .plan-card.add { clip-path: none; border: 1px dashed var(--line-2); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12.5px; font-weight: 700; }
 :root[data-style='cyber'] .plan-card.add:hover { background: var(--accent-soft); border-color: var(--accent); }
+:root[data-style='cyber'] button.danger { background: transparent; color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='cyber'] button.danger:hover { background: var(--red-soft); color: var(--red); box-shadow: inset 0 0 0 1px var(--red); filter: none; }
