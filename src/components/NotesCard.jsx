@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { createPortal } from 'react-dom'
+import Lightbox from './Lightbox.jsx'
 import { toDataUrl } from './ShotCard.jsx'
 
 const isImage = (f) => f && f.type && f.type.startsWith('image/')
@@ -73,12 +73,7 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
         </div>
       )}
 
-      {big && createPortal(
-        <div className="lightbox" onClick={() => setBig(null)}>
-          <img src={big} alt="" />
-        </div>,
-        document.body
-      )}
+      {big && <Lightbox src={big} onClose={() => setBig(null)} />}
     </section>
   )
 }
