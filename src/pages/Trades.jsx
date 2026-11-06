@@ -4,13 +4,13 @@ import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '
 import { calcTrade, fmt } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 
-const toLocalInput = (ts) => {
+export const toLocalInput = (ts) => {
   const d = new Date(ts)
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
   return d.toISOString().slice(0, 16)
 }
 
-const emptyForm = () => ({
+export const emptyForm = () => ({
   symbol: '',
   side: 'long',
   openedAt: toLocalInput(Date.now()),
@@ -27,7 +27,15 @@ const emptyForm = () => ({
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
-function TradeForm({ initial, onSubmit, onCancel }) {
+// Данные сделки из базы -> значения полей формы
+export const tradeToForm = (t) => ({
+  ...emptyForm(),
+  ...t,
+  openedAt: toLocalInput(t.openedAt),
+  closedAt: t.closedAt ? toLocalInput(t.closedAt) : '',
+})
+
+export function TradeForm({ initial, onSubmit, onCancel }) {
   const [f, setF] = useState(initial || emptyForm())
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
 
@@ -140,12 +148,7 @@ export default function Trades() {
         {editing ? (
           <TradeForm
             key={editing.id}
-            initial={{
-              ...emptyForm(),
-              ...editing,
-              openedAt: toLocalInput(editing.openedAt),
-              closedAt: editing.closedAt ? toLocalInput(editing.closedAt) : '',
-            }}
+            initial={tradeToForm(editing)}
             onSubmit={async (d) => {
               await updateTrade(editing.id, d)
               setEditing(null)

@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, createPlan, savePlan, removePlan, uuid } from '../db.js'
+import { db, createPlan, savePlan, removePlan, addTrade, updateTrade, uuid } from '../db.js'
+import { calcTrade, fmt } from '../stats.js'
+import { emptyForm, tradeToForm } from './Trades.jsx'
+import TradeModal from '../components/TradeModal.jsx'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import WeeklyRecap from '../components/WeeklyRecap.jsx'
@@ -32,8 +35,17 @@ const dayTitle = (ts) => {
 const timeOf = (ts) => new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
 const pick = (p) => Object.fromEntries(FIELDS.map((k) => [k, p[k] ?? blank[k]]))
 
+const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
+
 function PlanEditor({ plan, onDelete }) {
   const [p, setP] = useState(() => pick(plan))
+  // null — окно закрыто, {} — новая сделка, объект сделки — правка
+  const [tradeModal, setTradeModal] = useState(null)
+  const attached = useLiveQuery(
+    () => db.trades.filter((t) => t.planId === plan.id && !t.deleted).toArray().then((a) => a.sort((x, y) => y.openedAt - x.openedAt)),
+    [plan.id],
+    []
+  )
   const latest = useRef(p)
   const timer = useRef(null)
 
@@ -100,7 +112,7 @@ function PlanEditor({ plan, onDelete }) {
           <option value="be">Безубыточная</option>
         </select>
         <span className="spacer" />
-        <button className="danger" onClick={() => confirm('Удалить этот план?') && onDelete()}>Удалить план</button>
+        <button onClick={() => setTradeModal({})}>+ Добавить трейд</button>
       </div>
 
       <h3 className="section-title">Pre-Session</h3>
@@ -141,6 +153,48 @@ function PlanEditor({ plan, onDelete }) {
         </div>
       )}
 
+      <div className="section-row">
+        <h3 className="section-title">Трейды</h3>
+        <span className="hint">сделки, добавленные из этого плана</span>
+      </div>
+      {attached.length === 0 ? (
+        <div className="card empty">Пока пусто. Нажми «Добавить трейд» вверху: сделка запишется во вкладку Trades и закрепится здесь.</div>
+      ) : (
+        <section className="card">
+          <div className="tablewrap">
+            <table>
+              <thead>
+                <tr>
+                  <th className="left">Дата</th>
+                  <th className="left">Сторона</th>
+                  <th>Вход</th>
+                  <th>Выход</th>
+                  <th>PnL</th>
+                  <th>R</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {attached.map((t) => {
+                  const c = calcTrade(t)
+                  return (
+                    <tr key={t.id} title={t.notes || ''}>
+                      <td className="left">{new Date(t.openedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                      <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
+                      <td>{fmt(t.entry, 4)}</td>
+                      <td>{c.closed ? fmt(t.exit, 4) : 'открыта'}</td>
+                      <td className={sign(c.pnl)}>{fmt(c.pnl)}</td>
+                      <td className={sign(c.r)}>{fmt(c.r)}</td>
+                      <td><button className="ghost small" onClick={() => setTradeModal(t)}>Изм.</button></td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Recap</h3>
       <div className="row2">
         <ShotCard title="D1" {...shot('recapD1')} />
@@ -157,6 +211,23 @@ function PlanEditor({ plan, onDelete }) {
         onRemoveAt={removeNoteImg}
         placeholder="Любые заметки по неделе"
       />
+
+      <div className="plan-footer">
+        <button className="danger" onClick={() => confirm('Удалить этот план?') && onDelete()}>Удалить план</button>
+      </div>
+
+      {tradeModal && (
+        <TradeModal
+          title={(tradeModal.id ? 'Редактировать сделку' : 'Новая сделка') + (p.symbol ? ' · ' + p.symbol : '')}
+          initial={tradeModal.id ? tradeToForm(tradeModal) : { ...emptyForm(), symbol: p.symbol }}
+          onClose={() => setTradeModal(null)}
+          onSubmit={async (d) => {
+            if (tradeModal.id) await updateTrade(tradeModal.id, d)
+            else await addTrade({ ...d, planId: plan.id })
+            setTradeModal(null)
+          }}
+        />
+      )}
     </>
   )
 }

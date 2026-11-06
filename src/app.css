@@ -828,3 +828,9 @@ button { white-space: nowrap; }
 /* Линия под названием карточки (W1, D1, H4, До, После…), отделяет заголовок от скриншота */
 .shot-head { padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
 :root[data-style='cyber'] .shot-head { border-bottom-color: var(--line-2); }
+
+/* Окно сделки поверх страницы и подвал плана */
+.modal-back { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-start; justify-content: center; padding: 6vh 16px 16px; overflow: auto; background: rgba(0, 0, 0, 0.5); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.modal { width: 100%; max-width: 860px; margin: 0; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4); }
+:root[data-style='cyber'] .modal { clip-path: none; background: #120a0d; box-shadow: inset 0 0 0 1px var(--line-2), 0 24px 80px rgba(0, 0, 0, 0.7); }
+.plan-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; }
