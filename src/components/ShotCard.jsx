@@ -83,9 +83,7 @@ export default function ShotCard({ title, subtitle, onRemove, img, text, onImg, 
           </>
         ) : (
           <div className="shot-empty" tabIndex={0}>
-            <span>{busy ? 'Загружаю…' : 'Нажми сюда и вставь скриншот: Ctrl+V'}</span>
-            <span className="hint">или перетащи файл сюда</span>
-            <button type="button" className="ghost small" onClick={() => fileRef.current?.click()}>Выбрать файл</button>
+            <span>{busy ? 'Загружаю…' : 'Вставь скриншот'}</span>
           </div>
         )}
         <input

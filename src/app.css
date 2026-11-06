@@ -784,3 +784,8 @@ button { white-space: nowrap; }
 :root[data-style='cyber'] { --font: 'Play', 'Exo 2 Variable', 'Segoe UI', system-ui, sans-serif; }
 :root[data-style='cyber'] body { font-size: 16px; letter-spacing: 0.02em; }
 :root[data-style='cyber'] button, :root[data-style='cyber'] input, :root[data-style='cyber'] select, :root[data-style='cyber'] textarea { font-family: var(--font); }
+
+/* Пустое поле скриншота: без рамки и кнопок, только надпись «Вставь скриншот» */
+.shot:not(.has) { background: none; box-shadow: none; min-height: 0; margin-bottom: 0; }
+.shot-empty { min-height: 90px; padding: 8px; gap: 0; }
+:root[data-style='cyber'] .shot:not(.has) { background: none; box-shadow: none; }
