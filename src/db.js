@@ -21,6 +21,11 @@ db.version(3).stores({
   plans: 'id, weekStart, symbol, updatedAt, deleted, synced',
 })
 
+// v4: выплаты по счетам (Data → Accounts → Payouts)
+db.version(4).stores({
+  payouts: 'id, date, account, updatedAt, deleted, synced',
+})
+
 export const uuid = () =>
   crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)
 
@@ -98,6 +103,21 @@ export async function removeNote(id) {
   await db.notes.update(id, { deleted: 1, updatedAt: Date.now(), synced: 0 })
 }
 
+/* ---------- Выплаты ---------- */
+
+export async function addPayout(data) {
+  const now = Date.now()
+  await db.payouts.add({ id: uuid(), createdAt: now, updatedAt: now, deleted: 0, synced: 0, ...data })
+}
+
+export async function updatePayout(id, data) {
+  await db.payouts.update(id, { ...data, updatedAt: Date.now(), synced: 0 })
+}
+
+export async function removePayout(id) {
+  await db.payouts.update(id, { deleted: 1, updatedAt: Date.now(), synced: 0 })
+}
+
 /* ---------- Хранилище и резервные копии ---------- */
 
 // Просим браузер не удалять данные при нехватке места
@@ -113,8 +133,10 @@ export async function requestPersistentStorage() {
 }
 
 export async function exportJson() {
-  const [trades, plans, notes] = await Promise.all([db.trades.toArray(), db.plans.toArray(), db.notes.toArray()])
-  return JSON.stringify({ version: 2, exportedAt: Date.now(), trades, plans, notes }, null, 2)
+  const [trades, plans, notes, payouts, accRow] = await Promise.all([
+    db.trades.toArray(), db.plans.toArray(), db.notes.toArray(), db.payouts.toArray(), db.meta.get('accounts'),
+  ])
+  return JSON.stringify({ version: 3, exportedAt: Date.now(), trades, plans, notes, payouts, accounts: accRow?.value || [] }, null, 2)
 }
 
 export async function importJson(text) {
@@ -123,10 +145,17 @@ export async function importJson(text) {
     throw new Error('Неверный формат файла')
   }
   const mark = (arr) => (Array.isArray(arr) ? arr.map((x) => ({ ...x, synced: 0 })) : [])
-  await db.transaction('rw', db.trades, db.plans, db.notes, async () => {
+  await db.transaction('rw', db.trades, db.plans, db.notes, db.payouts, db.meta, async () => {
     await db.trades.bulkPut(mark(parsed.trades))
     await db.plans.bulkPut(mark(parsed.plans))
     await db.notes.bulkPut(mark(parsed.notes))
+    await db.payouts.bulkPut(mark(parsed.payouts))
+    // Счета объединяем с уже имеющимися: совпавшие по названию берутся из файла
+    if (Array.isArray(parsed.accounts) && parsed.accounts.length) {
+      const cur = (await db.meta.get('accounts'))?.value || []
+      const names = new Set(parsed.accounts.map((a) => a.name))
+      await db.meta.put({ key: 'accounts', value: [...cur.filter((a) => !names.has(a.name)), ...parsed.accounts] })
+    }
   })
-  return parsed.trades.length + (parsed.plans?.length || 0) + (parsed.notes?.length || 0)
+  return parsed.trades.length + (parsed.plans?.length || 0) + (parsed.notes?.length || 0) + (parsed.payouts?.length || 0)
 }

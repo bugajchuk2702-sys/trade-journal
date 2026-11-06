@@ -116,7 +116,7 @@ export default function ParamsBlock({ value, onChange }) {
 }
 
 // Стиль сделки — тот же выпадающий список, но вынесен в верхний ряд формы
-const STYLE = { key: 'style', label: 'Стиль', defaults: ['Swing', 'Intraweek'] }
+export const STYLE = { key: 'style', label: 'Стиль', defaults: ['Swing', 'Intraweek'] }
 
 export function StylePicker({ value, onChange }) {
   const { get, save } = useParamOptions()
@@ -138,7 +138,8 @@ export const ACC_KEY = 'accounts'
 
 export function AccountPicker({ value, onChange }) {
   const row = useLiveQuery(() => db.meta.get(ACC_KEY), [], undefined)
-  const list = row?.value || []
+  const all = row?.value || []
+  const list = all.filter((a) => !a.archived) // архивные счета в выбор не попадают
   const saveList = (v) => db.meta.put({ key: ACC_KEY, value: v })
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
@@ -171,8 +172,9 @@ export function AccountPicker({ value, onChange }) {
     const n = name.trim()
     const sz = toNum(size)
     if (!n || !(sz > 0)) return
-    const acc = { name: n, size: sz }
-    saveList([...list.filter((a) => a.name !== n), acc])
+    const old = all.find((a) => a.name === n)
+    const acc = { ...(old || {}), name: n, size: sz, archived: false }
+    saveList([...all.filter((a) => a.name !== n), acc])
     setName('')
     setSize('')
     pick(acc)
@@ -196,7 +198,7 @@ export function AccountPicker({ value, onChange }) {
                 <button type="button" role="option" aria-selected={a.name === value} className={'popt' + (a.name === value ? ' sel' : '')} onClick={() => pick(a)}>
                   {a.name} <span className="psub">{fmtSize(a.size)}</span>
                 </button>
-                <button type="button" className="pdel" title="Удалить счёт" aria-label={'Удалить ' + a.name} onClick={() => saveList(list.filter((x) => x.name !== a.name))}>✕</button>
+                <button type="button" className="pdel" title="Удалить счёт" aria-label={'Удалить ' + a.name} onClick={() => saveList(all.filter((x) => x.name !== a.name))}>✕</button>
               </div>
             ))}
           </div>

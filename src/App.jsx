@@ -75,12 +75,13 @@ export default function App() {
   }, [])
 
   const pending = useLiveQuery(async () => {
-    const [a, b, c] = await Promise.all([
+    const [a, b, c, d] = await Promise.all([
       db.trades.where('synced').equals(0).count(),
       db.plans.where('synced').equals(0).count(),
       db.notes.where('synced').equals(0).count(),
+      db.payouts.where('synced').equals(0).count(),
     ])
-    return a + b + c
+    return a + b + c + d
   }, [], 0)
 
   const go = (tab, params = {}) => {
