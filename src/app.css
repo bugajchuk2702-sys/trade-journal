@@ -722,7 +722,6 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
   @keyframes ow-nav { from { transform: translateY(-100%); } to { transform: none; } }
   @keyframes ow-tab-drop { from { opacity: 0; transform: translate(-10px, -14px); } to { opacity: 1; transform: none; } }
   @keyframes ow-shine { from { left: -70%; } to { left: 140%; } }
-  @keyframes ow-swipe { from { transform: translateX(-70vw) skewX(-18deg); } to { transform: translateX(160vw) skewX(-18deg); } }
   @keyframes ow-fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes ow-pop { from { opacity: 0; transform: translateY(28px) scale(0.95) skewX(-3deg); } to { opacity: 1; transform: none; } }
   @keyframes ow-drop { from { opacity: 0; transform: translateY(-8px) scaleY(0.9); } to { opacity: 1; transform: none; } }
@@ -753,14 +752,6 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
   /* --- шапка: съезжает сверху, вкладки падают по очереди --- */
   :root[data-style='ow'] .nav { animation: ow-nav 0.5s var(--ow-ease) backwards; }
   :root[data-style='ow'] .nav .tabs:not(.stylesw) > .tab { animation: ow-tab-drop 0.4s var(--ow-ease) backwards; animation-delay: calc(0.18s + var(--i, 0) * 60ms); }
-
-  /* --- смена раздела: косая шторка --- */
-  .ow-swipe { display: none; }
-  :root[data-style='ow'] .ow-swipe {
-    display: block; position: fixed; top: 0; bottom: 0; left: 0; width: 38vw; z-index: 90; pointer-events: none; will-change: transform;
-    animation: ow-swipe 0.62s cubic-bezier(0.65, 0, 0.35, 1) both;
-    background: linear-gradient(90deg, transparent 0, rgba(67, 169, 255, 0.09) 45%, rgba(67, 169, 255, 0.2) 76%, #f99e1a 76.5%, #f99e1a 84%, transparent 84.5%, transparent 87%, #eef3fb 87.5%, #eef3fb 89.5%, transparent 90%);
-  }
 
   /* --- страница: заголовок «въезжает», метка вырастает, блоки идут по очереди --- */
   :root[data-style='ow'] .page-title h2 { animation: ow-title 0.5s var(--ow-ease) backwards; }
