@@ -8,7 +8,7 @@ import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import WeeklyRecap from '../components/WeeklyRecap.jsx'
 import NotesCard from '../components/NotesCard.jsx'
-import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
+import { SymbolInput, SymbolIcon, norm } from '../components/Symbols.jsx'
 
 // Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
 // остаются в базе нетронутыми, просто не показываются на странице.
@@ -34,6 +34,59 @@ const dayTitle = (ts) => {
 }
 const timeOf = (ts) => new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
 const pick = (p) => Object.fromEntries(FIELDS.map((k) => [k, p[k] ?? blank[k]]))
+
+const money = (n) => fmt(n, 2).replace(/,00$/, '') + '$'
+
+// Цвет метки инструмента (как теги в Notion)
+const TAG_TINT = { BTC: '247,147,26', XAUUSD: '240,180,36', EURUSD: '70,110,220', GBPUSD: '200,70,90', GER40: '230,190,40', JP225: '220,50,60', AUDUSD: '40,120,200' }
+
+function TradeRow({ t, n, onOpen }) {
+  const c = calcTrade(t)
+  const res = !c.closed ? 'open' : c.pnl > 0 ? 'win' : c.pnl < 0 ? 'loss' : 'be'
+  const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]
+  const tint = TAG_TINT[norm(t.symbol)]
+  return (
+    <button type="button" className="trow" onClick={() => onOpen(t)} title={(t.notes || 'Открыть сделку') + ''}>
+      <svg className="trow-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path d="M3.5 1.5h6l3 3v10h-9z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+        <path d="M9.5 1.5v3h3M5.5 9.5l1.7-1.7 1.6 1.4 2-2.4" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span className="trow-title">Trade #{n}</span>
+      <span className="tchip" style={tint ? { '--tint': tint } : undefined}>
+        <SymbolIcon symbol={t.symbol} size={14} />
+        {t.symbol}
+      </span>
+      <span className={'tpill ' + res}><i />{label}</span>
+      <span className="trow-meta">
+        <span className={sign(c.r)}>{c.r == null ? '—' : fmt(c.r, 1) + 'RR'}</span>
+        {' / '}
+        <span className={sign(c.pnl)}>{c.closed ? money(c.pnl) : '—'}</span>
+      </span>
+      <span className="trow-side">{t.side === 'long' ? 'Лонг' : 'Шорт'}</span>
+      <span className="trow-date">{new Date(t.openedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
+    </button>
+  )
+}
+
+// Трейды плана — компактный список в стиле Notion
+function TradesList({ trades, onAdd, onOpen }) {
+  const ordered = [...trades].sort((a, b) => a.openedAt - b.openedAt || (a.createdAt || 0) - (b.createdAt || 0))
+  return (
+    <section className="tlist" aria-label="Трейды плана">
+      <div className="tlist-head">
+        <span>Trades</span>
+        {ordered.length > 0 && <span className="tlist-count">{ordered.length}</span>}
+        <span className="spacer" />
+        <button type="button" className="tlist-add" onClick={onAdd} title="Добавить трейд" aria-label="Добавить трейд">+</button>
+      </div>
+      {ordered.length === 0 ? (
+        <div className="tlist-empty">Трейдов пока нет</div>
+      ) : (
+        ordered.map((t, i) => <TradeRow key={t.id} t={t} n={i + 1} onOpen={onOpen} />)
+      )}
+    </section>
+  )
+}
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
@@ -115,6 +168,8 @@ function PlanEditor({ plan, onDelete }) {
         <button onClick={() => setTradeModal({})}>+ Добавить трейд</button>
       </div>
 
+      <TradesList trades={attached} onAdd={() => setTradeModal({})} onOpen={setTradeModal} />
+
       <h3 className="section-title">Pre-Session</h3>
       <div className="row3">
         <ShotCard title="W1" {...shot('w1')} />
@@ -151,48 +206,6 @@ function PlanEditor({ plan, onDelete }) {
             />
           ))}
         </div>
-      )}
-
-      <div className="section-row">
-        <h3 className="section-title">Трейды</h3>
-        <span className="hint">сделки, добавленные из этого плана</span>
-      </div>
-      {attached.length === 0 ? (
-        <div className="card empty">Пока пусто. Нажми «Добавить трейд» вверху: сделка запишется во вкладку Trades и закрепится здесь.</div>
-      ) : (
-        <section className="card">
-          <div className="tablewrap">
-            <table>
-              <thead>
-                <tr>
-                  <th className="left">Дата</th>
-                  <th className="left">Сторона</th>
-                  <th>Вход</th>
-                  <th>Выход</th>
-                  <th>PnL</th>
-                  <th>R</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {attached.map((t) => {
-                  const c = calcTrade(t)
-                  return (
-                    <tr key={t.id} title={t.notes || ''}>
-                      <td className="left">{new Date(t.openedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</td>
-                      <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
-                      <td>{fmt(t.entry, 4)}</td>
-                      <td>{c.closed ? fmt(t.exit, 4) : 'открыта'}</td>
-                      <td className={sign(c.pnl)}>{fmt(c.pnl)}</td>
-                      <td className={sign(c.r)}>{fmt(c.r)}</td>
-                      <td><button className="ghost small" onClick={() => setTradeModal(t)}>Изм.</button></td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
       )}
 
       <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Recap</h3>
