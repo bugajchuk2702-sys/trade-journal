@@ -706,3 +706,120 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
   .nav > * { flex-shrink: 0; }
   .nav > .status { flex-shrink: 1; }
 }
+
+/* =====================================================================
+   Hero: анимации в духе меню Overwatch 2.
+   Быстрые косые «въезды», шторка при смене раздела, блики на кнопках,
+   штамп результата, набегающие цифры. Только для Hero; без движения,
+   если в системе включено «уменьшить движение».
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-style='ow'] { --ow-ease: cubic-bezier(0.16, 1, 0.3, 1); --ow-snap: cubic-bezier(0.2, 0.9, 0.3, 1.25); }
+
+  @keyframes ow-slide { from { opacity: 0; transform: translate(-24px, 10px) skewX(-7deg); } to { opacity: 1; transform: none; } }
+  @keyframes ow-title { from { opacity: 0; transform: translateX(-40px) skewX(-12deg); clip-path: inset(0 60% 0 0); } to { opacity: 1; transform: none; clip-path: inset(0 -20% 0 0); } }
+  @keyframes ow-bar { from { transform: skewX(-22deg) scaleY(0); } to { transform: skewX(-22deg) scaleY(1); } }
+  @keyframes ow-nav { from { transform: translateY(-100%); } to { transform: none; } }
+  @keyframes ow-tab-drop { from { opacity: 0; transform: translate(-10px, -14px); } to { opacity: 1; transform: none; } }
+  @keyframes ow-shine { from { left: -70%; } to { left: 140%; } }
+  @keyframes ow-swipe { from { transform: translateX(-70vw) skewX(-18deg); } to { transform: translateX(160vw) skewX(-18deg); } }
+  @keyframes ow-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ow-pop { from { opacity: 0; transform: translateY(28px) scale(0.95) skewX(-3deg); } to { opacity: 1; transform: none; } }
+  @keyframes ow-drop { from { opacity: 0; transform: translateY(-8px) scaleY(0.9); } to { opacity: 1; transform: none; } }
+  @keyframes ow-stamp { 0% { opacity: 0; transform: scale(1.8) skewX(-14deg); } 60% { opacity: 1; transform: scale(0.93) skewX(-14deg); } 100% { opacity: 1; transform: none; } }
+  @keyframes ow-img { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
+  @keyframes ow-ping { from { transform: scale(1); opacity: 0.7; } to { transform: scale(3); opacity: 0; } }
+  @keyframes ow-tab-on {
+    0% { background-size: 0% 100%; color: var(--text); }
+    50% { background-size: 78% 100%; color: var(--text); }
+    51% { color: #101722; }
+    100% { background-size: 100% 100%; color: #101722; }
+  }
+
+  /* порядковый номер среди соседей (для ступенчатого появления) */
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(2) { --i: 1; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(3) { --i: 2; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(4) { --i: 3; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(5) { --i: 4; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(6) { --i: 5; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(7) { --i: 6; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(8) { --i: 7; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(9) { --i: 8; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(10) { --i: 9; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(11) { --i: 10; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(12) { --i: 11; }
+  :root[data-style='ow'] :is(.card, .plan-card, .trow, .note-item, .m, .symopt, .popt, .chip, .tab, tbody tr, .shotcard):nth-child(n + 13) { --i: 12; }
+
+  /* --- шапка: съезжает сверху, вкладки падают по очереди --- */
+  :root[data-style='ow'] .nav { animation: ow-nav 0.5s var(--ow-ease) backwards; }
+  :root[data-style='ow'] .nav .tabs:not(.stylesw) > .tab { animation: ow-tab-drop 0.4s var(--ow-ease) backwards; animation-delay: calc(0.18s + var(--i, 0) * 60ms); }
+
+  /* --- смена раздела: косая шторка --- */
+  .ow-swipe { display: none; }
+  :root[data-style='ow'] .ow-swipe {
+    display: block; position: fixed; top: 0; bottom: 0; left: 0; width: 38vw; z-index: 90; pointer-events: none; will-change: transform;
+    animation: ow-swipe 0.62s cubic-bezier(0.65, 0, 0.35, 1) both;
+    background: linear-gradient(90deg, transparent 0, rgba(67, 169, 255, 0.09) 45%, rgba(67, 169, 255, 0.2) 76%, #f99e1a 76.5%, #f99e1a 84%, transparent 84.5%, transparent 87%, #eef3fb 87.5%, #eef3fb 89.5%, transparent 90%);
+  }
+
+  /* --- страница: заголовок «въезжает», метка вырастает, блоки идут по очереди --- */
+  :root[data-style='ow'] .page-title h2 { animation: ow-title 0.5s var(--ow-ease) backwards; }
+  :root[data-style='ow'] .page-title h2::before { animation: ow-bar 0.35s var(--ow-ease) 0.2s backwards; }
+  :root[data-style='ow'] :is(.section-title, .chips, .toolbar, .tlist-head) { animation: ow-slide 0.42s var(--ow-ease) 0.08s backwards; }
+  :root[data-style='ow'] .card:not(.modal) { animation: ow-slide 0.45s var(--ow-ease) backwards; animation-delay: calc(0.1s + var(--i, 0) * 60ms); }
+  :root[data-style='ow'] .plan-card { animation: ow-slide 0.45s var(--ow-ease) backwards; animation-delay: calc(0.12s + var(--i, 0) * 55ms); }
+  :root[data-style='ow'] .chips .chip { animation: ow-slide 0.35s var(--ow-ease) backwards; animation-delay: calc(0.12s + var(--i, 0) * 45ms); }
+  :root[data-style='ow'] .metrics .m, :root[data-style='ow'] .recap-metrics .m { animation: ow-slide 0.4s var(--ow-ease) backwards; animation-delay: calc(0.2s + var(--i, 0) * 28ms); }
+  :root[data-style='ow'] .trow { animation: ow-slide 0.38s var(--ow-ease) backwards; animation-delay: calc(0.1s + var(--i, 0) * 45ms); }
+  :root[data-style='ow'] .note-item { animation: ow-slide 0.38s var(--ow-ease) backwards; animation-delay: calc(0.08s + var(--i, 0) * 40ms); }
+  :root[data-style='ow'] .tablewrap tbody tr { animation: ow-slide 0.38s var(--ow-ease) backwards; animation-delay: calc(0.15s + var(--i, 0) * 35ms); }
+  :root[data-style='ow'] .shot img { animation: ow-img 0.4s var(--ow-ease) backwards; }
+
+  /* --- результат: «штамп» --- */
+  :root[data-style='ow'] :is(.badge, .tpill.win, .tpill.loss, .tpill.be) { animation: ow-stamp 0.34s var(--ow-snap) 0.25s backwards; }
+
+  /* --- кнопки, вкладки, чипы: блик проходит по косой при наведении --- */
+  :root[data-style='ow'] :is(button:not([class]), button.ghost, button.danger, .padd button.small, .chip, .tab) { position: relative; overflow: clip; }
+  :root[data-style='ow'] :is(button:not([class]), button.ghost, button.danger, .padd button.small, .chip, .tab)::after {
+    content: ''; position: absolute; top: 0; bottom: 0; left: -70%; width: 38%; pointer-events: none;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.34), transparent); transform: skewX(-20deg);
+  }
+  :root[data-style='ow'] :is(button:not([class]), button.ghost, button.danger, .padd button.small, .chip, .tab):hover::after { animation: ow-shine 0.55s ease-out; }
+
+  /* выбранная вкладка / чип заливается слева направо */
+  :root[data-style='ow'] :is(.tab.active, .chip.active) { background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 0 / 100% 100%; animation: ow-tab-on 0.32s ease-out; }
+
+  /* --- карточки планов: подъём с «пружинкой» и блик --- */
+  :root[data-style='ow'] .plan-card { position: relative; overflow: clip; transition: transform 0.22s var(--ow-snap), box-shadow 0.15s, background-color 0.15s; }
+  :root[data-style='ow'] .plan-card:hover { transform: translateY(-4px); }
+  :root[data-style='ow'] .plan-card:not(.add)::after {
+    content: ''; position: absolute; top: 0; bottom: 0; left: -70%; width: 30%; pointer-events: none;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.07), transparent); transform: skewX(-20deg);
+  }
+  :root[data-style='ow'] .plan-card:not(.add):hover::after { animation: ow-shine 0.7s ease-out; }
+
+  /* --- строки списков: сдвиг и оранжевая планка --- */
+  :root[data-style='ow'] .trow, :root[data-style='ow'] .note-item { transition: transform 0.18s var(--ow-ease), background-color 0.15s, box-shadow 0.18s; }
+  :root[data-style='ow'] .trow:hover { transform: translateX(4px); }
+  :root[data-style='ow'] .note-item:not(.active):hover { transform: translateX(4px); box-shadow: inset 3px 0 0 var(--accent); }
+  :root[data-style='ow'] tbody tr td { transition: background-color 0.15s; }
+
+  /* --- поля: оранжевая линия вырастает снизу при фокусе --- */
+  :root[data-style='ow'] :is(input:not([type='checkbox']):not([type='radio']):not([type='file']), textarea) {
+    background-image: linear-gradient(var(--accent), var(--accent)); background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 2px;
+    transition: background-size 0.28s var(--ow-ease), box-shadow 0.15s;
+  }
+  :root[data-style='ow'] :is(input:not([type='checkbox']):not([type='radio']):not([type='file']), textarea):focus { background-size: 100% 2px; }
+
+  /* --- выпадающие списки и окна --- */
+  :root[data-style='ow'] :is(.symlist, .plist) { transform-origin: top; animation: ow-drop 0.16s ease-out; }
+  :root[data-style='ow'] :is(.symopt, .popt) { animation: ow-slide 0.25s var(--ow-ease) backwards; animation-delay: calc(0.03s + var(--i, 0) * 20ms); }
+  :root[data-style='ow'] .modal-back { animation: ow-fade 0.2s ease-out; }
+  :root[data-style='ow'] .modal { animation: ow-pop 0.34s var(--ow-ease); }
+  :root[data-style='ow'] .lightbox { animation: ow-fade 0.18s ease-out; }
+  :root[data-style='ow'] .lightbox img { animation: ow-pop 0.3s var(--ow-ease); }
+
+  /* --- статус «Онлайн»: тихий пульс --- */
+  :root[data-style='ow'] .dot { position: relative; }
+  :root[data-style='ow'] .dot.ok::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--green-fill); animation: ow-ping 2.4s ease-out infinite; }
+}

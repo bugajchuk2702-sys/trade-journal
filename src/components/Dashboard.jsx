@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { db } from '../db.js'
 import { summarize, fmt } from '../stats.js'
+import AnimNum, { heroMotion } from '../AnimNum.jsx'
 
 const sign = (n) => (n == null || !isFinite(n) ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
@@ -41,7 +42,7 @@ export default function Dashboard() {
           {items.map(([label, value, cls]) => (
             <div className="m" key={label}>
               <div className="l">{label}</div>
-              <div className={'v ' + (cls || '')}>{value}</div>
+              <div className={'v ' + (cls || '')}><AnimNum value={value} /></div>
             </div>
           ))}
         </div>
@@ -69,7 +70,7 @@ export default function Dashboard() {
                   labelFormatter={(n) => 'Сделка №' + n}
                   formatter={(v) => [fmt(v), 'Капитал']}
                 />
-                <Area type="monotone" dataKey="equity" stroke="#888" strokeWidth={2.5} fill="url(#eqFill)" dot={false} isAnimationActive={false} />
+                <Area type="monotone" dataKey="equity" stroke="#888" strokeWidth={2.5} fill="url(#eqFill)" dot={false} isAnimationActive={heroMotion()} animationDuration={1100} animationEasing="ease-out" />
               </AreaChart>
             </ResponsiveContainer>
           )}

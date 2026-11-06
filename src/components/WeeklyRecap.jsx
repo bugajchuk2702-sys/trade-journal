@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
 import { calcTrade, summarize, fmt } from '../stats.js'
+import AnimNum from '../AnimNum.jsx'
 
 const sign = (n) => (n == null || !isFinite(n) ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
@@ -62,7 +63,7 @@ export default function WeeklyRecap({ symbol, weekStart }) {
             {items.map(([label, value, cls]) => (
               <div className="m" key={label}>
                 <div className="l">{label}</div>
-                <div className={'v ' + (cls || '')}>{value}</div>
+                <div className={'v ' + (cls || '')}><AnimNum value={value} /></div>
               </div>
             ))}
           </div>

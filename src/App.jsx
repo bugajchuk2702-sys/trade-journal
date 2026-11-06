@@ -67,6 +67,8 @@ export default function App() {
   // сразу попасть в нужный план на странице Weekly Plan.
   const [view, setView] = useState({ tab: 'home', params: {} })
   const [persisted, setPersisted] = useState(null)
+  // Счётчик смены раздела: в Hero на каждую смену запускается косая «шторка» поверх страницы
+  const [swipe, setSwipe] = useState(0)
 
   useEffect(() => {
     requestPersistentStorage().then(setPersisted)
@@ -83,6 +85,7 @@ export default function App() {
 
   const go = (tab, params = {}) => {
     setView({ tab, params })
+    if (tab !== view.tab) setSwipe((n) => n + 1)
     document.querySelector('.main')?.scrollTo({ top: 0 })
   }
 
@@ -122,6 +125,8 @@ export default function App() {
           {THEME_ICON[theme]}
         </button>
       </header>
+
+      {style === 'ow' && swipe > 0 && <div key={swipe} className="ow-swipe" aria-hidden="true" />}
 
       <main className="main">
         <div className="main-inner">
