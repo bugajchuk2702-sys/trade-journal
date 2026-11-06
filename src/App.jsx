@@ -48,11 +48,11 @@ function useTheme() {
 
 function useStyle() {
   const [style, setStyle] = useState(() => {
-    try { return localStorage.getItem('style') === 'cyber' ? 'cyber' : 'apple' } catch { return 'apple' }
+    try { const v = localStorage.getItem('style'); return v === 'cyber' || v === 'ow' ? v : 'apple' } catch { return 'apple' }
   })
   useEffect(() => {
     const el = document.documentElement
-    if (style === 'cyber') el.dataset.style = 'cyber'
+    if (style === 'cyber' || style === 'ow') el.dataset.style = style
     else el.removeAttribute('data-style')
     try { localStorage.setItem('style', style) } catch {}
   }, [style])
@@ -115,6 +115,7 @@ export default function App() {
         <div className="tabs stylesw" title="Стиль оформления">
           <button className={'tab' + (style === 'apple' ? ' active' : '')} onClick={() => setStyle('apple')}>Apple</button>
           <button className={'tab' + (style === 'cyber' ? ' active' : '')} onClick={() => setStyle('cyber')}>Cyber</button>
+          <button className={'tab' + (style === 'ow' ? ' active' : '')} onClick={() => setStyle('ow')}>Hero</button>
         </div>
         <button className="icon-btn theme-btn" onClick={nextTheme} title={'Тема: ' + ({ auto: 'как в системе', light: 'светлая', dark: 'тёмная' })[theme]}>
           {THEME_ICON[theme]}

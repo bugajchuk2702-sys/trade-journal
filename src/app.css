@@ -1187,3 +1187,234 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
 
 /* Cyber: настоящий зелёный для плюса (не бирюзовый) */
 :root[data-style='cyber'] { --green: #5ccf7f; --green-fill: #5ccf7f; --green-soft: rgba(92, 207, 127, 0.15); }
+
+/* =====================================================================
+   Стиль «Hero» (в духе интерфейса Overwatch 2): data-style="ow".
+   Тёмно-синий фон, оранжевый акцент, голубой для второстепенного,
+   наклонные (параллелограммные) кнопки, курсивные узкие заголовки.
+   Всегда тёмный. Без свечения, чтобы глаза не уставали.
+   ===================================================================== */
+:root[data-style='ow'] {
+  color-scheme: dark;
+  --font: 'Fira Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Fira Sans Extra Condensed', 'Arial Narrow', 'Fira Sans', sans-serif;
+
+  --bg: #0b1220;
+  --surface: #141f33;
+  --surface-2: rgba(130, 175, 255, 0.11);
+  --surface-3: rgba(130, 175, 255, 0.06);
+  --text: #eef3fb;
+  --text-2: #a9bcd8;
+  --text-3: #6f87a8;
+  --line: rgba(150, 190, 255, 0.16);
+  --line-2: rgba(249, 158, 26, 0.5);
+
+  --accent: #f99e1a;
+  --accent-text: #101722;
+  --accent-soft: rgba(249, 158, 26, 0.17);
+  --blue: #43a9ff;
+
+  --green: #4cd68f;
+  --green-fill: #4cd68f;
+  --green-soft: rgba(76, 214, 143, 0.15);
+  --red: #ff6070;
+  --red-fill: #ff6070;
+  --red-soft: rgba(255, 96, 112, 0.16);
+  --orange: #7cc4ff;
+  --orange-fill: #7cc4ff;
+  --orange-soft: rgba(124, 196, 255, 0.16);
+
+  --seg-active: #f99e1a;
+  --nav-bg: rgba(8, 14, 27, 0.92);
+  --shadow: none;
+  --shadow-hover: none;
+}
+:root[data-style='ow'] body {
+  font-family: var(--font); font-size: 15.5px; letter-spacing: 0;
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.014) 0 2px, transparent 2px 16px),
+    radial-gradient(ellipse 80% 50% at 15% -8%, #1c2f52 0%, transparent 65%),
+    linear-gradient(165deg, #0e182b, #080d18 70%);
+  background-attachment: fixed;
+}
+:root[data-style='ow'] .theme-btn { display: none; }
+
+/* --- шрифты заголовков: узкий курсив, заглавные --- */
+:root[data-style='ow'] .page-title h2,
+:root[data-style='ow'] .section-title,
+:root[data-style='ow'] .card h2,
+:root[data-style='ow'] .form-sec,
+:root[data-style='ow'] .params-head,
+:root[data-style='ow'] .plan-card .sym,
+:root[data-style='ow'] .metrics .v,
+:root[data-style='ow'] .recap-metrics .v,
+:root[data-style='ow'] .trow-title,
+:root[data-style='ow'] .brand,
+:root[data-style='ow'] th {
+  font-family: var(--font-display); font-style: italic; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em;
+}
+:root[data-style='ow'] .page-title h2 { font-size: 40px; line-height: 1; color: var(--text); }
+:root[data-style='ow'] .section-title { font-size: 28px; color: var(--text); }
+:root[data-style='ow'] .card h2 { font-size: 20px; color: var(--text); }
+:root[data-style='ow'] .form-sec, :root[data-style='ow'] .params-head { font-size: 20px; color: var(--text); }
+:root[data-style='ow'] .form-sec::after, :root[data-style='ow'] .params-head::after { background: var(--line); }
+
+/* оранжевая «косая» метка перед заголовками */
+:root[data-style='ow'] .page-title h2::before,
+:root[data-style='ow'] .section-title::before,
+:root[data-style='ow'] .card h2::before,
+:root[data-style='ow'] .form-sec::before,
+:root[data-style='ow'] .params-head::before {
+  content: ''; display: inline-block; width: 6px; height: 0.8em; margin-right: 12px;
+  background: var(--accent); transform: skewX(-22deg); vertical-align: -0.04em; flex: none;
+}
+:root[data-style='ow'] .subtle { color: var(--text-2); font-size: 18px; font-weight: 500; }
+
+/* --- шапка --- */
+:root[data-style='ow'] .nav { border-bottom: 1px solid var(--line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+:root[data-style='ow'] .brand { font-size: 22px; color: var(--text); border-radius: 0; background: transparent; }
+:root[data-style='ow'] .brand:hover { background: transparent; color: var(--accent); }
+:root[data-style='ow'] .logo { border-radius: 0; background: var(--accent); clip-path: polygon(22% 0, 100% 0, 78% 100%, 0 100%); box-shadow: none; }
+:root[data-style='ow'] .logo svg { stroke: #101722; }
+:root[data-style='ow'] .tabs { background: transparent; padding: 0; gap: 4px; border-radius: 0; }
+:root[data-style='ow'] .tab {
+  font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 19px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-2); background: transparent; border-radius: 0; padding: 5px 20px;
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); box-shadow: none;
+}
+:root[data-style='ow'] .tab:hover { color: var(--text); background: var(--surface-2); }
+:root[data-style='ow'] .tab.active { background: var(--accent); color: #101722; box-shadow: none; }
+:root[data-style='ow'] .stylesw .tab { font-size: 15px; padding: 3px 14px; }
+:root[data-style='ow'] .status { color: var(--text-2); font-size: 12.5px; }
+:root[data-style='ow'] .dot.ok { background: var(--green-fill); box-shadow: none; }
+
+/* --- карточки и панели --- */
+:root[data-style='ow'] .card, :root[data-style='ow'] .plan-card {
+  background: linear-gradient(180deg, rgba(24, 38, 64, 0.9), rgba(15, 25, 43, 0.92));
+  border-radius: 4px; box-shadow: inset 0 0 0 1px var(--line); border: 0; clip-path: none;
+}
+:root[data-style='ow'] .card { padding: 22px 24px; }
+:root[data-style='ow'] .plan-card { transition: box-shadow 0.15s, background-color 0.15s; }
+:root[data-style='ow'] .plan-card:hover { transform: none; box-shadow: inset 0 0 0 1px var(--accent), inset 4px 0 0 var(--accent); }
+:root[data-style='ow'] .plan-card .sym { font-size: 28px; }
+:root[data-style='ow'] .plan-card .ex { color: var(--text-2); font-size: 15px; }
+:root[data-style='ow'] .plan-card.add { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--accent); font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+:root[data-style='ow'] .plan-card.add:hover { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+:root[data-style='ow'] .shot-head { border-bottom-color: var(--line); }
+:root[data-style='ow'] .plan-footer { border-top-color: var(--line); }
+
+:root[data-style='ow'] .badge { border-radius: 2px; font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 14px; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 10px; }
+
+/* --- кнопки: параллелограммы --- */
+:root[data-style='ow'] button:not([class]), :root[data-style='ow'] button.ghost, :root[data-style='ow'] button.danger,
+:root[data-style='ow'] .padd button.small, :root[data-style='ow'] .chip {
+  font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 17px; letter-spacing: 0.05em; text-transform: uppercase;
+  border-radius: 0; padding: 7px 26px; box-shadow: none;
+  clip-path: polygon(11px 0, 100% 0, calc(100% - 11px) 100%, 0 100%);
+}
+:root[data-style='ow'] button:not([class]) { background: var(--accent); color: var(--accent-text); }
+:root[data-style='ow'] button:not([class]):hover { background: #ffb23d; filter: none; }
+:root[data-style='ow'] button.ghost { background: var(--surface-2); color: var(--text); }
+:root[data-style='ow'] button.ghost:hover { background: rgba(130, 175, 255, 0.2); }
+:root[data-style='ow'] button.danger { background: var(--red-soft); color: var(--red); }
+:root[data-style='ow'] button.danger:hover { background: rgba(255, 96, 112, 0.26); }
+:root[data-style='ow'] button.small { font-size: 15px; padding: 4px 18px; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+:root[data-style='ow'] button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* вкладки планов (chips) */
+:root[data-style='ow'] .chip { background: var(--surface-2); color: var(--text); font-size: 18px; padding: 6px 24px; }
+:root[data-style='ow'] .chip:hover { background: rgba(130, 175, 255, 0.2); }
+:root[data-style='ow'] .chip.active { background: var(--accent); color: #101722; }
+:root[data-style='ow'] .chip.add { background: transparent; color: var(--accent); box-shadow: none; }
+:root[data-style='ow'] .chip.add:hover { background: var(--accent-soft); }
+:root[data-style='ow'] .chip-n { border-radius: 2px; background: var(--accent); color: #101722; }
+:root[data-style='ow'] .chip.active .chip-n { background: #101722; color: var(--accent); }
+:root[data-style='ow'] .rdot { border-radius: 0; transform: skewX(-20deg); }
+
+/* --- поля --- */
+:root[data-style='ow'] input, :root[data-style='ow'] select, :root[data-style='ow'] textarea {
+  background-color: rgba(7, 13, 25, 0.65); border-radius: 3px; box-shadow: inset 0 0 0 1px var(--line); color: var(--text);
+}
+:root[data-style='ow'] input:focus, :root[data-style='ow'] select:focus, :root[data-style='ow'] textarea:focus { box-shadow: inset 0 0 0 1.5px var(--accent); }
+:root[data-style='ow'] input::placeholder, :root[data-style='ow'] textarea::placeholder { color: var(--text-3); }
+:root[data-style='ow'] label { color: var(--text-2); font-weight: 500; }
+:root[data-style='ow'] select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23f99e1a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+:root[data-style='ow'] select.res { background-image: none; }
+:root[data-style='ow'] select.res.profit { background-color: var(--green-soft); color: var(--green); }
+:root[data-style='ow'] select.res.loss { background-color: var(--red-soft); color: var(--red); }
+:root[data-style='ow'] select.res.be { background-color: var(--orange-soft); color: var(--orange); }
+:root[data-style='ow'] option { background: #141f33; color: var(--text); }
+:root[data-style='ow'] .tag { border-radius: 2px; background: var(--surface-2); color: var(--text); }
+:root[data-style='ow'] .netres-val { border-radius: 3px; background: rgba(7, 13, 25, 0.65); box-shadow: inset 0 0 0 1px var(--line); font-family: var(--font-display); font-style: italic; font-size: 20px; letter-spacing: 0.03em; }
+:root[data-style='ow'] form.trade label, :root[data-style='ow'] form.trade .plabel { color: var(--text); font-weight: 600; font-size: 14.5px; }
+:root[data-style='ow'] form.trade input::placeholder, :root[data-style='ow'] form.trade .pbtn:not(.set) { color: var(--text-3); }
+
+/* выпадающие списки (инструмент, параметры, счета, планы) */
+:root[data-style='ow'] .symlist, :root[data-style='ow'] .plist { background: #15233a; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--line-2), 0 18px 40px rgba(0, 0, 0, 0.55); }
+:root[data-style='ow'] .symopt, :root[data-style='ow'] .popt { border-radius: 2px; color: var(--text); font-weight: 500; }
+:root[data-style='ow'] .symopt:hover, :root[data-style='ow'] .symopt.hi, :root[data-style='ow'] .popt:hover { background: var(--surface-2); }
+:root[data-style='ow'] .symopt.sel, :root[data-style='ow'] .popt.sel { background: var(--accent); color: #101722; }
+:root[data-style='ow'] .popt.sel .psub { color: #3b2a08; }
+:root[data-style='ow'] .pbtn { border-radius: 3px; background: rgba(7, 13, 25, 0.65); box-shadow: inset 0 0 0 1px var(--line); clip-path: none; font-family: var(--font); font-style: normal; text-transform: none; letter-spacing: 0; font-size: 15px; font-weight: 500; color: var(--text-3); padding: 10px 12px; }
+:root[data-style='ow'] .pbtn.set { color: var(--accent); font-weight: 600; }
+:root[data-style='ow'] .pbtn:hover { background: rgba(7, 13, 25, 0.85); }
+:root[data-style='ow'] .pbtn[aria-expanded='true'] { box-shadow: inset 0 0 0 1.5px var(--accent); }
+:root[data-style='ow'] .popt, :root[data-style='ow'] .pdel, :root[data-style='ow'] .params-head { clip-path: none; font-style: normal; }
+:root[data-style='ow'] .params-head { font-style: italic; }
+:root[data-style='ow'] .padd { border-top-color: var(--line); }
+:root[data-style='ow'] .symbox-chev, :root[data-style='ow'] .pbtn svg { color: var(--accent); }
+
+/* --- окно и просмотр скриншота --- */
+:root[data-style='ow'] .modal { background: linear-gradient(180deg, #172640, #0f1a2f); clip-path: none; box-shadow: inset 0 0 0 1px var(--line-2), 0 30px 80px rgba(0, 0, 0, 0.6); }
+:root[data-style='ow'] .modal-back { background: rgba(4, 8, 16, 0.7); }
+:root[data-style='ow'] .lightbox img { border-radius: 3px; }
+:root[data-style='ow'] .shot { border-radius: 3px; background: rgba(7, 13, 25, 0.5); box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='ow'] .shot:not(.has) { box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='ow'] .shot img, :root[data-style='ow'] .g-item { border-radius: 3px; }
+:root[data-style='ow'] .shot-empty { color: var(--text-2); border-radius: 3px; font-size: 16px; }
+:root[data-style='ow'] .shot-empty:focus { color: var(--text); box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+/* --- таблицы и метрики --- */
+:root[data-style='ow'] th { font-size: 15px; color: var(--text-2); border-bottom-color: var(--line); }
+:root[data-style='ow'] td { border-bottom-color: var(--line); font-size: 15px; }
+:root[data-style='ow'] tbody tr:hover td { background: var(--surface-3); }
+:root[data-style='ow'] td.pos, :root[data-style='ow'] .pos, :root[data-style='ow'] .long { color: var(--green); }
+:root[data-style='ow'] td.neg, :root[data-style='ow'] .neg, :root[data-style='ow'] .short { color: var(--red); }
+:root[data-style='ow'] .metrics .l, :root[data-style='ow'] .recap-metrics .l { color: var(--text-2); font-size: 13.5px; }
+:root[data-style='ow'] .metrics .v { font-size: 32px; }
+:root[data-style='ow'] .recap-metrics .v { font-size: 26px; }
+:root[data-style='ow'] .metrics .v.pos, :root[data-style='ow'] .recap-metrics .v.pos { color: var(--green); }
+:root[data-style='ow'] .metrics .v.neg, :root[data-style='ow'] .recap-metrics .v.neg { color: var(--red); }
+
+/* --- список трейдов плана --- */
+:root[data-style='ow'] .tlist-head { color: var(--text); font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 0.04em; }
+:root[data-style='ow'] .tlist-count { color: var(--text-3); }
+:root[data-style='ow'] .tlist-add { border-radius: 2px; color: var(--accent); }
+:root[data-style='ow'] .tlist-add:hover { background: var(--accent-soft); color: var(--accent); }
+:root[data-style='ow'] .trow { border-radius: 3px; background: rgba(130, 175, 255, 0.06); box-shadow: inset 0 0 0 1px var(--line); font-size: 15px; }
+:root[data-style='ow'] .trow:hover { background: rgba(130, 175, 255, 0.13); box-shadow: inset 0 0 0 1px var(--accent), inset 3px 0 0 var(--accent); }
+:root[data-style='ow'] .trow-title { font-size: 19px; color: var(--text); }
+:root[data-style='ow'] .tchip { border-radius: 2px; }
+:root[data-style='ow'] .tpill { border-radius: 2px; font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: 14.5px; letter-spacing: 0.04em; text-transform: uppercase; }
+:root[data-style='ow'] .tpill i { border-radius: 0; transform: skewX(-20deg); }
+:root[data-style='ow'] .trow-icon { color: var(--accent); }
+
+/* --- заметки --- */
+:root[data-style='ow'] .note-item { border-radius: 3px; }
+:root[data-style='ow'] .note-item:hover { background: var(--surface-3); }
+:root[data-style='ow'] .note-item.active { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+:root[data-style='ow'] .note-item .t { font-weight: 600; }
+
+/* прокрутка */
+:root[data-style='ow'] * { scrollbar-color: #3b5278 transparent; }
+
+/* Hero: компактнее шапка, ровные метки у разделов формы */
+:root[data-style='ow'] .nav { gap: 14px; }
+:root[data-style='ow'] .tab { padding: 5px 16px; }
+:root[data-style='ow'] .stylesw .tab { padding: 3px 12px; }
+:root[data-style='ow'] .form-sec::before, :root[data-style='ow'] .params-head::before { margin-right: 0; }
+:root[data-style='ow'] .params-head { gap: 12px; }
+:root[data-style='ow'] .form-sec { gap: 12px; }
+:root[data-style='ow'] .status { gap: 6px; font-size: 12px; }
