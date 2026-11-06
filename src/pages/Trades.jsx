@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
 import { calcTrade, fmt } from '../stats.js'
+import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 
 const toLocalInput = (ts) => {
   const d = new Date(ts)
@@ -52,7 +53,7 @@ function TradeForm({ initial, onSubmit, onCancel }) {
   return (
     <form className="trade" onSubmit={submit}>
       <label>Инструмент
-        <input required value={f.symbol} onChange={set('symbol')} placeholder="BTCUSDT" />
+        <SymbolInput required value={f.symbol} onChange={(v) => set('symbol')({ target: { value: v } })} placeholder="Выбери" />
       </label>
       <label>Направление
         <select value={f.side} onChange={set('side')}>
@@ -190,7 +191,7 @@ export default function Trades() {
                   return (
                     <tr key={t.id} title={t.notes || ''}>
                       <td className="left">{new Date(t.openedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</td>
-                      <td className="left">{t.symbol}</td>
+                      <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       <td>{fmt(t.entry, 4)}</td>
                       <td>{c.closed ? fmt(t.exit, 4) : 'открыта'}</td>

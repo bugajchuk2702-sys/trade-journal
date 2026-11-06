@@ -20,7 +20,7 @@ export default function WeeklyRecap({ symbol, weekStart }) {
       const all = await db.trades.where('deleted').equals(0).toArray()
       const key = norm(symbol)
       return all
-        .filter((t) => !key || norm(t.symbol) === key)
+        .filter((t) => !key || norm(t.symbol) === key || (key.length >= 3 && (norm(t.symbol).startsWith(key) || key.startsWith(norm(t.symbol)) && norm(t.symbol).length >= 3)))
         .filter((t) => {
           const ts = t.closedAt || t.openedAt
           return ts >= from && ts < to

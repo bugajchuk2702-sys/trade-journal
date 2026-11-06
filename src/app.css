@@ -789,3 +789,32 @@ button { white-space: nowrap; }
 .shot:not(.has) { background: none; box-shadow: none; min-height: 0; margin-bottom: 0; }
 .shot-empty { min-height: 90px; padding: 8px; gap: 0; }
 :root[data-style='cyber'] .shot:not(.has) { background: none; box-shadow: none; }
+
+/* ===== Значки инструментов и выбор инструмента ===== */
+.sico { display: inline-block; flex: none; border-radius: 50%; overflow: hidden; vertical-align: middle; box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.35); }
+.sico svg { display: block; }
+.sico-pair { position: relative; display: inline-block; flex: none; vertical-align: middle; }
+.sico-pair .sico { position: absolute; top: 0; left: 0; }
+.sico-pair .sico.second { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px rgba(128, 128, 128, 0.3); }
+.sico-generic { display: inline-grid; place-items: center; background: var(--surface-2); color: var(--text-2); font-weight: 700; letter-spacing: 0; }
+.sico-empty { background: var(--surface-2); box-shadow: none; }
+
+.symbox { position: relative; width: 100%; }
+.symbox input { font-weight: 700; font-size: 15.5px; }
+.symbox-ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; pointer-events: none; }
+.symlist { position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; min-width: 250px; width: 100%; margin: 0; padding: 6px; list-style: none; background: var(--surface); border-radius: 16px; box-shadow: 0 14px 44px rgba(0, 0, 0, 0.28), 0 0 0 0.5px var(--line-2); }
+.symopt { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; color: var(--text); border-radius: 10px; padding: 8px 10px; font-size: 14.5px; font-weight: 600; letter-spacing: 0; }
+.symopt:hover, .symopt.hi { background: var(--surface-2); filter: none; }
+.symopt.sel { background: var(--accent-soft); }
+.symopt-ico { display: flex; align-items: center; width: 40px; flex: none; }
+.symcell { display: inline-flex; align-items: center; gap: 8px; }
+.chip .sico, .chip .sico-pair { margin-right: 8px; }
+.plan-card .sym { display: inline-flex; align-items: center; gap: 10px; }
+
+:root[data-style='cyber'] .symlist { border-radius: 0; background: #130b0e; box-shadow: inset 0 0 0 1px var(--line-2), 0 14px 44px rgba(0, 0, 0, 0.7); }
+:root[data-style='cyber'] .symopt { background: transparent; color: var(--text); border-radius: 0; clip-path: none; text-transform: uppercase; letter-spacing: 0.06em; }
+:root[data-style='cyber'] .symopt:hover, :root[data-style='cyber'] .symopt.hi { background: var(--accent-soft); color: #fff; }
+:root[data-style='cyber'] .symopt.sel { background: var(--accent); color: #fff; }
+:root[data-style='cyber'] .sico, :root[data-style='cyber'] .sico-generic { border-radius: 50%; clip-path: none; }
+:root[data-style='cyber'] .newplan, :root[data-style='cyber'] form.trade { clip-path: none; overflow: visible; }
+:root[data-style='cyber'] .newplan { box-shadow: inset 0 0 0 1px var(--line-2); }

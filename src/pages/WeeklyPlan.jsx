@@ -5,6 +5,7 @@ import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import WeeklyRecap from '../components/WeeklyRecap.jsx'
 import NotesCard from '../components/NotesCard.jsx'
+import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 
 // Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
 // остаются в базе нетронутыми, просто не показываются на странице.
@@ -81,11 +82,11 @@ function PlanEditor({ plan, onDelete }) {
   return (
     <>
       <div className="toolbar">
-        <input
-          style={{ maxWidth: 260, fontWeight: 700, fontSize: 16 }}
+        <SymbolInput
+          style={{ maxWidth: 280 }}
           value={p.symbol}
-          onChange={(e) => update({ symbol: e.target.value.toUpperCase() })}
-          placeholder="Инструмент: BTCUSDT, EUR/USD…"
+          onChange={(v) => update({ symbol: v })}
+          placeholder="Выбери инструмент"
         />
         <select
           className={'res ' + p.result}
@@ -212,6 +213,7 @@ export default function WeeklyPlan({ params = {} }) {
               setAdding(false)
             }}
           >
+            {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
             {p.result && <span className={'rdot ' + p.result} />}
             {p.symbol || 'Общий'}
           </button>
@@ -225,11 +227,12 @@ export default function WeeklyPlan({ params = {} }) {
         <form className="card newplan" onSubmit={create}>
           <h2>{plans.length === 0 ? 'План на эту неделю ещё не создан' : 'Новый план'}</h2>
           <div className="addrow">
-            <input
+            <SymbolInput
               autoFocus
+              style={{ flex: 1 }}
               value={newSym}
-              onChange={(e) => setNewSym(e.target.value)}
-              placeholder="Инструмент: BTCUSDT, EUR/USD, золото…"
+              onChange={setNewSym}
+              placeholder="Выбери инструмент"
             />
             <button type="submit">Создать план</button>
             {adding && plans.length > 0 && (

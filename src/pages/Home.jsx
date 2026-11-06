@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
 import { mondayOf, weekLabel } from '../week.js'
 import Dashboard from '../components/Dashboard.jsx'
+import { SymbolIcon } from '../components/Symbols.jsx'
 
 // Итог недели по инструменту (второй элемент — цвет значка)
 const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
@@ -38,7 +39,7 @@ export default function Home({ go }) {
           return (
             <button key={p.id} className="plan-card" onClick={() => go('plan', { weekStart: ws, planId: p.id })}>
               <div className="plan-card-head">
-                <span className="sym">{p.symbol || 'Общий план'}</span>
+                <span className="sym">{p.symbol && <SymbolIcon symbol={p.symbol} size={26} />}{p.symbol || 'Общий план'}</span>
                 {bias && <span className={'badge ' + bias[1]}>{bias[0]}</span>}
               </div>
               {thumb && <img className="thumb" src={thumb} alt="" />}
