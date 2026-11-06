@@ -767,3 +767,15 @@ select.res option[value='be'] { color: var(--orange) !important; }
 button { white-space: nowrap; }
 :root[data-style='cyber'] .note-item { text-transform: none; letter-spacing: 0.01em; font-size: 14px; font-weight: 500; }
 :root[data-style='cyber'] .note-item .t { text-transform: uppercase; letter-spacing: 0.04em; font-size: 13px; font-weight: 700; }
+
+/* Плитки Cyber: серые, с тонкой рамкой и срезанным углом (без красного маркера) */
+:root[data-style='cyber'] .card,
+:root[data-style='cyber'] .plan-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02) 70%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
+}
+:root[data-style='cyber'] .card::before,
+:root[data-style='cyber'] .plan-card::before { display: none; }
+:root[data-style='cyber'] .plan-card:hover { background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035) 70%); box-shadow: inset 0 0 0 1px var(--line-2); }
+:root[data-style='cyber'] .plan-card.add { background: transparent; box-shadow: none; clip-path: none; border: 1px dashed rgba(255, 255, 255, 0.14); }
