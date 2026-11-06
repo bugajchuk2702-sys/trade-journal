@@ -47,7 +47,7 @@ function TradeRow({ t, n, onOpen }) {
   const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]
   const tint = TAG_TINT[norm(t.symbol)]
   return (
-    <button type="button" className="trow" onClick={() => onOpen(t)} title={(t.conclusion || t.notes || 'Открыть сделку') + ''}>
+    <button type="button" className="trow" onClick={() => onOpen(t)} title="Открыть сделку на вкладке Trades">
       <svg className="trow-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
         <path d="M3.5 1.5h6l3 3v10h-9z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
         <path d="M9.5 1.5v3h3M5.5 9.5l1.7-1.7 1.6 1.4 2-2.4" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -91,7 +91,7 @@ function TradesList({ trades, onAdd, onOpen }) {
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
-function PlanEditor({ plan, onDelete }) {
+function PlanEditor({ plan, onDelete, go }) {
   const [p, setP] = useState(() => pick(plan))
   // null — окно закрыто, {} — новая сделка, объект сделки — правка
   const [tradeModal, setTradeModal] = useState(null)
@@ -171,7 +171,7 @@ function PlanEditor({ plan, onDelete }) {
         <button onClick={() => setTradeModal({})}>+ Добавить трейд</button>
       </div>
 
-      <TradesList trades={attached} onAdd={() => setTradeModal({})} onOpen={setTradeModal} />
+      <TradesList trades={attached} onAdd={() => setTradeModal({})} onOpen={(t) => go('trades', { tradeId: t.id, back: { weekStart: plan.weekStart, planId: plan.id } })} />
 
       <h3 className="section-title">Pre-Session</h3>
       <div className="row3">
@@ -245,7 +245,7 @@ function PlanEditor({ plan, onDelete }) {
   )
 }
 
-export default function WeeklyPlan({ params = {} }) {
+export default function WeeklyPlan({ params = {}, go }) {
   const [ws, setWs] = useState(params.weekStart || mondayOf())
   const [selId, setSelId] = useState(params.planId || null)
   const [adding, setAdding] = useState(!!params.create)
@@ -338,6 +338,7 @@ export default function WeeklyPlan({ params = {} }) {
         <PlanEditor
           key={selected.id}
           plan={selected}
+          go={go}
           onDelete={async () => {
             await removePlan(selected.id)
             setSelId(null)

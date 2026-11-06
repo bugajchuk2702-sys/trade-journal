@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
 import { calcTrade, fmt, hasResult } from '../stats.js'
@@ -124,13 +124,19 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
   )
 }
 
-export default function Trades() {
+export default function Trades({ params = {}, go }) {
   const [editing, setEditing] = useState(null)
   const [query, setQuery] = useState('')
   const fileRef = useRef(null)
 
   const plans = useLiveQuery(() => db.plans.filter((p) => !p.deleted).toArray(), [], [])
   const planOf = (t) => plans.find((p) => p.id === t.planId)
+
+  // Пришли из плана по клику на сделку — сразу открываем её на правку
+  useEffect(() => {
+    if (!params.tradeId) return
+    db.trades.get(params.tradeId).then((t) => t && !t.deleted && setEditing(t))
+  }, [params.tradeId])
 
   const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).reverse().sortBy('openedAt'), [], [])
 
@@ -167,7 +173,13 @@ export default function Trades() {
   return (
     <>
       <section className="card">
-        <h2>{editing ? 'Редактировать сделку' : 'Новая сделка'}</h2>
+        <div className="shot-head">
+          <h2>{editing ? 'Редактировать сделку' : 'Новая сделка'}</h2>
+          <span className="spacer" />
+          {params.back && go && (
+            <button type="button" className="ghost small" onClick={() => go('plan', params.back)}>← К плану</button>
+          )}
+        </div>
         {editing ? (
           <TradeForm
             key={editing.id}
