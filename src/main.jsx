@@ -4,6 +4,10 @@ import { registerSW } from 'virtual:pwa-register'
 import App from './App.jsx'
 import '@fontsource-variable/inter/wght.css'
 import '@fontsource-variable/exo-2/wght.css'
+import '@fontsource/play/latin-400.css'
+import '@fontsource/play/latin-700.css'
+import '@fontsource/play/cyrillic-400.css'
+import '@fontsource/play/cyrillic-700.css'
 import './app.css'
 
 // Автообновление: когда на сайте выходит новая версия, приложение само
