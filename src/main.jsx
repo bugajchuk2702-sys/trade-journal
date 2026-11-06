@@ -31,6 +31,9 @@ import '@fontsource/alegreya-sans/cyrillic-700.css'
 import '@fontsource/forum/latin-400.css'
 import '@fontsource/forum/cyrillic-400.css'
 import '@fontsource-variable/source-sans-3/wght.css'
+import '@fontsource/oranienbaum/latin-400.css'
+import '@fontsource/oranienbaum/cyrillic-400.css'
+import '@fontsource-variable/jost/wght.css'
 import './app.css'
 
 // Автообновление: когда на сайте выходит новая версия, приложение само

@@ -1921,3 +1921,258 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
   .nav > .status { flex-shrink: 1; }
 }
 :root[data-style='lol'] .page-title h2::before { vertical-align: 0.16em; }
+
+/* =====================================================================
+   Стиль 5: Arcane — Пилтовер (латунь, ар-деко) и Заун (шиммер, ар-нуво)
+   ===================================================================== */
+:root[data-style='arc'] {
+  color-scheme: dark;
+  --font: 'Jost Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Oranienbaum', 'Jost Variable', Georgia, serif;
+
+  --bg: #0b0810;
+  --surface: #150f20;
+  --surface-2: rgba(216, 180, 106, 0.09);
+  --surface-3: rgba(216, 180, 106, 0.05);
+  --text: #ece1cc;
+  --text-2: #b6aa98;
+  --text-3: #7d7186;
+  --line: rgba(216, 180, 106, 0.2);
+  --line-2: rgba(216, 180, 106, 0.5);
+
+  --accent: #d8b46a;
+  --accent-text: #17101f;
+  --accent-soft: rgba(216, 180, 106, 0.14);
+  --gold: #d8b46a;
+  --gold-hi: #f4e8cb;
+  --pink: #e0479f;
+  --pink-hi: #ff7ccb;
+  --violet: #6e2a86;
+
+  --green: #86df6e;
+  --green-fill: #86df6e;
+  --green-soft: rgba(134, 223, 110, 0.15);
+  --red: #ff5a4f;
+  --red-fill: #ff5a4f;
+  --red-soft: rgba(255, 90, 79, 0.17);
+  --orange: #52c9de;
+  --orange-fill: #52c9de;
+  --orange-soft: rgba(82, 201, 222, 0.16);
+
+  --seg-active: #d8b46a;
+  --nav-bg: rgba(11, 8, 16, 0.94);
+  --shadow: none;
+  --shadow-hover: none;
+  --edge: linear-gradient(135deg, #efcf8e 0%, #8a6a40 30%, #5a3a82 66%, #e0479f 100%);
+  --shimmer: linear-gradient(180deg, #c33f9f, #6a2882);
+}
+:root[data-style='arc'] body {
+  font-family: var(--font); font-size: 17px; font-variant-numeric: tabular-nums;
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 0.92 0 0 0 0 0.8 0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.07'/></svg>"),
+    radial-gradient(ellipse 70% 42% at 12% -8%, rgba(214, 150, 60, 0.32) 0%, transparent 66%),
+    radial-gradient(ellipse 45% 35% at 40% -10%, rgba(20, 130, 138, 0.26) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 104% 106%, rgba(200, 40, 150, 0.38) 0%, transparent 66%),
+    radial-gradient(ellipse 50% 40% at -4% 110%, rgba(100, 56, 190, 0.3) 0%, transparent 70%),
+    #0b0810;
+  background-attachment: fixed;
+}
+:root[data-style='arc'] .theme-btn { display: none; }
+
+/* --- заголовки: резные капители, латунь → шиммер --- */
+:root[data-style='arc'] .page-title h2,
+:root[data-style='arc'] .section-title,
+:root[data-style='arc'] .card h2,
+:root[data-style='arc'] .form-sec,
+:root[data-style='arc'] .params-head,
+:root[data-style='arc'] .plan-card .sym,
+:root[data-style='arc'] .trow-title,
+:root[data-style='arc'] .brand,
+:root[data-style='arc'] .tlist-head,
+:root[data-style='arc'] th {
+  font-family: var(--font-display); font-weight: 400; text-transform: uppercase; letter-spacing: 0.07em; font-style: normal;
+  font-synthesis: none; -webkit-text-stroke: 0.45px currentColor;
+}
+:root[data-style='arc'] .page-title h2 {
+  font-size: 42px; line-height: 1.05; letter-spacing: 0.06em;
+  background: linear-gradient(90deg, #f6ead0 0%, #d8b46a 52%, #ee6fc0 100%); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; -webkit-text-stroke: 0; padding-right: 0.12em;
+}
+:root[data-style='arc'] .section-title { font-size: 29px; color: var(--gold); }
+:root[data-style='arc'] .card h2 { font-size: 22px; color: var(--gold); }
+:root[data-style='arc'] .form-sec, :root[data-style='arc'] .params-head { font-size: 23px; color: var(--gold); }
+:root[data-style='arc'] .form-sec::after, :root[data-style='arc'] .params-head::after { background: linear-gradient(90deg, rgba(216, 180, 106, 0.55), rgba(224, 71, 159, 0.35) 60%, transparent); }
+
+/* искра (хекстех) перед заголовками */
+:root[data-style='arc'] .page-title h2::before,
+:root[data-style='arc'] .section-title::before,
+:root[data-style='arc'] .card h2::before,
+:root[data-style='arc'] .form-sec::before,
+:root[data-style='arc'] .params-head::before {
+  content: ''; display: inline-block; width: 15px; height: 15px; margin-right: 12px;
+  background: linear-gradient(135deg, #f3d595, #e0479f);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  vertical-align: 0.08em; flex: none; -webkit-text-fill-color: initial;
+}
+:root[data-style='arc'] .page-title h2::before { vertical-align: 0.2em; }
+:root[data-style='arc'] .form-sec::before, :root[data-style='arc'] .params-head::before { margin-right: 0; }
+:root[data-style='arc'] .form-sec, :root[data-style='arc'] .params-head { gap: 13px; }
+:root[data-style='arc'] .subtle { color: var(--text-2); font-size: 18px; }
+:root[data-style='arc'] .page-title strong, :root[data-style='arc'] .period-nav strong { color: var(--text); font-weight: 600; }
+
+/* --- шапка --- */
+:root[data-style='arc'] .nav {
+  background: linear-gradient(180deg, #140e1e, #0b0810); border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, #7c5b34 8%, #d8b46a 34%, #a8409e 72%, #e0479f 90%, transparent) 1;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); gap: 12px;
+}
+:root[data-style='arc'] .brand { font-size: 23px; letter-spacing: 0.06em; color: var(--gold); background: transparent; border-radius: 0; }
+:root[data-style='arc'] .brand:hover { background: transparent; color: var(--gold-hi); }
+:root[data-style='arc'] .logo { border-radius: 50%; background: linear-gradient(135deg, #f0d08f, #c13f9c); box-shadow: 0 0 12px rgba(224, 71, 159, 0.45); }
+:root[data-style='arc'] .logo svg { stroke: #150c1c; }
+:root[data-style='arc'] .tabs { background: transparent; padding: 0; gap: 2px; border-radius: 0; }
+:root[data-style='arc'] .tab {
+  font-family: var(--font-display); font-weight: 400; font-size: 17px; letter-spacing: 0.06em; text-transform: uppercase; -webkit-text-stroke: 0.4px currentColor;
+  color: var(--text-2); background: transparent; border-radius: 0; padding: 7px 12px; box-shadow: none;
+  border-bottom: 2px solid transparent; transition: color 0.15s, background-color 0.15s;
+}
+:root[data-style='arc'] .tab:hover { color: var(--gold-hi); background: var(--surface-3); }
+:root[data-style='arc'] .tab.active {
+  color: var(--gold-hi); background: linear-gradient(180deg, transparent, rgba(224, 71, 159, 0.17));
+  border-bottom: 2px solid; border-image: linear-gradient(90deg, #d8b46a, #e0479f) 1; box-shadow: none;
+}
+:root[data-style='arc'] .stylesw .tab { font-size: 13.5px; padding: 4px 7px; letter-spacing: 0.03em; -webkit-text-stroke: 0.3px currentColor; }
+:root[data-style='arc'] .status { color: var(--text-2); font-size: 13px; gap: 6px; flex-basis: 200px; }
+:root[data-style='arc'] .dot.ok { background: var(--green-fill); box-shadow: 0 0 8px rgba(134, 223, 110, 0.8); }
+
+/* --- карточки: латунно-шиммерная рамка, уголки Пилтовер / Заун --- */
+:root[data-style='arc'] .card, :root[data-style='arc'] .plan-card {
+  border: 1px solid transparent; border-radius: 2px;
+  background:
+    linear-gradient(135deg, #f0d28f 0 50%, transparent 50%) 0 0 / 15px 15px no-repeat padding-box,
+    linear-gradient(-45deg, #e0479f 0 50%, transparent 50%) 100% 100% / 15px 15px no-repeat padding-box,
+    linear-gradient(180deg, #181022, #0f0a18) padding-box,
+    var(--edge) border-box;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+}
+:root[data-style='arc'] .card { padding: 24px 28px; }
+:root[data-style='arc'] .plan-card { transition: box-shadow 0.2s; }
+:root[data-style='arc'] .plan-card:hover { transform: none; box-shadow: 0 0 26px rgba(224, 71, 159, 0.3), 0 0 10px rgba(216, 180, 106, 0.2), 0 6px 22px rgba(0, 0, 0, 0.5); }
+:root[data-style='arc'] .plan-card .sym { font-size: 29px; color: var(--text); }
+:root[data-style='arc'] .plan-card .ex { color: var(--text-2); font-size: 17px; }
+:root[data-style='arc'] .plan-card.add {
+  background: transparent; border: 1px dashed rgba(216, 180, 106, 0.45); box-shadow: none; color: var(--gold);
+  font-family: var(--font-display); font-weight: 400; font-size: 22px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+:root[data-style='arc'] .plan-card.add:hover { background: var(--accent-soft); border-color: var(--gold); box-shadow: none; }
+:root[data-style='arc'] .shot-head { border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, var(--line-2), transparent) 1; }
+:root[data-style='arc'] .plan-footer { border-top-color: var(--line); }
+:root[data-style='arc'] .badge { border-radius: 2px; font-family: var(--font-display); font-weight: 400; font-size: 16px; letter-spacing: 0.07em; text-transform: uppercase; padding: 2px 10px; -webkit-text-stroke: 0.3px currentColor; }
+
+/* --- кнопки --- */
+:root[data-style='arc'] button:not([class]), :root[data-style='arc'] button.ghost, :root[data-style='arc'] button.danger,
+:root[data-style='arc'] .padd button.small, :root[data-style='arc'] .chip {
+  font-family: var(--font-display); font-weight: 400; font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; -webkit-text-stroke: 0.4px currentColor;
+  border-radius: 2px; padding: 8px 22px; font-style: normal; border: 1px solid transparent; transition: box-shadow 0.18s, color 0.18s, filter 0.18s;
+}
+:root[data-style='arc'] button:not([class]) {
+  background: var(--shimmer) padding-box, linear-gradient(180deg, #efcf8e, #8a6a40) border-box; color: #fff1dc;
+  box-shadow: inset 0 1px 0 rgba(255, 220, 240, 0.22);
+}
+:root[data-style='arc'] button:not([class]):hover { background: linear-gradient(180deg, #dd4fb4, #7b2f96) padding-box, linear-gradient(180deg, #f6dca0, #b08a4e) border-box; filter: none; box-shadow: 0 0 18px rgba(224, 71, 159, 0.55), inset 0 1px 0 rgba(255, 220, 240, 0.3); }
+:root[data-style='arc'] button.ghost { background: transparent; color: var(--text); border-color: rgba(216, 180, 106, 0.45); }
+:root[data-style='arc'] button.ghost:hover { background: var(--accent-soft); border-color: var(--gold); color: var(--gold-hi); }
+:root[data-style='arc'] button.danger { background: transparent; color: var(--red); border-color: rgba(255, 90, 79, 0.5); }
+:root[data-style='arc'] button.danger:hover { background: var(--red-soft); border-color: var(--red); }
+:root[data-style='arc'] button.small { font-size: 15px; padding: 4px 16px; }
+:root[data-style='arc'] button:focus-visible { outline: 2px solid var(--pink-hi); outline-offset: 2px; }
+
+/* вкладки планов и период (chips) */
+:root[data-style='arc'] .chip { background: transparent; color: var(--text-2); border-color: rgba(216, 180, 106, 0.3); font-size: 18px; padding: 7px 20px; }
+:root[data-style='arc'] .chip:hover { background: var(--accent-soft); color: var(--gold-hi); border-color: rgba(216, 180, 106, 0.6); }
+:root[data-style='arc'] .chip.active { background: var(--shimmer) padding-box, linear-gradient(180deg, #efcf8e, #8a6a40) border-box; color: #fff1dc; box-shadow: 0 0 14px rgba(224, 71, 159, 0.35); }
+:root[data-style='arc'] .chip.add { background: transparent; color: var(--gold); border-color: transparent; }
+:root[data-style='arc'] .chip.add:hover { background: var(--accent-soft); }
+:root[data-style='arc'] .chip-n { border-radius: 2px; background: var(--gold); color: #17101f; -webkit-text-stroke: 0; }
+:root[data-style='arc'] .chip.active .chip-n { background: #17101f; color: var(--gold-hi); }
+:root[data-style='arc'] .rdot { border-radius: 0; transform: rotate(45deg) scale(0.85); }
+
+/* --- поля --- */
+:root[data-style='arc'] input, :root[data-style='arc'] select, :root[data-style='arc'] textarea {
+  background-color: rgba(8, 5, 14, 0.72); border-radius: 2px; color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(124, 91, 52, 0.9); font-size: 17px; transition: box-shadow 0.15s;
+}
+:root[data-style='arc'] input:focus, :root[data-style='arc'] select:focus, :root[data-style='arc'] textarea:focus { box-shadow: inset 0 0 0 1px var(--pink), 0 0 12px rgba(224, 71, 159, 0.4); }
+:root[data-style='arc'] input::placeholder, :root[data-style='arc'] textarea::placeholder { color: var(--text-3); }
+:root[data-style='arc'] label { color: var(--gold); font-weight: 600; }
+:root[data-style='arc'] select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23d8b46a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+:root[data-style='arc'] select.res { background-image: none; }
+:root[data-style='arc'] select.res.profit { background-color: var(--green-soft); color: var(--green); }
+:root[data-style='arc'] select.res.loss { background-color: var(--red-soft); color: var(--red); }
+:root[data-style='arc'] select.res.be { background-color: var(--orange-soft); color: var(--orange); }
+:root[data-style='arc'] option { background: #130d1d; color: var(--text); }
+:root[data-style='arc'] .tag { border-radius: 2px; background: var(--surface-2); color: var(--text); }
+:root[data-style='arc'] .netres-val { border-radius: 2px; background: rgba(8, 5, 14, 0.72); box-shadow: inset 0 0 0 1px rgba(124, 91, 52, 0.9); font-family: var(--font); font-weight: 600; font-size: 19px; }
+:root[data-style='arc'] form.trade label, :root[data-style='arc'] form.trade .plabel { color: var(--gold); font-weight: 600; font-size: 15.5px; }
+:root[data-style='arc'] form.trade input::placeholder, :root[data-style='arc'] form.trade .pbtn:not(.set) { color: var(--text-3); }
+
+/* выпадающие списки */
+:root[data-style='arc'] .symlist, :root[data-style='arc'] .plist { background: #130d1d; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(216, 180, 106, 0.55), 0 18px 40px rgba(0, 0, 0, 0.75); }
+:root[data-style='arc'] .symopt, :root[data-style='arc'] .popt { border-radius: 2px; color: var(--text); font-weight: 500; }
+:root[data-style='arc'] .symopt:hover, :root[data-style='arc'] .symopt.hi, :root[data-style='arc'] .popt:hover { background: var(--accent-soft); }
+:root[data-style='arc'] .symopt.sel, :root[data-style='arc'] .popt.sel { background: linear-gradient(90deg, rgba(224, 71, 159, 0.3), rgba(224, 71, 159, 0.08)); color: #ffe3f3; box-shadow: inset 2px 0 0 var(--pink); }
+:root[data-style='arc'] .popt.sel .psub { color: #f3a8d6; }
+:root[data-style='arc'] .pbtn { border-radius: 2px; background: rgba(8, 5, 14, 0.72); box-shadow: inset 0 0 0 1px rgba(124, 91, 52, 0.9); font-family: var(--font); text-transform: none; letter-spacing: 0; -webkit-text-stroke: 0; font-size: 17px; font-weight: 500; color: var(--text-3); padding: 10px 12px; }
+:root[data-style='arc'] .pbtn.set { color: var(--gold-hi); font-weight: 600; }
+:root[data-style='arc'] .pbtn:hover { background: rgba(8, 5, 14, 0.95); }
+:root[data-style='arc'] .pbtn[aria-expanded='true'] { box-shadow: inset 0 0 0 1px var(--pink), 0 0 12px rgba(224, 71, 159, 0.35); }
+:root[data-style='arc'] .padd { border-top-color: var(--line); }
+:root[data-style='arc'] .symbox-chev, :root[data-style='arc'] .pbtn svg { color: var(--gold); }
+
+/* --- окно и скриншоты --- */
+:root[data-style='arc'] .modal { box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 60px rgba(224, 71, 159, 0.12); }
+:root[data-style='arc'] .modal-back { background: rgba(6, 3, 12, 0.84); }
+:root[data-style='arc'] .lightbox img { border-radius: 2px; }
+:root[data-style='arc'] .shot { border-radius: 2px; background: rgba(8, 5, 14, 0.6); box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='arc'] .shot img, :root[data-style='arc'] .g-item { border-radius: 2px; }
+:root[data-style='arc'] .shot-empty { color: var(--text-2); border-radius: 2px; font-size: 17px; }
+:root[data-style='arc'] .shot-empty:focus { color: var(--text); box-shadow: inset 0 0 0 1px var(--pink), 0 0 12px rgba(224, 71, 159, 0.35); }
+
+/* --- таблицы и метрики --- */
+:root[data-style='arc'] th { font-size: 16px; color: var(--gold); border-bottom-color: var(--line-2); }
+:root[data-style='arc'] td { border-bottom-color: var(--line); font-size: 17px; }
+:root[data-style='arc'] tbody tr:hover td { background: var(--surface-3); }
+:root[data-style='arc'] td.pos, :root[data-style='arc'] .pos, :root[data-style='arc'] .long { color: var(--green); }
+:root[data-style='arc'] td.neg, :root[data-style='arc'] .neg, :root[data-style='arc'] .short { color: var(--red); }
+:root[data-style='arc'] .metrics .l, :root[data-style='arc'] .recap-metrics .l { color: var(--text-2); font-size: 14.5px; }
+:root[data-style='arc'] .metrics .v, :root[data-style='arc'] .recap-metrics .v { font-family: var(--font); font-weight: 600; font-style: normal; text-transform: none; letter-spacing: 0; -webkit-text-stroke: 0; color: var(--text); }
+:root[data-style='arc'] .metrics .v { font-size: 30px; }
+:root[data-style='arc'] .recap-metrics .v { font-size: 25px; }
+:root[data-style='arc'] .metrics .v.pos, :root[data-style='arc'] .recap-metrics .v.pos { color: var(--green); }
+:root[data-style='arc'] .metrics .v.neg, :root[data-style='arc'] .recap-metrics .v.neg { color: var(--red); }
+
+/* --- список трейдов плана --- */
+:root[data-style='arc'] .tlist-head { color: var(--gold); font-size: 20px; }
+:root[data-style='arc'] .tlist-count { color: var(--text-3); }
+:root[data-style='arc'] .tlist-add { border-radius: 2px; color: var(--gold); }
+:root[data-style='arc'] .tlist-add:hover { background: var(--accent-soft); color: var(--gold-hi); }
+:root[data-style='arc'] .trow { border-radius: 2px; background: rgba(216, 180, 106, 0.05); box-shadow: inset 0 0 0 1px var(--line); font-size: 17px; transition: box-shadow 0.15s, background-color 0.15s; }
+:root[data-style='arc'] .trow:hover { background: rgba(224, 71, 159, 0.08); box-shadow: inset 0 0 0 1px var(--gold), 0 0 16px rgba(224, 71, 159, 0.2); }
+:root[data-style='arc'] .trow-title { font-size: 20px; color: var(--text); }
+:root[data-style='arc'] .tchip { border-radius: 2px; }
+:root[data-style='arc'] .tpill { border-radius: 2px; font-family: var(--font-display); font-weight: 400; font-size: 16px; letter-spacing: 0.07em; text-transform: uppercase; -webkit-text-stroke: 0.3px currentColor; }
+:root[data-style='arc'] .tpill i { border-radius: 0; transform: rotate(45deg) scale(0.85); }
+:root[data-style='arc'] .trow-icon { color: var(--gold); }
+
+/* --- заметки --- */
+:root[data-style='arc'] .note-item { border-radius: 2px; }
+:root[data-style='arc'] .note-item:hover { background: var(--surface-3); }
+:root[data-style='arc'] .note-item.active { background: linear-gradient(90deg, rgba(224, 71, 159, 0.22), rgba(224, 71, 159, 0.05)); box-shadow: inset 3px 0 0 var(--pink); }
+:root[data-style='arc'] .note-item .t { font-weight: 600; }
+
+:root[data-style='arc'] * { scrollbar-color: #7c5b34 transparent; }
+:root[data-style='arc'] th { font-size: 15px; letter-spacing: 0.04em; }
+:root[data-style='arc'] td { font-size: 16px; }
+:root[data-style='arc'] .tablewrap th, :root[data-style='arc'] .tablewrap td { padding-left: 8px; padding-right: 8px; }
