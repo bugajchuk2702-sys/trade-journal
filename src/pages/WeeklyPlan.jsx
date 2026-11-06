@@ -214,7 +214,7 @@ function PlanEditor({ plan, onDelete }) {
         <WeeklyRecap symbol={p.symbol} weekStart={plan.weekStart} />
       </div>
 
-      <h4 className="subhead">Заметки и наблюдения в течение недели:</h4>
+      <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Notes</h3>
       <NotesCard
         title="Заметки недели"
         text={p.weekNotes}
