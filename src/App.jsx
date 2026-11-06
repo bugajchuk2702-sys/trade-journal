@@ -48,11 +48,11 @@ function useTheme() {
 
 function useStyle() {
   const [style, setStyle] = useState(() => {
-    try { const v = localStorage.getItem('style'); return v === 'cyber' || v === 'ow' || v === 'd4' || v === 'lol' || v === 'arc' ? v : 'apple' } catch { return 'apple' }
+    try { const v = localStorage.getItem('style'); return v === 'ow' ? v : 'apple' } catch { return 'apple' }
   })
   useEffect(() => {
     const el = document.documentElement
-    if (style === 'cyber' || style === 'ow' || style === 'd4' || style === 'lol' || style === 'arc') el.dataset.style = style
+    if (style === 'ow') el.dataset.style = style
     else el.removeAttribute('data-style')
     try { localStorage.setItem('style', style) } catch {}
   }, [style])
@@ -116,11 +116,7 @@ export default function App() {
         </div>
         <div className="tabs stylesw" title="Стиль оформления">
           <button className={'tab' + (style === 'apple' ? ' active' : '')} onClick={() => setStyle('apple')}>Apple</button>
-          <button className={'tab' + (style === 'cyber' ? ' active' : '')} onClick={() => setStyle('cyber')}>Cyber</button>
           <button className={'tab' + (style === 'ow' ? ' active' : '')} onClick={() => setStyle('ow')}>Hero</button>
-          <button className={'tab' + (style === 'd4' ? ' active' : '')} onClick={() => setStyle('d4')}>Gothic</button>
-          <button className={'tab' + (style === 'lol' ? ' active' : '')} onClick={() => setStyle('lol')}>LoL</button>
-          <button className={'tab' + (style === 'arc' ? ' active' : '')} onClick={() => setStyle('arc')}>Arcane</button>
         </div>
         <button className="icon-btn theme-btn" onClick={nextTheme} title={'Тема: ' + ({ auto: 'как в системе', light: 'светлая', dark: 'тёмная' })[theme]}>
           {THEME_ICON[theme]}
