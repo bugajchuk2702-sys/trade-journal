@@ -1166,3 +1166,15 @@ form.trade .pbtn,
 form.trade .netres-val { height: 42px; min-height: 42px; box-sizing: border-box; }
 form.trade .symbox input { height: 42px; }
 form.trade .pbox, form.trade .netres, form.trade label { justify-content: flex-end; }
+
+/* Подписи полей формы: крупнее и ярче значений внутри полей, чтобы не сливались с «Выбрать» / «0.5» */
+form.trade label, form.trade .plabel,
+:root[data-style='cyber'] form.trade label, :root[data-style='cyber'] form.trade .plabel {
+  font-size: 14.5px; font-weight: 700; letter-spacing: 0.01em; text-transform: none; color: var(--text); line-height: 1.2;
+}
+form.trade label, form.trade .pbox, form.trade .netres { gap: 7px; }
+form.trade label > input, form.trade label > select, form.trade label > .symbox,
+form.trade label > .symbox input { font-weight: 500; }
+:root[data-style='cyber'] form.trade input::placeholder, :root[data-style='cyber'] form.trade .pbtn:not(.set) { color: var(--text-3); font-weight: 400; }
+form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
+.form-sec, .params-head, :root[data-style='cyber'] .params-head { font-size: 16px; }
