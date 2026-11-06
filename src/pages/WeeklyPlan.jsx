@@ -144,24 +144,26 @@ function PlanEditor({ plan, onDelete }) {
 
   return (
     <>
-      <div className="toolbar">
+      <div className="toolbar" style={{ alignItems: 'flex-end' }}>
         <SymbolInput
           style={{ maxWidth: 280 }}
           value={p.symbol}
           onChange={(v) => update({ symbol: v })}
           placeholder="Выбери инструмент"
         />
-        <select
-          className={'res ' + p.result}
-          style={{ maxWidth: 200 }}
-          value={p.result}
-          onChange={(e) => update({ result: e.target.value })}
-        >
-          <option value="">Итог: не выбран</option>
-          <option value="profit">Прибыльная</option>
-          <option value="loss">Убыточная</option>
-          <option value="be">Безубыточная</option>
-        </select>
+        <label style={{ width: 200 }}>
+          Weekly Result
+          <select
+            className={'res ' + p.result}
+            value={p.result}
+            onChange={(e) => update({ result: e.target.value })}
+          >
+            <option value="">Итог: не выбран</option>
+            <option value="profit">Прибыльная</option>
+            <option value="loss">Убыточная</option>
+            <option value="be">Безубыточная</option>
+          </select>
+        </label>
         <span className="spacer" />
         <button onClick={() => setTradeModal({})}>+ Добавить трейд</button>
       </div>

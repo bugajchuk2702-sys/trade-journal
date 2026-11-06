@@ -920,3 +920,6 @@ button { white-space: nowrap; }
 :root[data-style='cyber'] .trow-title { text-transform: uppercase; letter-spacing: 0.06em; font-size: 13px; }
 @media (max-width: 700px) { .trow { flex-wrap: wrap; } .trow-side { margin-left: 0; } }
 :root[data-style='cyber'] .tlist-add { font-size: 20px; font-weight: 400; letter-spacing: 0; }
+select.res.profit { color: var(--green); } select.res.loss { color: var(--red); } select.res.be { color: var(--orange); }
+.toolbar label select { font-size: 15px; text-transform: none; letter-spacing: normal; font-weight: 400; }
+:root[data-style='cyber'] .toolbar label select { font-size: 15px; letter-spacing: 0.02em; }
