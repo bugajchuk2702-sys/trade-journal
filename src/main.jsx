@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import App from './App.jsx'
 import '@fontsource-variable/inter/wght.css'
+import '@fontsource-variable/exo-2/wght.css'
 import './app.css'
 
 // Автообновление: когда на сайте выходит новая версия, приложение само

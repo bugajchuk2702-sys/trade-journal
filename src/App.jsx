@@ -46,8 +46,22 @@ function useTheme() {
   return [theme, next]
 }
 
+function useStyle() {
+  const [style, setStyle] = useState(() => {
+    try { return localStorage.getItem('style') === 'cyber' ? 'cyber' : 'apple' } catch { return 'apple' }
+  })
+  useEffect(() => {
+    const el = document.documentElement
+    if (style === 'cyber') el.dataset.style = 'cyber'
+    else el.removeAttribute('data-style')
+    try { localStorage.setItem('style', style) } catch {}
+  }, [style])
+  return [style, setStyle]
+}
+
 export default function App() {
   const online = useOnline()
+  const [style, setStyle] = useStyle()
   const [theme, nextTheme] = useTheme()
   // Приложение всегда открывается на главной. params нужны, чтобы с карточки плана
   // сразу попасть в нужный план на странице Weekly Plan.
@@ -98,7 +112,11 @@ export default function App() {
           {persisted === false && ' · хранилище не защищено'}
           <span title="Время сборки этой версии"> · версия от {new Date(__BUILD_TIME__).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</span>
         </div>
-        <button className="icon-btn" onClick={nextTheme} title={'Тема: ' + ({ auto: 'как в системе', light: 'светлая', dark: 'тёмная' })[theme]}>
+        <div className="tabs stylesw" title="Стиль оформления">
+          <button className={'tab' + (style === 'apple' ? ' active' : '')} onClick={() => setStyle('apple')}>Apple</button>
+          <button className={'tab' + (style === 'cyber' ? ' active' : '')} onClick={() => setStyle('cyber')}>Cyber</button>
+        </div>
+        <button className="icon-btn theme-btn" onClick={nextTheme} title={'Тема: ' + ({ auto: 'как в системе', light: 'светлая', dark: 'тёмная' })[theme]}>
           {THEME_ICON[theme]}
         </button>
       </header>

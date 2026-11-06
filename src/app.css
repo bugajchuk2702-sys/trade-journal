@@ -337,3 +337,161 @@ select.res option[value='be'] { color: var(--orange) !important; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* =====================================================================
+   Стиль «Cyberpunk»: включается атрибутом data-style="cyber" на <html>.
+   Всегда тёмный, жёлтый акцент, острые срезанные углы, неоновое свечение.
+   Лежит в конце файла, чтобы перебивать токены обеих тем.
+   ===================================================================== */
+:root[data-style='cyber'] {
+  color-scheme: dark;
+  --font: 'Exo 2 Variable', 'Exo 2', 'Segoe UI', system-ui, sans-serif;
+  --bg: #08080c;
+  --surface: #13131b;
+  --surface-2: rgba(252, 238, 10, 0.08);
+  --surface-3: rgba(0, 240, 255, 0.06);
+  --text: #f4f1e4;
+  --text-2: #8d90a6;
+  --text-3: #55586d;
+  --line: rgba(252, 238, 10, 0.16);
+  --line-2: rgba(252, 238, 10, 0.4);
+  --accent: #fcee0a;
+  --accent-text: #0a0a0a;
+  --accent-soft: rgba(252, 238, 10, 0.2);
+  --green: #1af2a5;
+  --green-fill: #1af2a5;
+  --green-soft: rgba(26, 242, 165, 0.14);
+  --red: #ff2a55;
+  --red-fill: #ff2a55;
+  --red-soft: rgba(255, 42, 85, 0.16);
+  --orange: #ff9d00;
+  --orange-fill: #ff9d00;
+  --orange-soft: rgba(255, 157, 0, 0.16);
+  --seg-active: #fcee0a;
+  --nav-bg: rgba(8, 8, 12, 0.85);
+  --shadow: none;
+  --shadow-hover: 0 0 22px rgba(252, 238, 10, 0.22);
+  --cut: 14px;
+  --cut-s: 8px;
+}
+
+/* Фон: едва заметная сетка и тёплое свечение сверху */
+:root[data-style='cyber'] body {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255, 42, 85, 0.1), transparent 70%),
+    linear-gradient(rgba(252, 238, 10, 0.025) 1px, transparent 1px) 0 0 / 100% 32px,
+    linear-gradient(90deg, rgba(252, 238, 10, 0.025) 1px, transparent 1px) 0 0 / 32px 100%,
+    var(--bg);
+  letter-spacing: 0.01em;
+}
+
+/* Углы: острые, у крупных блоков срезаны */
+:root[data-style='cyber'] .card,
+:root[data-style='cyber'] .plan-card {
+  border-radius: 0;
+  border-left: 3px solid var(--accent);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
+  background: linear-gradient(135deg, #171722, var(--surface) 60%);
+}
+:root[data-style='cyber'] .plan-card:hover { transform: none; background: linear-gradient(135deg, #1e1e2b, #16161f 60%); border-left-color: #00f0ff; }
+:root[data-style='cyber'] .plan-card.add { background: transparent; border-left-color: var(--line-2); box-shadow: none; color: var(--accent); }
+:root[data-style='cyber'] .row3 .card,
+:root[data-style='cyber'] .row2 .card { border-left-color: var(--line-2); }
+
+/* Шапка и меню */
+:root[data-style='cyber'] .nav { border-bottom: 1px solid var(--line-2); box-shadow: 0 1px 18px rgba(252, 238, 10, 0.1); }
+:root[data-style='cyber'] .tabs { background: transparent; padding: 0; gap: 4px; border-radius: 0; }
+:root[data-style='cyber'] .tab {
+  border-radius: 0; text-transform: uppercase; letter-spacing: 0.1em; font-size: 12.5px; font-weight: 700;
+  padding: 8px 16px; background: var(--surface-2); color: var(--text-2);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+:root[data-style='cyber'] .tab:hover { color: var(--accent); }
+:root[data-style='cyber'] .tab.active { background: var(--accent); color: #0a0a0a; box-shadow: none; }
+:root[data-style='cyber'] .brand { border-radius: 0; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 800; color: var(--accent); }
+:root[data-style='cyber'] .logo { border-radius: 0; background: var(--accent); box-shadow: 0 0 14px rgba(252, 238, 10, 0.55); clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); }
+:root[data-style='cyber'] .logo svg { stroke: #0a0a0a; }
+:root[data-style='cyber'] .status { color: var(--text-2); }
+:root[data-style='cyber'] .dot.ok { box-shadow: 0 0 8px var(--green-fill); }
+
+/* Заголовки */
+:root[data-style='cyber'] .page-title h2,
+:root[data-style='cyber'] .section-title { text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; }
+:root[data-style='cyber'] .page-title h2 { font-size: 26px; color: var(--accent); text-shadow: 0 0 18px rgba(252, 238, 10, 0.35); }
+:root[data-style='cyber'] .section-title { font-size: 17px; color: var(--text); padding-left: 12px; border-left: 3px solid #00f0ff; line-height: 1.1; }
+:root[data-style='cyber'] .subtle { font-size: 14px; color: #00f0ff; letter-spacing: 0.06em; }
+:root[data-style='cyber'] .card h2 { text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; font-weight: 700; color: var(--text-2); }
+:root[data-style='cyber'] .subhead { text-transform: uppercase; letter-spacing: 0.08em; font-size: 12.5px; }
+
+/* Кнопки */
+:root[data-style='cyber'] button { border-radius: 0; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12.5px; font-weight: 700; padding: 9px 18px; clip-path: polygon(0 0, calc(100% - var(--cut-s)) 0, 100% var(--cut-s), 100% 100%, var(--cut-s) 100%, 0 calc(100% - var(--cut-s))); }
+:root[data-style='cyber'] button:hover { filter: none; box-shadow: none; background: #fff86b; }
+:root[data-style='cyber'] button.ghost { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line-2); }
+:root[data-style='cyber'] button.ghost:hover { background: var(--accent-soft); }
+:root[data-style='cyber'] button.danger { background: var(--red-soft); color: var(--red); }
+:root[data-style='cyber'] button.danger:hover { background: rgba(255, 42, 85, 0.28); filter: none; }
+:root[data-style='cyber'] button.small { padding: 5px 12px; font-size: 11.5px; }
+:root[data-style='cyber'] .brand, :root[data-style='cyber'] .note-item, :root[data-style='cyber'] .g-x, :root[data-style='cyber'] .tab { clip-path: none; }
+:root[data-style='cyber'] .tab { clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+:root[data-style='cyber'] .brand:hover { background: transparent; text-shadow: 0 0 12px rgba(252, 238, 10, 0.7); }
+:root[data-style='cyber'] .chip { border-radius: 0; text-transform: uppercase; letter-spacing: 0.06em; font-size: 12.5px; font-weight: 700; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+:root[data-style='cyber'] .chip:hover { background: var(--surface); box-shadow: inset 0 0 0 1px var(--accent); }
+:root[data-style='cyber'] .chip.active { background: var(--accent); color: #0a0a0a; box-shadow: none; }
+:root[data-style='cyber'] .chip.add { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line-2); }
+:root[data-style='cyber'] .chip.active .rdot { box-shadow: 0 0 0 2px #0a0a0a; }
+:root[data-style='cyber'] .rdot { border-radius: 0; transform: rotate(45deg); }
+
+/* Поля */
+:root[data-style='cyber'] input,
+:root[data-style='cyber'] select,
+:root[data-style='cyber'] textarea { border-radius: 0; background-color: rgba(252, 238, 10, 0.05); box-shadow: inset 0 -1px 0 var(--line-2); }
+:root[data-style='cyber'] input:focus,
+:root[data-style='cyber'] select:focus,
+:root[data-style='cyber'] textarea:focus { box-shadow: inset 0 -2px 0 var(--accent), 0 0 16px rgba(252, 238, 10, 0.2); }
+:root[data-style='cyber'] label { text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+:root[data-style='cyber'] select.res.profit { background-color: var(--green-soft); }
+:root[data-style='cyber'] select.res.loss { background-color: var(--red-soft); }
+:root[data-style='cyber'] select.res.be { background-color: var(--orange-soft); }
+
+/* Бейджи, теги, таблицы, метрики */
+:root[data-style='cyber'] .badge,
+:root[data-style='cyber'] .tag { border-radius: 0; text-transform: uppercase; letter-spacing: 0.07em; font-size: 11px; font-weight: 700; box-shadow: inset 0 0 0 1px currentColor; background: transparent; }
+:root[data-style='cyber'] .badge.profit { background: var(--green-soft); }
+:root[data-style='cyber'] .badge.loss { background: var(--red-soft); }
+:root[data-style='cyber'] .badge.be { background: var(--orange-soft); }
+:root[data-style='cyber'] th { text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: var(--accent); border-bottom-color: var(--line-2); }
+:root[data-style='cyber'] tbody tr:hover td { background: rgba(0, 240, 255, 0.06); }
+:root[data-style='cyber'] .metrics .l,
+:root[data-style='cyber'] .recap-metrics .l { text-transform: uppercase; letter-spacing: 0.08em; font-size: 10.5px; }
+:root[data-style='cyber'] .metrics .v,
+:root[data-style='cyber'] .recap-metrics .v { font-weight: 700; letter-spacing: 0.02em; }
+:root[data-style='cyber'] .metrics .v.pos, :root[data-style='cyber'] .recap-metrics .v.pos { text-shadow: 0 0 14px rgba(26, 242, 165, 0.4); }
+:root[data-style='cyber'] .metrics .v.neg, :root[data-style='cyber'] .recap-metrics .v.neg { text-shadow: 0 0 14px rgba(255, 42, 85, 0.4); }
+:root[data-style='cyber'] .curve .recharts-area-curve { filter: drop-shadow(0 0 5px var(--tone)); }
+
+/* Скриншоты и заметки */
+:root[data-style='cyber'] .shot,
+:root[data-style='cyber'] .shot img,
+:root[data-style='cyber'] .shot-empty,
+:root[data-style='cyber'] .g-item,
+:root[data-style='cyber'] .plan-card .thumb,
+:root[data-style='cyber'] .lightbox img { border-radius: 0; }
+:root[data-style='cyber'] .shot { box-shadow: inset 0 0 0 1px var(--line-2); background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(252, 238, 10, 0.03) 8px 9px); }
+:root[data-style='cyber'] .shot.has { background: transparent; box-shadow: none; }
+:root[data-style='cyber'] .g-x { border-radius: 0; background: rgba(8, 8, 12, 0.8); color: var(--accent); }
+:root[data-style='cyber'] .note-item { border-radius: 0; }
+:root[data-style='cyber'] .note-item.active { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+:root[data-style='cyber'] .tablewrap { clip-path: none; }
+:root[data-style='cyber'] .icon-btn { clip-path: none; }
+:root[data-style='cyber'] .stylesw .tab { padding: 5px 12px; }
+
+/* Переключатель стиля в шапке (в обоих стилях) */
+.stylesw { padding: 2px; border-radius: 9px; }
+.stylesw .tab { padding: 4px 11px; font-size: 12.5px; border-radius: 7px; }
+:root[data-style='cyber'] .stylesw { padding: 0; border-radius: 0; }
+:root[data-style='cyber'] .stylesw .tab { font-size: 11px; }
+:root[data-style='cyber'] .theme-btn { display: none; }
+:root[data-style='cyber'] .plan-card { text-transform: none; letter-spacing: 0.01em; font-size: 14.5px; font-weight: 500; padding: 18px 20px; }
+:root[data-style='cyber'] .plan-card .sym { text-transform: uppercase; letter-spacing: 0.06em; }
+:root[data-style='cyber'] .plan-card.add { clip-path: none; border: 1px dashed var(--line-2); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12.5px; font-weight: 700; }
+:root[data-style='cyber'] .plan-card.add:hover { background: var(--accent-soft); border-color: var(--accent); }
