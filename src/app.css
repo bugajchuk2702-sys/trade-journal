@@ -1038,3 +1038,7 @@ form.trade .trade-shots { align-items: stretch; }
   .trade-shots { grid-template-columns: 1fr; }
   .trade-shots > .card, .trade-shots > .card:nth-child(4) { grid-column: 1; }
 }
+
+/* Result — по центру под рядом W1 / D1 / H4 */
+.trade-shots > .card:nth-child(4) { grid-column: 1 / -1; width: 50%; justify-self: center; }
+@media (max-width: 760px) { .trade-shots > .card:nth-child(4) { width: auto; } }
