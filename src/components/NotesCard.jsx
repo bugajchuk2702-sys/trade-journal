@@ -48,10 +48,7 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
 
   return (
     <section className="card weeknotes">
-      <div className="shot-head">
-        <h2>{title}</h2>
-        {busy && <span className="hint">Добавляю скриншот…</span>}
-      </div>
+      {busy && <div className="hint" style={{ marginBottom: 8 }}>Добавляю скриншот…</div>}
 
       <textarea
         value={text}
