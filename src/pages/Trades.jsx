@@ -134,9 +134,44 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
   )
 }
 
+// Период для фильтра таблицы: неделя (с понедельника) или месяц
+const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
+function periodRange(mode, anchor) {
+  const a = startOfDay(anchor)
+  if (mode === 'week') {
+    const start = new Date(a)
+    start.setDate(a.getDate() - ((a.getDay() + 6) % 7))
+    const end = new Date(start)
+    end.setDate(start.getDate() + 7)
+    return [start, end]
+  }
+  const start = new Date(a.getFullYear(), a.getMonth(), 1)
+  return [start, new Date(a.getFullYear(), a.getMonth() + 1, 1)]
+}
+function shiftAnchor(mode, anchor, n) {
+  const x = new Date(anchor)
+  if (mode === 'week') x.setDate(x.getDate() + 7 * n)
+  else x.setMonth(x.getMonth() + n, 1)
+  return x
+}
+function periodLabel(mode, anchor) {
+  const [start, end] = periodRange(mode, anchor)
+  if (mode === 'month') {
+    const m = start.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })
+    return m.replace(/\s*г\.$/, '').replace(/^./, (c) => c.toUpperCase())
+  }
+  const last = new Date(end)
+  last.setDate(end.getDate() - 1)
+  const f = (d) => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+  return `${f(start)} – ${f(last)} ${last.getFullYear()}`
+}
+
 export default function Trades({ params = {}, go }) {
   const [editing, setEditing] = useState(null)
+  const [formOpen, setFormOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [mode, setMode] = useState('week') // week | month | all
+  const [anchor, setAnchor] = useState(() => new Date())
   const fileRef = useRef(null)
 
   const plans = useLiveQuery(() => db.plans.filter((p) => !p.deleted).toArray(), [], [])
@@ -145,19 +180,40 @@ export default function Trades({ params = {}, go }) {
   // Пришли из плана по клику на сделку — сразу открываем её на правку
   useEffect(() => {
     if (!params.tradeId) return
-    db.trades.get(params.tradeId).then((t) => t && !t.deleted && setEditing(t))
+    db.trades.get(params.tradeId).then((t) => {
+      if (t && !t.deleted) {
+        setEditing(t)
+        setFormOpen(true)
+      }
+    })
   }, [params.tradeId])
 
   const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).reverse().sortBy('openedAt'), [], [])
 
+  const [from, to] = mode === 'all' ? [null, null] : periodRange(mode, anchor)
+  const inPeriod = useMemo(
+    () => (mode === 'all' ? trades : trades.filter((t) => t.openedAt >= from.getTime() && t.openedAt < to.getTime())),
+    [trades, mode, anchor] // eslint-disable-line react-hooks/exhaustive-deps
+  )
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return trades
-    return trades.filter((t) => `${t.symbol} ${t.conclusion || t.notes || ''}`.toLowerCase().includes(q))
-  }, [trades, query])
+    if (!q) return inPeriod
+    return inPeriod.filter((t) => `${t.symbol} ${t.conclusion || t.notes || ''}`.toLowerCase().includes(q))
+  }, [inPeriod, query])
+
+  const [curFrom] = mode === 'all' ? [null] : periodRange(mode, new Date())
+  const isCurrent = mode === 'all' || (from && curFrom && from.getTime() === curFrom.getTime())
 
   // Колонки PnL / R нужны только для старых сделок, где ещё были цены
   const hasNums = filtered.some(hasResult)
+
+  const closeForm = () => { setFormOpen(false); setEditing(null) }
+  const openNew = () => { setEditing(null); setFormOpen(true) }
+  const openEdit = (t) => {
+    setEditing(t)
+    setFormOpen(true)
+    document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const doExport = async () => {
     const blob = new Blob([await exportJson()], { type: 'application/json' })
@@ -182,40 +238,74 @@ export default function Trades({ params = {}, go }) {
 
   return (
     <>
-      <section className="card">
-        <div className="shot-head">
-          <h2>{editing ? 'Редактировать сделку' : 'Новая сделка'}</h2>
-          <span className="spacer" />
-          {params.back && go && (
-            <button type="button" className="ghost small" onClick={() => go('plan', params.back)}>← К плану</button>
-          )}
-        </div>
-        {editing ? (
-          <TradeForm
-            key={editing.id}
-            initial={tradeToForm(editing)}
-            onSubmit={async (d) => {
-              await updateTrade(editing.id, d)
-              setEditing(null)
-            }}
-            onCancel={() => setEditing(null)}
-          />
-        ) : (
-          <TradeForm onSubmit={addTrade} />
+      <div className="page-title">
+        <h2>Trades</h2>
+        <span className="spacer" />
+        {params.back && go && !formOpen && (
+          <button type="button" className="ghost" onClick={() => go('plan', params.back)}>← К плану</button>
         )}
-      </section>
+        {formOpen
+          ? <button type="button" className="ghost" onClick={closeForm}>Закрыть</button>
+          : <button type="button" onClick={openNew}>+ Новая сделка</button>}
+      </div>
+
+      {formOpen && (
+        <section className="card">
+          <div className="shot-head">
+            <h2>{editing ? 'Редактировать сделку' : 'Новая сделка'}</h2>
+            <span className="spacer" />
+            {params.back && go && (
+              <button type="button" className="ghost small" onClick={() => go('plan', params.back)}>← К плану</button>
+            )}
+          </div>
+          {editing ? (
+            <TradeForm
+              key={editing.id}
+              initial={tradeToForm(editing)}
+              onSubmit={async (d) => {
+                await updateTrade(editing.id, d)
+                closeForm()
+              }}
+              onCancel={closeForm}
+            />
+          ) : (
+            <TradeForm
+              onSubmit={async (d) => {
+                await addTrade(d)
+                closeForm()
+              }}
+              onCancel={closeForm}
+            />
+          )}
+        </section>
+      )}
 
       <section className="card">
         <div className="toolbar">
           <h2 style={{ margin: 0 }}>Сделки</h2>
-          <input placeholder="Поиск: тикер, заключение" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <div className="chips period-chips">
+            {[['week', 'Неделя'], ['month', 'Месяц'], ['all', 'Все']].map(([k, label]) => (
+              <button key={k} type="button" className={'chip' + (mode === k ? ' active' : '')} onClick={() => { setMode(k); setAnchor(new Date()) }}>{label}</button>
+            ))}
+          </div>
+          {mode !== 'all' && (
+            <div className="period-nav">
+              <button type="button" className="ghost small" onClick={() => setAnchor(shiftAnchor(mode, anchor, -1))} aria-label="Назад">◀</button>
+              <strong>{periodLabel(mode, anchor)}</strong>
+              <button type="button" className="ghost small" onClick={() => setAnchor(shiftAnchor(mode, anchor, 1))} aria-label="Вперёд">▶</button>
+              {!isCurrent && <button type="button" className="ghost small" onClick={() => setAnchor(new Date())}>{mode === 'week' ? 'Текущая неделя' : 'Текущий месяц'}</button>}
+            </div>
+          )}
           <span className="spacer" />
-          <button className="ghost small" onClick={doExport}>Экспорт JSON</button>
-          <button className="ghost small" onClick={() => fileRef.current?.click()}>Импорт JSON</button>
+          <button type="button" className="ghost small" onClick={doExport}>Экспорт JSON</button>
+          <button type="button" className="ghost small" onClick={() => fileRef.current?.click()}>Импорт JSON</button>
           <input ref={fileRef} type="file" accept="application/json" hidden onChange={doImport} />
         </div>
+        <div className="toolbar">
+          <input placeholder="Поиск: тикер, заключение" value={query} onChange={(e) => setQuery(e.target.value)} />
+        </div>
         {filtered.length === 0 ? (
-          <div className="empty">Пока нет сделок</div>
+          <div className="empty">{trades.length === 0 ? 'Пока нет сделок' : mode === 'all' || query ? 'Ничего не найдено' : 'За этот период сделок нет'}</div>
         ) : (
           <div className="tablewrap">
             <table>
@@ -250,7 +340,7 @@ export default function Trades({ params = {}, go }) {
                         ))}
                       </td>
                       <td>
-                        <button className="ghost small" onClick={() => { setEditing(t); document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'smooth' }) }}>Изм.</button>{' '}
+                        <button className="ghost small" onClick={() => openEdit(t)}>Изм.</button>{' '}
                         <button className="danger small" onClick={() => confirm('Удалить сделку?') && removeTrade(t.id)}>✕</button>
                       </td>
                     </tr>

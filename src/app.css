@@ -1418,3 +1418,9 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
 :root[data-style='ow'] .params-head { gap: 12px; }
 :root[data-style='ow'] .form-sec { gap: 12px; }
 :root[data-style='ow'] .status { gap: 6px; font-size: 12px; }
+
+/* Trades: период таблицы */
+.period-chips { margin: 0; flex-wrap: nowrap; }
+.period-nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.period-nav strong { min-width: 150px; text-align: center; white-space: nowrap; }
+.toolbar .chip { padding-top: 6px; padding-bottom: 6px; }
