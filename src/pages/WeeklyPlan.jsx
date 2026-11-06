@@ -258,6 +258,12 @@ export default function WeeklyPlan({ params = {} }) {
     []
   )
   const selected = plans.find((p) => p.id === selId) || plans[0] || null
+  // Сколько сделок привязано к каждому плану — показываем на вкладке плана
+  const counts = useLiveQuery(
+    () => db.trades.filter((t) => !t.deleted && t.planId).toArray().then((a) => a.reduce((m, t) => ((m[t.planId] = (m[t.planId] || 0) + 1), m), {})),
+    [],
+    {}
+  )
   const showForm = adding || plans.length === 0
 
   const changeWeek = (next) => {
@@ -300,6 +306,7 @@ export default function WeeklyPlan({ params = {} }) {
             {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
             {p.result && <span className={'rdot ' + p.result} />}
             {p.symbol || 'Общий'}
+            {counts[p.id] > 0 && <span className="chip-n" title="Сделок в плане">{counts[p.id]}</span>}
           </button>
         ))}
         {plans.length > 0 && !adding && (

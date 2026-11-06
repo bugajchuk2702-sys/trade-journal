@@ -18,6 +18,12 @@ export default function Home({ go }) {
     []
   )
 
+  const counts = useLiveQuery(
+    () => db.trades.filter((t) => !t.deleted && t.planId).toArray().then((a) => a.reduce((m, t) => ((m[t.planId] = (m[t.planId] || 0) + 1), m), {})),
+    [],
+    {}
+  )
+
   return (
     <>
       <div className="page-title">
@@ -47,6 +53,7 @@ export default function Home({ go }) {
               </div>
               <div className="ex">{text || 'Заметок пока нет'}</div>
               {items.length > 0 && <div className="hint">Чек-лист: {done}/{items.length}</div>}
+              {counts[p.id] > 0 && <div className="hint">Trades: {counts[p.id]}</div>}
               {(p.updates || []).length > 0 && <div className="hint">Updates: {p.updates.length}</div>}
             </button>
           )
