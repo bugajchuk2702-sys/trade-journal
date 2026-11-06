@@ -834,3 +834,57 @@ button { white-space: nowrap; }
 .modal { width: 100%; max-width: 860px; margin: 0; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4); }
 :root[data-style='cyber'] .modal { clip-path: none; background: #120a0d; box-shadow: inset 0 0 0 1px var(--line-2), 0 24px 80px rgba(0, 0, 0, 0.7); }
 .plan-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; }
+
+/* Cyber: красного почти нет — основной акцент жёлтый, выбранное голубое.
+   Красным остаются только убытки и опасные действия. */
+:root[data-style='cyber'] {
+  --accent: #e6d84a;
+  --accent-text: #0b0a06;
+  --accent-soft: rgba(230, 216, 74, 0.16);
+  --line-2: rgba(230, 216, 74, 0.32);
+  --nav-bg: rgba(10, 8, 9, 0.9);
+}
+:root[data-style='cyber'] body {
+  background:
+    radial-gradient(ellipse 70% 38% at 15% -6%, rgba(61, 242, 255, 0.055), transparent 70%),
+    radial-gradient(ellipse 60% 36% at 100% 100%, rgba(230, 216, 74, 0.04), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px) 0 0 / 100% 32px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.016) 1px, transparent 1px) 0 0 / 32px 100%,
+    var(--bg);
+}
+:root[data-style='cyber'] .nav { border-bottom: 1px solid var(--line-2); box-shadow: none; }
+:root[data-style='cyber'] .tab { color: var(--text-2); }
+:root[data-style='cyber'] .tab:hover { color: var(--text); background: var(--surface-2); }
+:root[data-style='cyber'] .brand { color: var(--text); }
+:root[data-style='cyber'] .brand:hover { text-shadow: none; }
+:root[data-style='cyber'] .logo { background: var(--accent); box-shadow: none; }
+:root[data-style='cyber'] .logo svg { stroke: #0b0a06; }
+:root[data-style='cyber'] .page-title h2 { color: var(--text); text-shadow: none; }
+:root[data-style='cyber'] .section-title { color: var(--text); }
+:root[data-style='cyber'] .card h2 { color: var(--text-2); }
+:root[data-style='cyber'] th { color: var(--text-2); border-bottom-color: var(--line-2); }
+:root[data-style='cyber'] button { background: var(--accent); color: var(--accent-text); }
+:root[data-style='cyber'] button:hover { background: #f5ea74; }
+:root[data-style='cyber'] button.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line-2); }
+:root[data-style='cyber'] button.ghost:hover { background: var(--accent-soft); color: #fff; }
+:root[data-style='cyber'] button.danger { background: transparent; color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='cyber'] button.danger:hover { background: var(--red-soft); color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+:root[data-style='cyber'] .g-x { background: rgba(10, 8, 9, 0.85); color: var(--text); }
+/* выбранное — голубое, как активная вкладка */
+:root[data-style='cyber'] .chip.active,
+:root[data-style='cyber'] .note-item.active,
+:root[data-style='cyber'] .symopt.sel { background: rgba(61, 242, 255, 0.12); color: var(--cyan); box-shadow: inset 0 0 0 1px var(--cyan); }
+:root[data-style='cyber'] .note-item.active .s { color: rgba(61, 242, 255, 0.75); }
+:root[data-style='cyber'] .chip.active .rdot { box-shadow: 0 0 0 2px #0a0809; }
+:root[data-style='cyber'] .chip:hover, :root[data-style='cyber'] .note-item:hover { background: var(--accent-soft); }
+:root[data-style='cyber'] .chip.add { color: var(--text-2); }
+:root[data-style='cyber'] .plan-card.add:hover, :root[data-style='cyber'] .plan-card:hover { box-shadow: inset 0 0 0 1px var(--accent); }
+:root[data-style='cyber'] .symlist { background: #121010; box-shadow: inset 0 0 0 1px var(--line-2), 0 14px 44px rgba(0, 0, 0, 0.7); }
+:root[data-style='cyber'] .modal { background: #100e0e; box-shadow: inset 0 0 0 1px var(--line-2), 0 24px 80px rgba(0, 0, 0, 0.7); }
+:root[data-style='cyber'] .symbox-chev { color: var(--text-2); }
+:root[data-style='cyber'] { --text-3: #6d675a; --text-2: #a39d90; --surface-2: rgba(255, 255, 255, 0.06); --surface-3: rgba(255, 255, 255, 0.035); }
+:root[data-style='cyber'] input, :root[data-style='cyber'] select { background-color: rgba(255, 255, 255, 0.05); }
+:root[data-style='cyber'] .shot { background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(255, 255, 255, 0.02) 8px 9px); }
+:root[data-style='cyber'] .shot:not(.has) { background: none; }
+:root[data-style='cyber'] .plan-card { color: var(--text); background-color: transparent; }
+:root[data-style='cyber'] .plan-card .sym { color: var(--text); }
