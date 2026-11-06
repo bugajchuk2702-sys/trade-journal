@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useRef, useState } from 'react'
 
 // Инструменты, которые торгуются. Для каждого — свой значок.
 // «Совпадение» считаем без разделителей: EUR/USD = EURUSD = eur-usd.
@@ -96,7 +96,7 @@ export const SYMBOLS = [
   { code: 'EUR/USD', icons: ['EU', 'US'] },
   { code: 'GBP/USD', icons: ['GB', 'US'] },
   { code: 'GER40', icons: ['DE'] },
-  { code: 'XAU/USD', icons: ['XAU', 'US'] },
+  { code: 'XAU/USD', icons: ['XAU'] },
   { code: 'BTC', icons: ['BTC'] },
   { code: 'JP225', icons: ['JP'] },
   { code: 'AUD/USD', icons: ['AU', 'US'] },
@@ -139,8 +139,7 @@ export function SymbolInput({ value, onChange, placeholder, autoFocus, required,
   const wrap = useRef(null)
 
   const q = norm(value)
-  const exact = SYMBOLS.some((s) => norm(s.code) === q)
-  const list = useMemo(() => (!q || exact ? SYMBOLS : SYMBOLS.filter((s) => norm(s.code).includes(q))), [q, exact])
+  const list = SYMBOLS // это выбор из списка, не ввод текста
 
   useEffect(() => setHi(-1), [value, open])
   useEffect(() => {
@@ -178,13 +177,23 @@ export function SymbolInput({ value, onChange, placeholder, autoFocus, required,
         autoComplete="off"
         style={{ paddingLeft: 20 + iconW }}
         value={value}
-        onChange={(e) => { onChange(e.target.value.toUpperCase()); setOpen(true) }}
-        onFocus={() => setOpen(true)}
-        onKeyDown={onKey}
+        className="symbox-input"
+        inputMode="none"
+        onChange={() => {}}
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={(e) => {
+          // печатать здесь не нужно — только выбирать из списка
+          if (e.key === 'Enter' && !open) { e.preventDefault(); setOpen(true); return }
+          if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete') e.preventDefault()
+          onKey(e)
+        }}
+        onPaste={(e) => e.preventDefault()}
+        onDrop={(e) => e.preventDefault()}
         placeholder={placeholder}
         role="combobox"
         aria-expanded={open}
       />
+      <svg className="symbox-chev" viewBox="0 0 12 8" width="12" height="8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
       {open && list.length > 0 && (
         <ul className="symlist" role="listbox">
           {list.map((s, i) => (
