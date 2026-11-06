@@ -1125,3 +1125,6 @@ form.trade .trade-shots { align-items: stretch; }
 .padd-acc input:first-child { flex: 1 1 100%; }
 .padd-acc input:nth-child(2) { flex: 1 1 0; }
 .pempty { white-space: normal; }
+
+.popt-plan { display: flex; align-items: center; gap: 8px; }
+.popt-plan .psub { margin-left: auto; }

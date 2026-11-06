@@ -17,7 +17,7 @@ export default function TradeModal({ title, initial, onSubmit, onClose }) {
           <span className="spacer" />
           <button type="button" className="ghost small" onClick={onClose} title="Закрыть (Esc)">✕</button>
         </div>
-        <TradeForm initial={initial} onSubmit={onSubmit} onCancel={onClose} />
+        <TradeForm hidePlan initial={initial} onSubmit={onSubmit} onCancel={onClose} />
       </section>
     </div>
   )

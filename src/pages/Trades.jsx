@@ -3,8 +3,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
 import { calcTrade, fmt, hasResult } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
+import { weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
-import ParamsBlock, { StylePicker, AccountPicker } from '../components/Params.jsx'
+import ParamsBlock, { StylePicker, AccountPicker, PlanPicker } from '../components/Params.jsx'
 
 export const toLocalInput = (ts) => {
   const d = new Date(ts)
@@ -17,6 +18,7 @@ export const emptyForm = () => ({
   side: 'long',
   openedAt: toLocalInput(Date.now()),
   closedAt: '',
+  planId: '',
   style: '',
   account: '',
   accountSize: '',
@@ -42,7 +44,7 @@ export const tradeToForm = (t) => ({
 
 const signed = (n, d = 2, suffix = '') => (n == null || !isFinite(n) ? '—' : (n > 0 ? '+' : '') + fmt(n, d) + suffix)
 
-export function TradeForm({ initial, onSubmit, onCancel }) {
+export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
   const [f, setF] = useState(initial || emptyForm())
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const net = calcTrade({ pnlUsd: f.pnlUsd, accountSize: f.accountSize, riskPct: f.riskPct })
@@ -54,6 +56,7 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       side: f.side,
       openedAt: f.openedAt ? new Date(f.openedAt).getTime() : Date.now(),
       closedAt: f.closedAt ? new Date(f.closedAt).getTime() : null,
+      ...(hidePlan ? {} : { planId: f.planId || null }),
       style: f.style,
       account: f.account,
       accountSize: f.accountSize,
@@ -102,6 +105,7 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
           {net.r == null ? '—' : fmt(net.r, 2) + ' RR'}
         </div>
       </div>
+      {!hidePlan && <PlanPicker value={f.planId} symbol={f.symbol} onChange={(v) => setF((x) => ({ ...x, planId: v }))} />}
       <ParamsBlock value={f.params} onChange={(v) => setF((x) => ({ ...x, params: v }))} />
       <div className="wide trade-shots">
         <ShotCard title="W1" img={f.w1} onImg={(v) => setF((x) => ({ ...x, w1: v }))} />
@@ -124,6 +128,9 @@ export default function Trades() {
   const [editing, setEditing] = useState(null)
   const [query, setQuery] = useState('')
   const fileRef = useRef(null)
+
+  const plans = useLiveQuery(() => db.plans.filter((p) => !p.deleted).toArray(), [], [])
+  const planOf = (t) => plans.find((p) => p.id === t.planId)
 
   const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).reverse().sortBy('openedAt'), [], [])
 
@@ -195,6 +202,7 @@ export default function Trades() {
                   <th className="left">Дата</th>
                   <th className="left">Инструмент</th>
                   <th className="left">Сторона</th>
+                  <th className="left">План</th>
                   {hasNums && <th>PnL</th>}
                   {hasNums && <th>Net</th>}
                   {hasNums && <th>R</th>}
@@ -210,6 +218,7 @@ export default function Trades() {
                       <td className="left">{new Date(t.openedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</td>
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
+                      <td className="left">{planOf(t) ? <span className="tag">{planOf(t).symbol} · {weekLabel(planOf(t).weekStart).replace(/ \d{4}$/, '')}</span> : <span className="subtle">—</span>}</td>
                       {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) : '—'}</td>}
                       {hasNums && <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>}
                       {hasNums && <td className={sign(c.r)}>{fmt(c.r)}</td>}

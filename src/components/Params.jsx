@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
 import { toNum } from '../stats.js'
+import { weekLabel } from '../week.js'
+import { SymbolIcon, norm } from './Symbols.jsx'
 
 // Параметры сделки: у каждого свой список вариантов. Список можно пополнять и чистить прямо в выпадашке,
 // он хранится в базе (meta) и общий для всех сделок.
@@ -202,6 +204,76 @@ export function AccountPicker({ value, onChange }) {
             <input value={name} placeholder="Название" onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
             <input value={size} placeholder="Размер, $" inputMode="decimal" onChange={(e) => setSize(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
             <button type="button" className="small" onClick={add} disabled={!name.trim() || !(toNum(size) > 0)}>+</button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Привязка сделки к недельному плану: список планов, самые свежие недели сверху,
+// планы по выбранному инструменту — выше остальных в своей неделе.
+export function PlanPicker({ value, symbol, onChange }) {
+  const plans = useLiveQuery(() => db.plans.filter((p) => !p.deleted).toArray(), [], [])
+  const [open, setOpen] = useState(false)
+  const [alignRight, setAlignRight] = useState(false)
+  const wrap = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const off = (e) => { if (wrap.current && !wrap.current.contains(e.target)) setOpen(false) }
+    const esc = (e) => { if (e.key === 'Escape') { e.stopPropagation(); setOpen(false) } }
+    document.addEventListener('mousedown', off)
+    document.addEventListener('keydown', esc, true)
+    return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc, true) }
+  }, [open])
+
+  const toggle = () => {
+    if (!open && wrap.current) {
+      const r = wrap.current.getBoundingClientRect()
+      const box = wrap.current.closest('.card, .modal')
+      const limit = box ? box.getBoundingClientRect().right : window.innerWidth
+      setAlignRight(r.left + 330 > limit - 8)
+    }
+    setOpen((o) => !o)
+  }
+
+  const q = norm(symbol || '')
+  const sorted = [...plans].sort((a, b) => {
+    if (a.weekStart !== b.weekStart) return a.weekStart < b.weekStart ? 1 : -1
+    const am = q && norm(a.symbol) === q ? 0 : 1
+    const bm = q && norm(b.symbol) === q ? 0 : 1
+    return am - bm || (a.createdAt || 0) - (b.createdAt || 0)
+  })
+  const cur = plans.find((p) => p.id === value)
+  const label = (p) => `${p.symbol || 'Общий план'}`
+
+  return (
+    <div className="pbox" ref={wrap}>
+      <span className="plabel">План недели</span>
+      <button type="button" className={'pbtn' + (cur ? ' set' : '')} onClick={toggle} aria-expanded={open}>
+        <span>{cur ? `${label(cur)} · ${weekLabel(cur.weekStart).replace(/ \d{4}$/, '')}` : 'Без плана'}</span>
+        <svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      {open && (
+        <div className={'plist plist-wide' + (alignRight ? ' right' : '')} role="listbox">
+          <div className="plist-items">
+            {value && <button type="button" className="popt clear" onClick={() => { onChange(''); setOpen(false) }}>Отвязать от плана</button>}
+            {sorted.length === 0 && <div className="pempty">Планов пока нет. Создай план на вкладке Weekly Plan.</div>}
+            {sorted.map((p) => (
+              <button
+                type="button"
+                key={p.id}
+                role="option"
+                aria-selected={p.id === value}
+                className={'popt popt-plan' + (p.id === value ? ' sel' : '')}
+                onClick={() => { onChange(p.id); setOpen(false) }}
+              >
+                {p.symbol && <SymbolIcon symbol={p.symbol} size={16} />}
+                <span>{label(p)}</span>
+                <span className="psub">{weekLabel(p.weekStart).replace(/ \d{4}$/, '')}</span>
+              </button>
+            ))}
           </div>
         </div>
       )}
