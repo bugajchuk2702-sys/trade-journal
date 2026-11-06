@@ -186,10 +186,9 @@ function PlanEditor({ plan, onDelete }) {
       <div className="section-row">
         <h3 className="section-title">Updates</h3>
         <button onClick={addUpdate}>+ Update</button>
-        <span className="hint">карточка создаётся с названием сегодняшнего дня</span>
       </div>
       {p.updates.length === 0 ? (
-        <div className="card empty">Обновлений пока нет. Нажми Update, чтобы добавить скриншот и заметку за сегодня.</div>
+        <div className="card empty">На этой неделе сделок нету</div>
       ) : (
         <div className="row2">
           {p.updates.map((u) => (
