@@ -5,15 +5,16 @@ import { db } from '../db.js'
 // Параметры сделки: у каждого свой список вариантов. Список можно пополнять и чистить прямо в выпадашке,
 // он хранится в базе (meta) и общий для всех сделок.
 export const PARAMS = [
-  { key: 'pointA', label: 'Point A', defaults: ['Weekly High', 'Weekly Low', 'Daily High', 'Daily Low', 'Previous Day High', 'Previous Day Low', 'Asia High', 'Asia Low', 'London High', 'London Low'] },
-  { key: 'pointB', label: 'Point B', defaults: ['Weekly High', 'Weekly Low', 'Daily High', 'Daily Low', 'Previous Day High', 'Previous Day Low', 'Asia High', 'Asia Low', 'London High', 'London Low'] },
-  { key: 'positionType', label: 'Position Type', defaults: ['Scalp', 'Intraday', 'Swing'] },
-  { key: 'priceDelivery', label: 'Price Delivery', defaults: ['Bullish', 'Bearish', 'Expansion', 'Retracement', 'Reversal', 'Consolidation'] },
-  { key: 'entryModel', label: 'Entry Model', defaults: ['FVG', 'Order Block', 'Breaker', 'MSS', 'Liquidity Sweep', 'Retest', 'Breakout'] },
-  { key: 'entryTf', label: 'Entry TF', defaults: ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'] },
+  { key: 'pointA', label: 'Point A', defaults: ['Fractal D1', 'FVG D1', '0.5 DR D1', 'IFVG D1', 'Пока не доказано обратное'] },
+  { key: 'pointB', label: 'Point B', defaults: ['0.5 DR D1', 'Fractal D1', 'FVG D1', '0.5 W1'] },
+  { key: 'positionType', label: 'Position Type', defaults: ['Reversal', 'Continuation'] },
+  { key: 'priceDelivery', label: 'Price Delivery', defaults: ['1st POI', 'OF', 'SOF'] },
+  { key: 'entryModel', label: 'Entry Model', defaults: ['DR H4 -> SNR H4', 'DR H4 -> SHIFT H4', 'SNR H4', 'SHIFT H4'] },
+  { key: 'entryTf', label: 'Entry TF', defaults: ['D1', 'H4'] },
 ]
 
-const META_KEY = 'paramOptions'
+// v2: списки по умолчанию заменены на настоящие; старые (черновые) варианты не подхватываются
+const META_KEY = 'paramOptions.v2'
 
 export function useParamOptions() {
   const row = useLiveQuery(() => db.meta.get(META_KEY), [], undefined)
