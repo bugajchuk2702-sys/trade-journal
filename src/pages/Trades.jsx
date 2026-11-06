@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
 import { calcTrade, fmt } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
+import ShotCard from '../components/ShotCard.jsx'
 
 export const toLocalInput = (ts) => {
   const d = new Date(ts)
@@ -15,14 +16,11 @@ export const emptyForm = () => ({
   side: 'long',
   openedAt: toLocalInput(Date.now()),
   closedAt: '',
-  entry: '',
-  exit: '',
-  size: '',
-  stop: '',
-  take: '',
-  fees: '',
-  tags: '',
-  notes: '',
+  w1: '',
+  d1: '',
+  h4: '',
+  resultImg: '',
+  conclusion: '',
 })
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
@@ -46,14 +44,11 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       side: f.side,
       openedAt: f.openedAt ? new Date(f.openedAt).getTime() : Date.now(),
       closedAt: f.closedAt ? new Date(f.closedAt).getTime() : null,
-      entry: f.entry,
-      exit: f.exit,
-      size: f.size,
-      stop: f.stop,
-      take: f.take,
-      fees: f.fees,
-      tags: f.tags,
-      notes: f.notes,
+      w1: f.w1,
+      d1: f.d1,
+      h4: f.h4,
+      resultImg: f.resultImg,
+      conclusion: f.conclusion,
     })
     if (!initial) setF(emptyForm())
   }
@@ -75,29 +70,14 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       <label>Закрыта
         <input type="datetime-local" value={f.closedAt} onChange={set('closedAt')} />
       </label>
-      <label>Цена входа
-        <input required type="number" step="any" value={f.entry} onChange={set('entry')} />
-      </label>
-      <label>Цена выхода
-        <input type="number" step="any" value={f.exit} onChange={set('exit')} placeholder="пусто = открыта" />
-      </label>
-      <label>Объём
-        <input required type="number" step="any" value={f.size} onChange={set('size')} />
-      </label>
-      <label>Стоп
-        <input type="number" step="any" value={f.stop} onChange={set('stop')} />
-      </label>
-      <label>Тейк
-        <input type="number" step="any" value={f.take} onChange={set('take')} />
-      </label>
-      <label>Комиссии, всего
-        <input type="number" step="any" value={f.fees} onChange={set('fees')} />
-      </label>
-      <label className="wide">Теги (через запятую)
-        <input value={f.tags} onChange={set('tags')} placeholder="пробой, по тренду" />
-      </label>
-      <label className="wide">Заметки
-        <textarea value={f.notes} onChange={set('notes')} />
+      <div className="wide trade-shots">
+        <ShotCard title="W1" img={f.w1} onImg={(v) => setF((x) => ({ ...x, w1: v }))} />
+        <ShotCard title="D1" img={f.d1} onImg={(v) => setF((x) => ({ ...x, d1: v }))} />
+        <ShotCard title="H4" img={f.h4} onImg={(v) => setF((x) => ({ ...x, h4: v }))} />
+        <ShotCard title="Result" img={f.resultImg} onImg={(v) => setF((x) => ({ ...x, resultImg: v }))} />
+      </div>
+      <label className="wide">Conclusion
+        <textarea value={f.conclusion} onChange={set('conclusion')} />
       </label>
       <div className="wide" style={{ display: 'flex', gap: 8 }}>
         <button type="submit">{initial ? 'Сохранить' : 'Добавить сделку'}</button>
@@ -117,8 +97,11 @@ export default function Trades() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return trades
-    return trades.filter((t) => `${t.symbol} ${t.tags} ${t.notes}`.toLowerCase().includes(q))
+    return trades.filter((t) => `${t.symbol} ${t.conclusion || t.notes || ''}`.toLowerCase().includes(q))
   }, [trades, query])
+
+  // Колонки PnL / R нужны только для старых сделок, где ещё были цены
+  const hasNums = filtered.some((t) => t.entry !== '' && t.entry != null)
 
   const doExport = async () => {
     const blob = new Blob([await exportJson()], { type: 'application/json' })
@@ -163,7 +146,7 @@ export default function Trades() {
       <section className="card">
         <div className="toolbar">
           <h2 style={{ margin: 0 }}>Сделки</h2>
-          <input placeholder="Поиск: тикер, тег, заметка" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <input placeholder="Поиск: тикер, заключение" value={query} onChange={(e) => setQuery(e.target.value)} />
           <span className="spacer" />
           <button className="ghost small" onClick={doExport}>Экспорт JSON</button>
           <button className="ghost small" onClick={() => fileRef.current?.click()}>Импорт JSON</button>
@@ -179,12 +162,9 @@ export default function Trades() {
                   <th className="left">Дата</th>
                   <th className="left">Инструмент</th>
                   <th className="left">Сторона</th>
-                  <th>Вход</th>
-                  <th>Выход</th>
-                  <th>Объём</th>
-                  <th>PnL</th>
-                  <th>R</th>
-                  <th className="left">Теги</th>
+                  {hasNums && <th>PnL</th>}
+                  {hasNums && <th>R</th>}
+                  <th className="left">Скриншоты</th>
                   <th />
                 </tr>
               </thead>
@@ -192,18 +172,15 @@ export default function Trades() {
                 {filtered.map((t) => {
                   const c = calcTrade(t)
                   return (
-                    <tr key={t.id} title={t.notes || ''}>
+                    <tr key={t.id} title={t.conclusion || t.notes || ''}>
                       <td className="left">{new Date(t.openedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</td>
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
-                      <td>{fmt(t.entry, 4)}</td>
-                      <td>{c.closed ? fmt(t.exit, 4) : 'открыта'}</td>
-                      <td>{fmt(t.size, 4)}</td>
-                      <td className={sign(c.pnl)}>{fmt(c.pnl)}</td>
-                      <td className={sign(c.r)}>{fmt(c.r)}</td>
+                      {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) : '—'}</td>}
+                      {hasNums && <td className={sign(c.r)}>{fmt(c.r)}</td>}
                       <td className="left">
-                        {(t.tags || '').split(',').map((x) => x.trim()).filter(Boolean).map((x) => (
-                          <span className="tag" key={x}>{x}</span>
+                        {[['W1', t.w1], ['D1', t.d1], ['H4', t.h4], ['Result', t.resultImg]].filter(([, v]) => v).map(([k]) => (
+                          <span className="tag" key={k}>{k}</span>
                         ))}
                       </td>
                       <td>

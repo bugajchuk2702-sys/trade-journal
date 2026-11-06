@@ -78,8 +78,8 @@ export default function ShotCard({ title, subtitle, onRemove, img, text, onImg, 
           <>
             <img src={img} alt={title} onClick={() => setBig(true)} title="Нажми, чтобы открыть крупно" />
             <div className="shot-actions">
-              <button className="ghost small" onClick={() => fileRef.current?.click()}>Заменить</button>
-              <button className="danger small" onClick={() => onImg('')}>Убрать</button>
+              <button type="button" className="ghost small" onClick={() => fileRef.current?.click()}>Заменить</button>
+              <button type="button" className="danger small" onClick={() => onImg('')}>Убрать</button>
             </div>
           </>
         ) : (

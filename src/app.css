@@ -1022,3 +1022,10 @@ select.res.profit { color: var(--green); } select.res.loss { color: var(--red); 
 :root[data-style='cyber'] .tab:hover { color: #6fd6de; }
 :root[data-style='cyber'] .tab.active { color: #6fd6de; }
 :root[data-style='cyber'] input::placeholder, :root[data-style='cyber'] textarea::placeholder { color: #437d83; }
+
+/* Форма трейда: четыре карточки со скриншотами */
+.trade-shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.trade-shots .card { margin: 0; min-width: 0; }
+form.trade .trade-shots { align-items: stretch; }
+.modal { max-width: 1100px; }
+@media (max-width: 760px) { .trade-shots { grid-template-columns: repeat(2, 1fr); } }

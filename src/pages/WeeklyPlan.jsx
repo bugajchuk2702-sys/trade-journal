@@ -42,11 +42,12 @@ const TAG_TINT = { BTC: '247,147,26', XAUUSD: '240,180,36', EURUSD: '70,110,220'
 
 function TradeRow({ t, n, onOpen }) {
   const c = calcTrade(t)
+  const hasNums = t.entry !== '' && t.entry != null
   const res = !c.closed ? 'open' : c.pnl > 0 ? 'win' : c.pnl < 0 ? 'loss' : 'be'
   const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]
   const tint = TAG_TINT[norm(t.symbol)]
   return (
-    <button type="button" className="trow" onClick={() => onOpen(t)} title={(t.notes || 'Открыть сделку') + ''}>
+    <button type="button" className="trow" onClick={() => onOpen(t)} title={(t.conclusion || t.notes || 'Открыть сделку') + ''}>
       <svg className="trow-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
         <path d="M3.5 1.5h6l3 3v10h-9z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
         <path d="M9.5 1.5v3h3M5.5 9.5l1.7-1.7 1.6 1.4 2-2.4" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -56,12 +57,14 @@ function TradeRow({ t, n, onOpen }) {
         <SymbolIcon symbol={t.symbol} size={14} />
         {t.symbol}
       </span>
-      <span className={'tpill ' + res}><i />{label}</span>
-      <span className="trow-meta">
-        <span className={sign(c.r)}>{c.r == null ? '—' : fmt(c.r, 1) + 'RR'}</span>
-        {' / '}
-        <span className={sign(c.pnl)}>{c.closed ? money(c.pnl) : '—'}</span>
-      </span>
+      {hasNums && <span className={'tpill ' + res}><i />{label}</span>}
+      {hasNums && (
+        <span className="trow-meta">
+          <span className={sign(c.r)}>{c.r == null ? '—' : fmt(c.r, 1) + 'RR'}</span>
+          {' / '}
+          <span className={sign(c.pnl)}>{c.closed ? money(c.pnl) : '—'}</span>
+        </span>
+      )}
       <span className="trow-side">{t.side === 'long' ? 'Лонг' : 'Шорт'}</span>
       <span className="trow-date">{new Date(t.openedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</span>
     </button>
