@@ -4,6 +4,7 @@ import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '
 import { calcTrade, fmt } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import ShotCard from '../components/ShotCard.jsx'
+import ParamsBlock from '../components/Params.jsx'
 
 export const toLocalInput = (ts) => {
   const d = new Date(ts)
@@ -16,6 +17,7 @@ export const emptyForm = () => ({
   side: 'long',
   openedAt: toLocalInput(Date.now()),
   closedAt: '',
+  params: {},
   w1: '',
   d1: '',
   h4: '',
@@ -44,6 +46,7 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       side: f.side,
       openedAt: f.openedAt ? new Date(f.openedAt).getTime() : Date.now(),
       closedAt: f.closedAt ? new Date(f.closedAt).getTime() : null,
+      params: f.params || {},
       w1: f.w1,
       d1: f.d1,
       h4: f.h4,
@@ -70,6 +73,7 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       <label>Закрыта
         <input type="datetime-local" value={f.closedAt} onChange={set('closedAt')} />
       </label>
+      <ParamsBlock value={f.params} onChange={(v) => setF((x) => ({ ...x, params: v }))} />
       <div className="wide trade-shots">
         <ShotCard title="W1" img={f.w1} onImg={(v) => setF((x) => ({ ...x, w1: v }))} />
         <ShotCard title="D1" img={f.d1} onImg={(v) => setF((x) => ({ ...x, d1: v }))} />
