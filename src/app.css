@@ -1002,3 +1002,13 @@ select.res.profit { color: var(--green); } select.res.loss { color: var(--red); 
 :root[data-style='cyber'] .tab { color: var(--text-2); } :root[data-style='cyber'] .tab.active { color: var(--cyan); }
 :root[data-style='cyber'] .chip.active, :root[data-style='cyber'] .note-item.active, :root[data-style='cyber'] .symopt.sel { color: var(--cyan); }
 :root[data-style='cyber'] .logo { background: var(--accent); }
+
+/* Cyber — вторичный текст бирюзовый вместо серого */
+:root[data-style='cyber'] {
+  --text-2: #6fd6de;
+  --text-3: #4fa9b1;
+}
+:root[data-style='cyber'] .tab { color: #6fd6de; }
+:root[data-style='cyber'] .tab:hover { color: #a4eef3; }
+:root[data-style='cyber'] .tab.active { color: #6fd6de; }
+:root[data-style='cyber'] input::placeholder, :root[data-style='cyber'] textarea::placeholder { color: #4fa9b1; }
