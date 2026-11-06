@@ -1663,3 +1663,261 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
 :root[data-style='d4'] .tab { padding: 7px 11px; font-size: 16px; letter-spacing: 0.07em; }
 :root[data-style='d4'] .stylesw .tab { padding: 4px 8px; font-size: 13px; letter-spacing: 0.04em; }
 :root[data-style='d4'] .status { flex-basis: 220px; }
+
+/* =====================================================================
+   Стиль 4: LoL — Hextech (League of Legends): тёмно-синий, золото, бирюзовое свечение
+   ===================================================================== */
+:root[data-style='lol'] {
+  color-scheme: dark;
+  --font: 'Source Sans 3 Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Forum', 'Source Sans 3 Variable', Georgia, serif;
+
+  --bg: #010a13;
+  --surface: #0c1827;
+  --surface-2: rgba(200, 170, 110, 0.09);
+  --surface-3: rgba(200, 170, 110, 0.05);
+  --text: #f0e6d2;
+  --text-2: #b3ad9b;
+  --text-3: #6e7a86;
+  --line: rgba(200, 170, 110, 0.2);
+  --line-2: rgba(200, 170, 110, 0.5);
+
+  --accent: #c8aa6e;
+  --accent-text: #0a1424;
+  --accent-soft: rgba(200, 170, 110, 0.14);
+  --gold: #c8aa6e;
+  --gold-hi: #f0e6d2;
+  --gold-lo: #785a28;
+  --teal: #0ac8b9;
+  --teal-hi: #cdfafa;
+  --teal-soft: rgba(10, 200, 185, 0.16);
+
+  --green: #5bd68a;
+  --green-fill: #5bd68a;
+  --green-soft: rgba(91, 214, 138, 0.15);
+  --red: #e84057;
+  --red-fill: #e84057;
+  --red-soft: rgba(232, 64, 87, 0.17);
+  --orange: #c8aa6e;
+  --orange-fill: #c8aa6e;
+  --orange-soft: rgba(200, 170, 110, 0.16);
+
+  --seg-active: #c8aa6e;
+  --nav-bg: rgba(1, 10, 19, 0.94);
+  --shadow: none;
+  --shadow-hover: none;
+  --gold-edge: linear-gradient(180deg, #e0c98d 0%, #9c7b3a 45%, #5c4620 100%);
+}
+:root[data-style='lol'] body {
+  font-family: var(--font); font-size: 17px; letter-spacing: 0.003em; font-variant-numeric: tabular-nums;
+  background:
+    radial-gradient(ellipse 85% 48% at 50% -14%, rgba(6, 70, 92, 0.6) 0%, transparent 66%),
+    radial-gradient(ellipse 55% 40% at 100% 100%, rgba(120, 90, 40, 0.14) 0%, transparent 70%),
+    url("data:image/svg+xml;utf8,<svg width='28' height='49' viewBox='0 0 28 49' xmlns='http://www.w3.org/2000/svg'><g fill-rule='evenodd'><g fill='%23c8aa6e' fill-opacity='0.055' fill-rule='nonzero'><path d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/></g></g></svg>"),
+    #010a13;
+  background-attachment: fixed;
+}
+:root[data-style='lol'] .theme-btn { display: none; }
+
+/* --- заголовки: римские капители, золото, шестиугольник --- */
+:root[data-style='lol'] .page-title h2,
+:root[data-style='lol'] .section-title,
+:root[data-style='lol'] .card h2,
+:root[data-style='lol'] .form-sec,
+:root[data-style='lol'] .params-head,
+:root[data-style='lol'] .plan-card .sym,
+:root[data-style='lol'] .trow-title,
+:root[data-style='lol'] .brand,
+:root[data-style='lol'] .tlist-head,
+:root[data-style='lol'] th {
+  font-family: var(--font-display); font-weight: 400; text-transform: uppercase; letter-spacing: 0.09em; font-style: normal;
+  font-synthesis: none; -webkit-text-stroke: 0.35px currentColor;
+}
+:root[data-style='lol'] .page-title h2 {
+  font-size: 38px; line-height: 1.05; letter-spacing: 0.08em; color: var(--gold-hi);
+  background: linear-gradient(180deg, #f5ecd8 20%, #c8aa6e 85%); -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; -webkit-text-stroke: 0;
+}
+:root[data-style='lol'] .section-title { font-size: 27px; color: var(--gold); }
+:root[data-style='lol'] .card h2 { font-size: 20px; color: var(--gold); }
+:root[data-style='lol'] .form-sec, :root[data-style='lol'] .params-head { font-size: 21px; color: var(--gold); }
+:root[data-style='lol'] .form-sec::after, :root[data-style='lol'] .params-head::after { background: linear-gradient(90deg, rgba(200, 170, 110, 0.55), transparent); }
+
+/* шестиугольник перед заголовками */
+:root[data-style='lol'] .page-title h2::before,
+:root[data-style='lol'] .section-title::before,
+:root[data-style='lol'] .card h2::before,
+:root[data-style='lol'] .form-sec::before,
+:root[data-style='lol'] .params-head::before {
+  content: ''; display: inline-block; width: 11px; height: 12px; margin-right: 13px;
+  background: var(--teal); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  vertical-align: 0.04em; flex: none; -webkit-text-fill-color: initial;
+}
+:root[data-style='lol'] .form-sec::before, :root[data-style='lol'] .params-head::before { margin-right: 0; }
+:root[data-style='lol'] .form-sec, :root[data-style='lol'] .params-head { gap: 14px; }
+:root[data-style='lol'] .subtle { color: var(--text-2); font-size: 18px; }
+:root[data-style='lol'] .page-title strong, :root[data-style='lol'] .period-nav strong { color: var(--text); font-weight: 700; }
+
+/* --- шапка --- */
+:root[data-style='lol'] .nav {
+  background: linear-gradient(180deg, #08131f, #010a13); border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, #785a28 12%, #c8aa6e 50%, #785a28 88%, transparent) 1;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); gap: 12px;
+}
+:root[data-style='lol'] .brand { font-size: 21px; letter-spacing: 0.07em; color: var(--gold); background: transparent; border-radius: 0; }
+:root[data-style='lol'] .brand:hover { background: transparent; color: var(--gold-hi); }
+:root[data-style='lol'] .logo { border-radius: 0; background: linear-gradient(180deg, #e0c98d, #8a6a30); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); box-shadow: none; }
+:root[data-style='lol'] .logo svg { stroke: #010a13; }
+:root[data-style='lol'] .tabs { background: transparent; padding: 0; gap: 2px; border-radius: 0; }
+:root[data-style='lol'] .tab {
+  font-family: var(--font-display); font-weight: 400; font-size: 16px; letter-spacing: 0.08em; text-transform: uppercase; -webkit-text-stroke: 0.3px currentColor;
+  color: var(--text-2); background: transparent; border-radius: 0; padding: 7px 12px; box-shadow: none;
+  border-bottom: 2px solid transparent; transition: color 0.15s, background-color 0.15s;
+}
+:root[data-style='lol'] .tab:hover { color: var(--gold-hi); background: var(--surface-3); }
+:root[data-style='lol'] .tab.active {
+  color: var(--gold-hi); background: linear-gradient(180deg, transparent, rgba(10, 200, 185, 0.16));
+  border-bottom-color: var(--gold); box-shadow: 0 6px 14px -8px rgba(200, 170, 110, 0.9);
+}
+:root[data-style='lol'] .stylesw .tab { font-size: 13px; padding: 4px 8px; letter-spacing: 0.04em; }
+:root[data-style='lol'] .status { color: var(--text-2); font-size: 13px; gap: 6px; flex-basis: 220px; }
+:root[data-style='lol'] .dot.ok { background: var(--teal); box-shadow: 0 0 8px rgba(10, 200, 185, 0.9); }
+
+/* --- карточки: золотая рамка-градиент и яркие углы --- */
+:root[data-style='lol'] .card, :root[data-style='lol'] .plan-card {
+  border: 1px solid transparent; border-radius: 2px;
+  background:
+    linear-gradient(#f3dfa6, #f3dfa6) 0 0 / 16px 2px no-repeat padding-box,
+    linear-gradient(#f3dfa6, #f3dfa6) 0 0 / 2px 16px no-repeat padding-box,
+    linear-gradient(#f3dfa6, #f3dfa6) 100% 100% / 16px 2px no-repeat padding-box,
+    linear-gradient(#f3dfa6, #f3dfa6) 100% 100% / 2px 16px no-repeat padding-box,
+    linear-gradient(180deg, #0f1d2f, #09131f) padding-box,
+    var(--gold-edge) border-box;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+}
+:root[data-style='lol'] .card { padding: 24px 28px; }
+:root[data-style='lol'] .plan-card { transition: box-shadow 0.2s; }
+:root[data-style='lol'] .plan-card:hover { transform: none; box-shadow: 0 0 26px rgba(200, 170, 110, 0.28), 0 6px 22px rgba(0, 0, 0, 0.45); }
+:root[data-style='lol'] .plan-card .sym { font-size: 27px; color: var(--text); }
+:root[data-style='lol'] .plan-card .ex { color: var(--text-2); font-size: 16.5px; }
+:root[data-style='lol'] .plan-card.add {
+  background: transparent; border: 1px dashed rgba(200, 170, 110, 0.45); box-shadow: none; color: var(--gold);
+  font-family: var(--font-display); font-weight: 400; font-size: 20px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+:root[data-style='lol'] .plan-card.add:hover { background: var(--accent-soft); border-color: var(--gold); box-shadow: none; }
+:root[data-style='lol'] .shot-head { border-bottom: 1px solid transparent; border-image: linear-gradient(90deg, var(--line-2), transparent) 1; }
+:root[data-style='lol'] .plan-footer { border-top-color: var(--line); }
+:root[data-style='lol'] .badge { border-radius: 2px; font-family: var(--font-display); font-weight: 400; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 10px; }
+
+/* --- кнопки --- */
+:root[data-style='lol'] button:not([class]), :root[data-style='lol'] button.ghost, :root[data-style='lol'] button.danger,
+:root[data-style='lol'] .padd button.small, :root[data-style='lol'] .chip {
+  font-family: var(--font-display); font-weight: 400; font-size: 16px; letter-spacing: 0.1em; text-transform: uppercase; -webkit-text-stroke: 0.3px currentColor;
+  border-radius: 2px; padding: 8px 22px; font-style: normal; border: 1px solid transparent; transition: box-shadow 0.18s, color 0.18s, filter 0.18s;
+}
+:root[data-style='lol'] button:not([class]) {
+  background: linear-gradient(180deg, #1d2e42, #0b1624) padding-box, var(--gold-edge) border-box; color: var(--gold-hi);
+  box-shadow: inset 0 1px 0 rgba(240, 230, 210, 0.1);
+}
+:root[data-style='lol'] button:not([class]):hover { background: linear-gradient(180deg, #27405a, #0f1e30) padding-box, linear-gradient(180deg, #f3dfa6, #c8aa6e 50%, #8a6a30) border-box; filter: none; box-shadow: 0 0 16px rgba(200, 170, 110, 0.4), inset 0 0 14px rgba(10, 200, 185, 0.12); }
+:root[data-style='lol'] button.ghost { background: transparent; color: var(--text); border-color: rgba(200, 170, 110, 0.4); }
+:root[data-style='lol'] button.ghost:hover { background: var(--accent-soft); border-color: var(--gold); color: var(--gold-hi); }
+:root[data-style='lol'] button.danger { background: transparent; color: var(--red); border-color: rgba(232, 64, 87, 0.5); }
+:root[data-style='lol'] button.danger:hover { background: var(--red-soft); border-color: var(--red); }
+:root[data-style='lol'] button.small { font-size: 14.5px; padding: 4px 16px; }
+:root[data-style='lol'] button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+/* вкладки планов и период (chips) */
+:root[data-style='lol'] .chip { background: transparent; color: var(--text-2); border-color: rgba(200, 170, 110, 0.28); font-size: 17px; padding: 7px 20px; }
+:root[data-style='lol'] .chip:hover { background: var(--accent-soft); color: var(--gold-hi); border-color: rgba(200, 170, 110, 0.6); }
+:root[data-style='lol'] .chip.active { background: linear-gradient(180deg, #e3cb8f, #b8984f); color: #0a1424; border-color: transparent; -webkit-text-stroke: 0.2px #0a1424; }
+:root[data-style='lol'] .chip.add { background: transparent; color: var(--gold); border-color: transparent; }
+:root[data-style='lol'] .chip.add:hover { background: var(--accent-soft); }
+:root[data-style='lol'] .chip-n { border-radius: 2px; background: var(--gold); color: #0a1424; }
+:root[data-style='lol'] .chip.active .chip-n { background: #0a1424; color: var(--gold); }
+:root[data-style='lol'] .rdot { border-radius: 0; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+
+/* --- поля --- */
+:root[data-style='lol'] input, :root[data-style='lol'] select, :root[data-style='lol'] textarea {
+  background-color: rgba(1, 10, 19, 0.78); border-radius: 2px; color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(120, 90, 40, 0.85); font-size: 16.5px; transition: box-shadow 0.15s;
+}
+:root[data-style='lol'] input:focus, :root[data-style='lol'] select:focus, :root[data-style='lol'] textarea:focus { box-shadow: inset 0 0 0 1px var(--teal), 0 0 12px rgba(10, 200, 185, 0.35); }
+:root[data-style='lol'] input::placeholder, :root[data-style='lol'] textarea::placeholder { color: var(--text-3); }
+:root[data-style='lol'] label { color: var(--gold); font-weight: 600; }
+:root[data-style='lol'] select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' fill='none' stroke='%23c8aa6e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+:root[data-style='lol'] select.res { background-image: none; }
+:root[data-style='lol'] select.res.profit { background-color: var(--green-soft); color: var(--green); }
+:root[data-style='lol'] select.res.loss { background-color: var(--red-soft); color: var(--red); }
+:root[data-style='lol'] select.res.be { background-color: var(--orange-soft); color: var(--orange); }
+:root[data-style='lol'] option { background: #0a1424; color: var(--text); }
+:root[data-style='lol'] .tag { border-radius: 2px; background: var(--surface-2); color: var(--text); }
+:root[data-style='lol'] .netres-val { border-radius: 2px; background: rgba(1, 10, 19, 0.78); box-shadow: inset 0 0 0 1px rgba(120, 90, 40, 0.85); font-family: var(--font); font-weight: 700; font-size: 19px; }
+:root[data-style='lol'] form.trade label, :root[data-style='lol'] form.trade .plabel { color: var(--gold); font-weight: 700; font-size: 15.5px; }
+:root[data-style='lol'] form.trade input::placeholder, :root[data-style='lol'] form.trade .pbtn:not(.set) { color: var(--text-3); }
+
+/* выпадающие списки */
+:root[data-style='lol'] .symlist, :root[data-style='lol'] .plist { background: #0a1424; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(200, 170, 110, 0.55), 0 18px 40px rgba(0, 0, 0, 0.7); }
+:root[data-style='lol'] .symopt, :root[data-style='lol'] .popt { border-radius: 2px; color: var(--text); font-weight: 500; }
+:root[data-style='lol'] .symopt:hover, :root[data-style='lol'] .symopt.hi, :root[data-style='lol'] .popt:hover { background: var(--accent-soft); }
+:root[data-style='lol'] .symopt.sel, :root[data-style='lol'] .popt.sel { background: linear-gradient(90deg, rgba(10, 200, 185, 0.26), rgba(10, 200, 185, 0.08)); color: var(--teal-hi); box-shadow: inset 2px 0 0 var(--teal); }
+:root[data-style='lol'] .popt.sel .psub { color: #8fe9e2; }
+:root[data-style='lol'] .pbtn { border-radius: 2px; background: rgba(1, 10, 19, 0.78); box-shadow: inset 0 0 0 1px rgba(120, 90, 40, 0.85); font-family: var(--font); text-transform: none; letter-spacing: 0; -webkit-text-stroke: 0; font-size: 16.5px; font-weight: 500; color: var(--text-3); padding: 10px 12px; }
+:root[data-style='lol'] .pbtn.set { color: var(--gold-hi); font-weight: 700; }
+:root[data-style='lol'] .pbtn:hover { background: rgba(1, 10, 19, 0.95); }
+:root[data-style='lol'] .pbtn[aria-expanded='true'] { box-shadow: inset 0 0 0 1px var(--teal), 0 0 12px rgba(10, 200, 185, 0.3); }
+:root[data-style='lol'] .padd { border-top-color: var(--line); }
+:root[data-style='lol'] .symbox-chev, :root[data-style='lol'] .pbtn svg { color: var(--gold); }
+
+/* --- окно и скриншоты --- */
+:root[data-style='lol'] .modal { box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(10, 200, 185, 0.08); }
+:root[data-style='lol'] .modal-back { background: rgba(1, 6, 12, 0.82); }
+:root[data-style='lol'] .lightbox img { border-radius: 2px; }
+:root[data-style='lol'] .shot { border-radius: 2px; background: rgba(1, 10, 19, 0.6); box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='lol'] .shot img, :root[data-style='lol'] .g-item { border-radius: 2px; }
+:root[data-style='lol'] .shot-empty { color: var(--text-2); border-radius: 2px; font-size: 17px; }
+:root[data-style='lol'] .shot-empty:focus { color: var(--text); box-shadow: inset 0 0 0 1px var(--teal), 0 0 12px rgba(10, 200, 185, 0.3); }
+
+/* --- таблицы и метрики --- */
+:root[data-style='lol'] th { font-size: 15px; color: var(--gold); border-bottom-color: var(--line-2); }
+:root[data-style='lol'] td { border-bottom-color: var(--line); font-size: 16.5px; }
+:root[data-style='lol'] tbody tr:hover td { background: var(--surface-3); }
+:root[data-style='lol'] td.pos, :root[data-style='lol'] .pos, :root[data-style='lol'] .long { color: var(--green); }
+:root[data-style='lol'] td.neg, :root[data-style='lol'] .neg, :root[data-style='lol'] .short { color: var(--red); }
+:root[data-style='lol'] .metrics .l, :root[data-style='lol'] .recap-metrics .l { color: var(--text-2); font-size: 14.5px; }
+:root[data-style='lol'] .metrics .v, :root[data-style='lol'] .recap-metrics .v { font-family: var(--font); font-weight: 700; font-style: normal; text-transform: none; letter-spacing: 0; -webkit-text-stroke: 0; color: var(--text); }
+:root[data-style='lol'] .metrics .v { font-size: 30px; }
+:root[data-style='lol'] .recap-metrics .v { font-size: 25px; }
+:root[data-style='lol'] .metrics .v.pos, :root[data-style='lol'] .recap-metrics .v.pos { color: var(--green); }
+:root[data-style='lol'] .metrics .v.neg, :root[data-style='lol'] .recap-metrics .v.neg { color: var(--red); }
+
+/* --- список трейдов плана --- */
+:root[data-style='lol'] .tlist-head { color: var(--gold); font-size: 19px; }
+:root[data-style='lol'] .tlist-count { color: var(--text-3); }
+:root[data-style='lol'] .tlist-add { border-radius: 2px; color: var(--gold); }
+:root[data-style='lol'] .tlist-add:hover { background: var(--accent-soft); color: var(--gold-hi); }
+:root[data-style='lol'] .trow { border-radius: 2px; background: rgba(200, 170, 110, 0.05); box-shadow: inset 0 0 0 1px var(--line); font-size: 16.5px; transition: box-shadow 0.15s, background-color 0.15s; }
+:root[data-style='lol'] .trow:hover { background: rgba(10, 200, 185, 0.07); box-shadow: inset 0 0 0 1px var(--gold), 0 0 16px rgba(200, 170, 110, 0.18); }
+:root[data-style='lol'] .trow-title { font-size: 19px; color: var(--text); }
+:root[data-style='lol'] .tchip { border-radius: 2px; }
+:root[data-style='lol'] .tpill { border-radius: 2px; font-family: var(--font-display); font-weight: 400; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; }
+:root[data-style='lol'] .tpill i { border-radius: 0; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+:root[data-style='lol'] .trow-icon { color: var(--gold); }
+
+/* --- заметки --- */
+:root[data-style='lol'] .note-item { border-radius: 2px; }
+:root[data-style='lol'] .note-item:hover { background: var(--surface-3); }
+:root[data-style='lol'] .note-item.active { background: linear-gradient(90deg, rgba(10, 200, 185, 0.2), rgba(10, 200, 185, 0.05)); box-shadow: inset 3px 0 0 var(--teal); }
+:root[data-style='lol'] .note-item .t { font-weight: 700; }
+
+:root[data-style='lol'] * { scrollbar-color: #785a28 transparent; }
+
+/* Шапка на широких экранах всегда в одну строку: сжимается только статус (с многоточием) */
+@media (min-width: 901px) {
+  .nav { flex-wrap: nowrap; }
+  .nav > * { flex-shrink: 0; }
+  .nav > .status { flex-shrink: 1; }
+}
+:root[data-style='lol'] .page-title h2::before { vertical-align: 0.16em; }
