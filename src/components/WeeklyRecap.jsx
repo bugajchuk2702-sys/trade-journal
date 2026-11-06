@@ -54,9 +54,7 @@ export default function WeeklyRecap({ symbol, weekStart }) {
 
       {trades.length === 0 ? (
         <div className="empty">
-          На этой неделе сделок{symbol ? ` по ${symbol}` : ''} нет.
-          <br />
-          <span className="hint">Добавь сделку на вкладке Trades, и она появится здесь сама.</span>
+          На этой неделе сделок нету
         </div>
       ) : (
         <>

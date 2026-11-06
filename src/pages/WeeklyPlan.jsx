@@ -187,9 +187,7 @@ function PlanEditor({ plan, onDelete }) {
         <h3 className="section-title">Updates</h3>
         <button onClick={addUpdate}>+ Update</button>
       </div>
-      {p.updates.length === 0 ? (
-        <div className="card empty">На этой неделе сделок нету</div>
-      ) : (
+      {p.updates.length === 0 ? null : (
         <div className="row2">
           {p.updates.map((u) => (
             <ShotCard
