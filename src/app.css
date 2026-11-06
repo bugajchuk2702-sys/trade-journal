@@ -814,3 +814,13 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
   :root[data-style='ow'] .dot { position: relative; }
   :root[data-style='ow'] .dot.ok::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--green-fill); animation: ow-ping 2.4s ease-out infinite; }
 }
+
+/* ---------- Data → Accounts ---------- */
+.acc-add { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.acc-add label { flex: 1 1 200px; max-width: 280px; }
+.acc-edit { min-width: 150px; padding-top: 7px; padding-bottom: 7px; }
+.acc-edit-size { min-width: 110px; max-width: 150px; text-align: right; }
+.acc-note { color: var(--text-2); font-size: 12px; font-weight: 400; }
+.acc-error { color: var(--red); font-size: 13px; margin: -4px 0 12px; }
+.tablewrap td button:not([class]) { padding: 5px 12px; font-size: 13px; }
+:root[data-style='ow'] .tablewrap td button:not([class]) { font-size: 15px; padding: 4px 18px; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }

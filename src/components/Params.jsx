@@ -134,7 +134,7 @@ export function StylePicker({ value, onChange }) {
 }
 
 // Проп-счета: название + размер. Размер нужен, чтобы считать Net Result в % и Risk Reward.
-const ACC_KEY = 'accounts'
+export const ACC_KEY = 'accounts'
 
 export function AccountPicker({ value, onChange }) {
   const row = useLiveQuery(() => db.meta.get(ACC_KEY), [], undefined)

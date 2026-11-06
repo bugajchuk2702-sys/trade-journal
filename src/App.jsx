@@ -6,12 +6,14 @@ import WeeklyPlan from './pages/WeeklyPlan.jsx'
 import Trades from './pages/Trades.jsx'
 import Mpa from './pages/Mpa.jsx'
 import Notes from './pages/Notes.jsx'
+import Data from './pages/Data.jsx'
 
 const TABS = [
   { id: 'plan', label: 'Weekly Plan', Page: WeeklyPlan },
   { id: 'trades', label: 'Trades', Page: Trades },
   { id: 'mpa', label: 'MPA', Page: Mpa },
   { id: 'notes', label: 'Notes', Page: Notes },
+  { id: 'data', label: 'Data', Page: Data },
 ]
 
 function useOnline() {
@@ -67,7 +69,6 @@ export default function App() {
   // сразу попасть в нужный план на странице Weekly Plan.
   const [view, setView] = useState({ tab: 'home', params: {} })
   const [persisted, setPersisted] = useState(null)
-  // Счётчик смены раздела: в Hero на каждую смену запускается косая «шторка» поверх страницы
 
   useEffect(() => {
     requestPersistentStorage().then(setPersisted)
