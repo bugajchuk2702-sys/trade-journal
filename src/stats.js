@@ -1,5 +1,14 @@
 // Расчёты по сделке. Универсальная формула: работает для крипты, акций, форекса (если size — в единицах актива)
-const has = (v) => v !== '' && v != null && isFinite(Number(v))
+// Число из текста, который ввёл человек: терпимо к «180$», «1%», «1,5», пробелам
+export const toNum = (v) => {
+  if (v == null || v === '') return null
+  if (typeof v === 'number') return isFinite(v) ? v : null
+  const m = String(v).replace(',', '.').replace(/[^0-9.+-]/g, '')
+  if (m === '' || m === '-' || m === '+' || m === '.') return null
+  const n = Number(m)
+  return isFinite(n) ? n : null
+}
+const has = (v) => toNum(v) != null
 
 // Есть ли у сделки результат: новый (PnL в $) или старый (цены входа / выхода)
 export const hasResult = (t) => has(t.pnlUsd) || has(t.entry)
@@ -7,9 +16,9 @@ export const hasResult = (t) => has(t.pnlUsd) || has(t.entry)
 export function calcTrade(t) {
   // Новая схема: PnL в долларах, риск в % от счёта, размер счёта запоминается в сделке
   if (has(t.pnlUsd)) {
-    const pnl = Number(t.pnlUsd)
-    const acc = Number(t.accountSize)
-    const risk = Number(t.riskPct)
+    const pnl = toNum(t.pnlUsd)
+    const acc = toNum(t.accountSize) || 0
+    const risk = toNum(t.riskPct) || 0
     const netPct = acc > 0 ? (pnl / acc) * 100 : null
     const r = acc > 0 && risk > 0 ? pnl / ((acc * risk) / 100) : null
     return { closed: true, pnl, r, netPct }

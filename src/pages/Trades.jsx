@@ -89,10 +89,10 @@ export function TradeForm({ initial, onSubmit, onCancel }) {
       <StylePicker value={f.style} onChange={(v) => setF((x) => ({ ...x, style: v }))} />
       <AccountPicker value={f.account} onChange={(name, size) => setF((x) => ({ ...x, account: name, accountSize: size }))} />
       <label>Risk, %
-        <input type="number" step="any" min="0" value={f.riskPct} onChange={set('riskPct')} placeholder="0.5" />
+        <input type="text" inputMode="decimal" autoComplete="off" value={f.riskPct} onChange={set('riskPct')} placeholder="0.5" />
       </label>
       <label>PNL, $
-        <input type="number" step="any" value={f.pnlUsd} onChange={set('pnlUsd')} placeholder="0" />
+        <input type="text" inputMode="decimal" autoComplete="off" value={f.pnlUsd} onChange={set('pnlUsd')} placeholder="0" />
       </label>
       <div className="netres">
         <span className="plabel">Net Result</span>

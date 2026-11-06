@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
+import { toNum } from '../stats.js'
 
 // Параметры сделки: у каждого свой список вариантов. Список можно пополнять и чистить прямо в выпадашке,
 // он хранится в базе (meta) и общий для всех сделок.
@@ -140,7 +141,19 @@ export function AccountPicker({ value, onChange }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [size, setSize] = useState('')
+  const [alignRight, setAlignRight] = useState(false)
   const wrap = useRef(null)
+
+  // Список шире колонки: если справа не хватает места внутри карточки — раскрываем влево
+  const toggle = () => {
+    if (!open && wrap.current) {
+      const r = wrap.current.getBoundingClientRect()
+      const box = wrap.current.closest('.card, .modal')
+      const limit = box ? box.getBoundingClientRect().right : window.innerWidth
+      setAlignRight(r.left + 330 > limit - 8)
+    }
+    setOpen((o) => !o)
+  }
 
   useEffect(() => {
     if (!open) return
@@ -154,7 +167,7 @@ export function AccountPicker({ value, onChange }) {
   const pick = (a) => { onChange(a ? a.name : '', a ? a.size : ''); setOpen(false) }
   const add = () => {
     const n = name.trim()
-    const sz = Number(String(size).replace(',', '.'))
+    const sz = toNum(size)
     if (!n || !(sz > 0)) return
     const acc = { name: n, size: sz }
     saveList([...list.filter((a) => a.name !== n), acc])
@@ -167,12 +180,12 @@ export function AccountPicker({ value, onChange }) {
   return (
     <div className="pbox" ref={wrap}>
       <span className="plabel">Account</span>
-      <button type="button" className={'pbtn' + (value ? ' set' : '')} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+      <button type="button" className={'pbtn' + (value ? ' set' : '')} onClick={toggle} aria-expanded={open}>
         <span>{value || 'Выбрать'}</span>
         <svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>
       {open && (
-        <div className="plist" role="listbox">
+        <div className={'plist plist-wide' + (alignRight ? ' right' : '')} role="listbox">
           <div className="plist-items">
             {value && <button type="button" className="popt clear" onClick={() => pick(null)}>Очистить</button>}
             {list.length === 0 && <div className="pempty">Счетов пока нет. Добавь первый ниже.</div>}
@@ -185,10 +198,10 @@ export function AccountPicker({ value, onChange }) {
               </div>
             ))}
           </div>
-          <div className="padd">
+          <div className="padd padd-acc">
             <input value={name} placeholder="Название" onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
-            <input value={size} placeholder="Размер, $" inputMode="decimal" style={{ maxWidth: 110 }} onChange={(e) => setSize(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
-            <button type="button" className="small" onClick={add} disabled={!name.trim() || !(Number(String(size).replace(',', '.')) > 0)}>+</button>
+            <input value={size} placeholder="Размер, $" inputMode="decimal" onChange={(e) => setSize(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
+            <button type="button" className="small" onClick={add} disabled={!name.trim() || !(toNum(size) > 0)}>+</button>
           </div>
         </div>
       )}
