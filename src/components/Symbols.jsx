@@ -64,19 +64,33 @@ const FLAGS = {
   ),
 }
 
-const Gold = ({ id }) => (
-  <svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true">
-    <defs>
-      <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#ffe27a" />
-        <stop offset="1" stopColor="#c98a12" />
-      </linearGradient>
-    </defs>
-    <circle cx="12" cy="12" r="12" fill={`url(#${id})`} />
-    <circle cx="12" cy="12" r="9" fill="none" stroke="#a46d08" strokeOpacity=".55" strokeWidth="1" />
-    <text x="12" y="15.6" textAnchor="middle" fontSize="9.5" fontWeight="700" fontFamily="Arial, sans-serif" fill="#7a4d00">Au</text>
-  </svg>
-)
+// Золото: стопка слитков на золотистом фоне (нарисовано вручную)
+const Gold = ({ id }) => {
+  const bar = (x, y, w, h, k) => (
+    <g key={k}>
+      <path d={`M${x} ${y + h} L${x + w} ${y + h} L${x + w - h * 0.5} ${y} L${x + h * 0.5} ${y} Z`} fill={`url(#${id}b)`} stroke="#7a4a00" strokeWidth=".6" strokeLinejoin="round" />
+      <path d={`M${x + h * 0.5 + 0.6} ${y + 1.1} L${x + w - h * 0.5 - 0.6} ${y + 1.1}`} stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity=".9" />
+    </g>
+  )
+  return (
+    <svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true">
+      <defs>
+        <linearGradient id={id + 'g'} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#f0b324" />
+          <stop offset="1" stopColor="#b86f00" />
+        </linearGradient>
+        <linearGradient id={id + 'b'} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff3b0" />
+          <stop offset="1" stopColor="#ffc933" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="12" fill={`url(#${id}g)`} />
+      {bar(2.6, 13.4, 9.6, 5.2, 'l')}
+      {bar(11.8, 13.4, 9.6, 5.2, 'r')}
+      {bar(7.2, 7.8, 9.6, 5.2, 't')}
+    </svg>
+  )
+}
 
 const Bitcoin = () => (
   <svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true">
