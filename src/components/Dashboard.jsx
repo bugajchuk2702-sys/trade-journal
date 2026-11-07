@@ -20,22 +20,17 @@ export default function Dashboard() {
   const last = pc.curve[pc.curve.length - 1].equity
   const tone = last < 0 ? 'var(--red-fill)' : 'var(--green-fill)'
 
+  const pf = (v) => (v == null ? '—' : (v > 0 ? '+' : '') + fmt(v) + '%')
   const items = [
-    ['Закрыто сделок', s.count],
-    ['Открыто', s.open],
-    ['PnL', fmt(s.totalPnl), sign(s.totalPnl)],
+    ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
     ['Винрейт', s.winrate == null ? '—' : fmt(s.winrate, 1) + '%'],
     ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor)],
-    ['Матожидание', fmt(s.expectancy), sign(s.expectancy)],
     ['Средний R', fmt(s.avgR), sign(s.avgR)],
-    ['Ср. прибыль', fmt(s.avgWin), s.avgWin != null ? 'pos' : ''],
-    ['Ср. убыток', fmt(s.avgLoss), s.avgLoss != null ? 'neg' : ''],
-    ['Лучшая сделка', fmt(s.best), sign(s.best)],
-    ['Худшая сделка', fmt(s.worst), sign(s.worst)],
-    ['Макс. просадка', fmt(s.maxDd), s.maxDd > 0 ? 'neg' : ''],
+    ['Ср. % прибыли', pf(s.avgWinPct), s.avgWinPct != null ? 'pos' : ''],
+    ['Ср. % убытка', pf(s.avgLossPct), s.avgLossPct != null ? 'neg' : ''],
+    ['Макс. просадка', s.maxDdPct == null ? '—' : (s.maxDdPct > 0 ? '-' : '') + fmt(s.maxDdPct) + '%', s.maxDdPct > 0 ? 'neg' : ''],
     ['Серия побед', s.maxWinStreak],
     ['Серия убытков', s.maxLossStreak],
-    ['Комиссии', fmt(s.fees)],
   ]
 
   return (
@@ -43,12 +38,28 @@ export default function Dashboard() {
       <h3 className="section-title">Метрики и кривая капитала</h3>
       <div className="dash-body">
         <div className="card metrics">
-          {items.map(([label, value, cls]) => (
-            <div className="m" key={label}>
-              <div className="l">{label}</div>
-              <div className={'v ' + (cls || '')}><AnimNum value={value} /></div>
+          <div className="m-total">
+            <div className="tt-title">Total Trades</div>
+            <div className="tt-row">
+              <b>{s.total} Trades</b>
+              <span className="tt-sep">|</span>
+              <span className="tt-g" title="Прибыльные">{s.winCount}</span>
+              <span className="tt-sl">/</span>
+              <span className="tt-r" title="Убыточные">{s.lossCount}</span>
+              <span className="tt-sl">/</span>
+              <span className="tt-o" title="Безубыток">{s.beCount}</span>
+              <span className="tt-sl">/</span>
+              <span className="tt-b" title="Открытые">{s.open}</span>
             </div>
-          ))}
+          </div>
+          <div className="m-grid">
+            {items.map(([label, value, cls]) => (
+              <div className="m" key={label}>
+                <div className="l">{label}</div>
+                <div className={'v ' + (cls || '')}><AnimNum value={value} /></div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="card curve" style={{ '--tone': tone }}>

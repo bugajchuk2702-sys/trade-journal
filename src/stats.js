@@ -89,9 +89,29 @@ export function summarize(trades) {
 
   const pnls = closed.map((t) => t.pnl)
 
+  // Проценты от размера счёта (только сделки, у которых размер счёта известен)
+  const pct = closed.filter((t) => t.netPct != null)
+  const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null)
+  let pe = 0
+  let pPeak = 0
+  let maxDdPct = 0
+  pct.forEach((t) => {
+    pe += t.netPct
+    pPeak = Math.max(pPeak, pe)
+    maxDdPct = Math.max(maxDdPct, pPeak - pe)
+  })
+
   return {
     count: closed.length,
+    total: trades.length,
     open: trades.length - closed.length,
+    winCount: wins.length,
+    lossCount: losses.length,
+    beCount: closed.length - wins.length - losses.length,
+    pctTotal: pct.length ? pe : null,
+    avgWinPct: mean(pct.filter((t) => t.pnl > 0).map((t) => t.netPct)),
+    avgLossPct: mean(pct.filter((t) => t.pnl < 0).map((t) => t.netPct)),
+    maxDdPct: pct.length ? maxDdPct : null,
     winrate: closed.length ? (wins.length / closed.length) * 100 : null,
     totalPnl,
     fees,
