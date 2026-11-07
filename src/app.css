@@ -428,6 +428,9 @@ form.trade .trade-shots { align-items: stretch; }
 .netres-val.neg { color: var(--red); }
 .pempty { padding: 10px; font-size: 13px; color: var(--text-3); }
 .psub { margin-left: 8px; font-size: 12.5px; color: var(--text-3); font-weight: 500; }
+/* Сумма на счёте: выше размера счёта — зелёная, ниже — красная */
+.psub.up { color: var(--green); font-weight: 700; }
+.psub.down { color: var(--red); font-weight: 700; }
 /* Список счетов шире колонки; не вылезает за карточку */
 .plist-wide { width: 320px; max-width: calc(100vw - 32px); }
 .plist-wide.right { left: auto; right: 0; }
@@ -636,6 +639,9 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
 :root[data-style='ow'] .symopt:hover, :root[data-style='ow'] .symopt.hi, :root[data-style='ow'] .popt:hover { background: var(--surface-2); }
 :root[data-style='ow'] .symopt.sel, :root[data-style='ow'] .popt.sel { background: var(--accent); color: #101722; }
 :root[data-style='ow'] .popt.sel .psub { color: #3b2a08; }
+/* на оранжевой выбранной строке зелёный/красный должны оставаться читаемыми */
+:root[data-style='ow'] .popt.sel .psub.up { color: #0b5a2b; }
+:root[data-style='ow'] .popt.sel .psub.down { color: #8a0f1f; }
 :root[data-style='ow'] .pbtn { border-radius: 3px; background: rgba(7, 13, 25, 0.65); box-shadow: inset 0 0 0 1px var(--line); clip-path: none; font-family: var(--font); font-style: normal; text-transform: none; letter-spacing: 0; font-size: 15px; font-weight: 500; color: var(--text-3); padding: 10px 12px; }
 :root[data-style='ow'] .pbtn.set { color: var(--accent); font-weight: 600; }
 :root[data-style='ow'] .pbtn:hover { background: rgba(7, 13, 25, 0.85); }

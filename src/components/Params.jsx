@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
-import { toNum } from '../stats.js'
+import { toNum, summarize } from '../stats.js'
 import { weekLabel } from '../week.js'
 import { SymbolIcon, norm } from './Symbols.jsx'
 
@@ -179,13 +179,27 @@ export function AccountPicker({ value, onChange }) {
     setSize('')
     pick(acc)
   }
-  const fmtSize = (n) => Number(n).toLocaleString('ru-RU') + ' $'
+  const fmtSize = (n) => Number(n).toLocaleString('ru-RU', { maximumFractionDigits: 2 }) + ' $'
+
+  // Сумма на счёте = размер счёта + результат всех его сделок (в том числе той, что правят сейчас).
+  // Выше размера счёта — зелёная, ниже — красная.
+  const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray(), [], [])
+  const balanceOf = (a) => {
+    const size = toNum(a.size) || 0
+    const bal = size + summarize(trades.filter((t) => t.account === a.name)).totalPnl
+    return { bal, cls: bal > size + 0.005 ? 'up' : bal < size - 0.005 ? 'down' : '' }
+  }
+  const cur = value ? list.find((a) => a.name === value) : null
+  const curBal = cur ? balanceOf(cur) : null
 
   return (
     <div className="pbox" ref={wrap}>
       <span className="plabel">Account</span>
       <button type="button" className={'pbtn' + (value ? ' set' : '')} onClick={toggle} aria-expanded={open}>
-        <span>{value || 'Выбрать'}</span>
+        <span>
+          {value || 'Выбрать'}
+          {curBal && <span className={'psub ' + curBal.cls}>{fmtSize(curBal.bal)}</span>}
+        </span>
         <svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>
       {open && (
@@ -193,14 +207,17 @@ export function AccountPicker({ value, onChange }) {
           <div className="plist-items">
             {value && <button type="button" className="popt clear" onClick={() => pick(null)}>Очистить</button>}
             {list.length === 0 && <div className="pempty">Счетов пока нет. Добавь первый ниже.</div>}
-            {list.map((a) => (
+            {list.map((a) => {
+              const b = balanceOf(a)
+              return (
               <div className="prow" key={a.name}>
                 <button type="button" role="option" aria-selected={a.name === value} className={'popt' + (a.name === value ? ' sel' : '')} onClick={() => pick(a)}>
-                  {a.name} <span className="psub">{fmtSize(a.size)}</span>
+                  {a.name} <span className={'psub ' + b.cls} title={'Размер счёта: ' + fmtSize(a.size)}>{fmtSize(b.bal)}</span>
                 </button>
                 <button type="button" className="pdel" title="Удалить счёт" aria-label={'Удалить ' + a.name} onClick={() => saveList(all.filter((x) => x.name !== a.name))}>✕</button>
               </div>
-            ))}
+              )
+            })}
           </div>
           <div className="padd padd-acc">
             <input value={name} placeholder="Название" onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }} />
