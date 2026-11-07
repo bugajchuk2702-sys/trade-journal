@@ -34,22 +34,21 @@ export default function Dashboard() {
 
   // «1 д 0 ч»
   const hold = (ms) => {
-    if (ms == null) return '—'
-    const h = Math.round(ms / 3600000)
+    const h = Math.round((ms || 0) / 3600000)
     return `${Math.floor(h / 24)} д ${h % 24} ч`
   }
-  const wr = (v) => (v == null ? '—' : fmt(v, 1) + '%')
-  const pf = (v) => (v == null ? '—' : (v > 0 ? '+' : '') + fmt(v) + '%')
+  const wr = (v) => fmt(v || 0, 1) + '%'
+  const pf = (v) => ((v || 0) > 0 ? '+' : '') + fmt(v || 0) + '%'
   const items = [
     ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
     ['Винрейт', wr(s.winrate)],
-    ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor)],
+    ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor || 0)],
     ['Винрейт лонг / шорт', [wr(s.winrateLong), wr(s.winrateShort)], '', 'Доля прибыльных сделок: лонг / шорт', true],
     ['Время в позиции', hold(s.avgHold), '', 'Среднее время в позиции'],
-    ['Средний R', fmt(s.avgR), sign(s.avgR)],
+    ['Средний R', fmt(s.avgR || 0), sign(s.avgR)],
     ['Ср. % прибыли', pf(s.avgWinPct), s.avgWinPct != null ? 'pos' : ''],
     ['Ср. % убытка', pf(s.avgLossPct), s.avgLossPct != null ? 'neg' : ''],
-    ['Макс. просадка', s.maxDdPct == null ? '—' : (s.maxDdPct > 0 ? '-' : '') + fmt(s.maxDdPct) + '%', s.maxDdPct > 0 ? 'neg' : ''],
+    ['Макс. просадка', (s.maxDdPct > 0 ? '-' : '') + fmt(s.maxDdPct || 0) + '%', s.maxDdPct > 0 ? 'neg' : ''],
     ['Серия побед', s.maxWinStreak],
     ['Серия убытков', s.maxLossStreak],
   ]
