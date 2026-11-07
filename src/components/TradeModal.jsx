@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { TradeForm } from '../pages/Trades.jsx'
 
 // Окно создания / правки сделки поверх страницы (например, из плана недели)
-export default function TradeModal({ title, initial, onSubmit, onClose }) {
+export default function TradeModal({ title, initial, onSave, onClose }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', onKey)
@@ -17,7 +17,7 @@ export default function TradeModal({ title, initial, onSubmit, onClose }) {
           <span className="spacer" />
           <button type="button" className="ghost small" onClick={onClose} title="Закрыть (Esc)">✕</button>
         </div>
-        <TradeForm hidePlan initial={initial} onSubmit={onSubmit} onCancel={onClose} />
+        <TradeForm hidePlan initial={initial} onSave={onSave} onClose={onClose} />
       </section>
     </div>
   )

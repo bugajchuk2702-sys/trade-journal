@@ -54,42 +54,69 @@ export const tradeToForm = (t) => ({
 
 const signed = (n, d = 2, suffix = '') => (n == null || !isFinite(n) ? '—' : (n > 0 ? '+' : '') + fmt(n, d) + suffix)
 
-export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
+// Данные формы -> запись сделки в базе
+const formToTrade = (f, hidePlan) => ({
+  symbol: f.symbol.trim().toUpperCase(),
+  side: f.side,
+  openedAt: f.openedAt
+    ? (f.openedTs && toLocalDate(f.openedTs) === f.openedAt ? f.openedTs : dateToMs(f.openedAt))
+    : Date.now(),
+  closedAt: f.closedAt
+    ? (f.closedTs && toLocalDate(f.closedTs) === f.closedAt ? f.closedTs : dateToMs(f.closedAt))
+    : null,
+  ...(hidePlan ? {} : { planId: f.planId || null }),
+  style: f.style,
+  account: f.account,
+  accountSize: f.accountSize,
+  riskPct: f.riskPct,
+  pnlUsd: f.pnlUsd,
+  params: f.params || {},
+  w1: f.w1,
+  d1: f.d1,
+  h4: f.h4,
+  resultImg: f.resultImg,
+  conclusion: f.conclusion,
+})
+
+// Заготовка новой сделки. Запись создаётся сразу, как только нажали «Новая сделка»,
+// а дальше форма сама сохраняет каждое изменение — если вкладку закроет или выбьет,
+// сделка уже лежит в таблице.
+export const newTradeData = (over = {}) => formToTrade({ ...emptyForm(), ...over }, false)
+
+const AUTOSAVE_MS = 500
+
+// Форма сохраняется автоматически: каждое изменение уходит в базу через полсекунды,
+// а при закрытии формы несохранённое дописывается сразу.
+export function TradeForm({ initial, onSave, onClose, hidePlan }) {
   const [f, setF] = useState(initial || emptyForm())
-  const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
+  const latest = useRef(f)
+  const timer = useRef(null)
+  const saveRef = useRef(onSave)
+  saveRef.current = onSave
   const net = calcTrade({ pnlUsd: f.pnlUsd, accountSize: f.accountSize, riskPct: f.riskPct })
 
-  const submit = (e) => {
-    e.preventDefault()
-    onSubmit({
-      symbol: f.symbol.trim().toUpperCase(),
-      side: f.side,
-      openedAt: f.openedAt
-        ? (f.openedTs && toLocalDate(f.openedTs) === f.openedAt ? f.openedTs : dateToMs(f.openedAt))
-        : Date.now(),
-      closedAt: f.closedAt
-        ? (f.closedTs && toLocalDate(f.closedTs) === f.closedAt ? f.closedTs : dateToMs(f.closedAt))
-        : null,
-      ...(hidePlan ? {} : { planId: f.planId || null }),
-      style: f.style,
-      account: f.account,
-      accountSize: f.accountSize,
-      riskPct: f.riskPct,
-      pnlUsd: f.pnlUsd,
-      params: f.params || {},
-      w1: f.w1,
-      d1: f.d1,
-      h4: f.h4,
-      resultImg: f.resultImg,
-      conclusion: f.conclusion,
-    })
-    if (!initial) setF(emptyForm())
+  const flush = () => {
+    if (!timer.current) return
+    clearTimeout(timer.current)
+    timer.current = null
+    saveRef.current(formToTrade(latest.current, hidePlan))
   }
+  // Закрыли форму или ушли со страницы — не теряем последние правки
+  useEffect(() => () => flush(), []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const upd = (patch) => {
+    const next = { ...latest.current, ...patch }
+    latest.current = next
+    setF(next)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(flush, AUTOSAVE_MS)
+  }
+  const set = (k) => (e) => upd({ [k]: e.target.value })
 
   return (
-    <form className="trade" onSubmit={submit}>
+    <form className="trade" onSubmit={(e) => { e.preventDefault(); flush() }}>
       <label className="c4">Инструмент
-        <SymbolInput required value={f.symbol} onChange={(v) => set('symbol')({ target: { value: v } })} placeholder="Выбери" />
+        <SymbolInput value={f.symbol} onChange={(v) => upd({ symbol: v })} placeholder="Выбери" />
       </label>
       <label className="c4">Направление
         <select value={f.side} onChange={set('side')}>
@@ -103,15 +130,15 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
       <label className="c4">Закрыта
         <input type="date" value={f.closedAt} onChange={set('closedAt')} />
       </label>
-      <div className="c4"><StylePicker value={f.style} onChange={(v) => setF((x) => ({ ...x, style: v }))} /></div>
+      <div className="c4"><StylePicker value={f.style} onChange={(v) => upd({ style: v })} /></div>
       <div className="c4">
         {hidePlan
           ? <div className="pbox"><span className="plabel">План недели</span><div className="pbtn set" style={{ cursor: 'default' }}><span>Этот план</span></div></div>
-          : <PlanPicker value={f.planId} symbol={f.symbol} onChange={(v) => setF((x) => ({ ...x, planId: v }))} />}
+          : <PlanPicker value={f.planId} symbol={f.symbol} onChange={(v) => upd({ planId: v })} />}
       </div>
 
       <div className="wide form-sec">Результат</div>
-      <div className="c4"><AccountPicker value={f.account} onChange={(name, size) => setF((x) => ({ ...x, account: name, accountSize: size }))} /></div>
+      <div className="c4"><AccountPicker value={f.account} onChange={(name, size) => upd({ account: name, accountSize: size })} /></div>
       <div className="c4 pair">
         <label>Risk, %
           <input type="text" inputMode="decimal" autoComplete="off" value={f.riskPct} onChange={set('riskPct')} placeholder="0.5" />
@@ -129,20 +156,20 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
         </div>
       </div>
 
-      <ParamsBlock value={f.params} onChange={(v) => setF((x) => ({ ...x, params: v }))} />
+      <ParamsBlock value={f.params} onChange={(v) => upd({ params: v })} />
       <div className="wide form-sec">Скриншоты</div>
       <div className="wide trade-shots">
-        <ShotCard title="W1" img={f.w1} onImg={(v) => setF((x) => ({ ...x, w1: v }))} />
-        <ShotCard title="D1" img={f.d1} onImg={(v) => setF((x) => ({ ...x, d1: v }))} />
-        <ShotCard title="H4" img={f.h4} onImg={(v) => setF((x) => ({ ...x, h4: v }))} />
-        <ShotCard title="Result" img={f.resultImg} onImg={(v) => setF((x) => ({ ...x, resultImg: v }))} />
+        <ShotCard title="W1" img={f.w1} onImg={(v) => upd({ w1: v })} />
+        <ShotCard title="D1" img={f.d1} onImg={(v) => upd({ d1: v })} />
+        <ShotCard title="H4" img={f.h4} onImg={(v) => upd({ h4: v })} />
+        <ShotCard title="Result" img={f.resultImg} onImg={(v) => upd({ resultImg: v })} />
       </div>
       <label className="wide">Conclusion
         <AutoTextarea value={f.conclusion} onChange={set('conclusion')} />
       </label>
-      <div className="wide" style={{ display: 'flex', gap: 8 }}>
-        <button type="submit">{initial ? 'Сохранить' : 'Добавить сделку'}</button>
-        {onCancel && <button type="button" className="ghost" onClick={onCancel}>Отмена</button>}
+      <div className="wide" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <button type="button" onClick={() => { flush(); onClose && onClose() }}>Готово</button>
+        <span className="hint">Сохраняется автоматически</span>
       </div>
     </form>
   )
@@ -183,6 +210,7 @@ function periodLabel(mode, anchor) {
 export default function Trades({ params = {}, go }) {
   const [editing, setEditing] = useState(null)
   const [formOpen, setFormOpen] = useState(false)
+  const [newId, setNewId] = useState(null) // id только что созданной сделки (для заголовка формы)
   const [query, setQuery] = useState('')
   const [mode, setMode] = useState('week') // week | month | all
   const [anchor, setAnchor] = useState(() => new Date())
@@ -221,10 +249,17 @@ export default function Trades({ params = {}, go }) {
   // Колонки PnL / R нужны только для старых сделок, где ещё были цены
   const hasNums = filtered.some(hasResult)
 
-  const closeForm = () => { setFormOpen(false); setEditing(null) }
-  const openNew = () => { setEditing(null); setFormOpen(true) }
+  const closeForm = () => { setFormOpen(false); setEditing(null); setNewId(null) }
+  // Сделка создаётся сразу и появляется в таблице — даже пустая; дальше правки сохраняются сами
+  const openNew = async () => {
+    const t = await addTrade(newTradeData())
+    setEditing(t)
+    setNewId(t.id)
+    setFormOpen(true)
+  }
   const openEdit = (t) => {
     setEditing(t)
+    setNewId(null)
     setFormOpen(true)
     document.querySelector('.main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -263,34 +298,21 @@ export default function Trades({ params = {}, go }) {
           : <button type="button" onClick={openNew}>+ Новая сделка</button>}
       </div>
 
-      {formOpen && (
+      {formOpen && editing && (
         <section className="card">
           <div className="shot-head">
-            <h2>{editing ? 'Редактировать сделку' : 'Новая сделка'}</h2>
+            <h2>{editing.id === newId ? 'Новая сделка' : 'Редактировать сделку'}</h2>
             <span className="spacer" />
             {params.back && go && (
               <button type="button" className="ghost small" onClick={() => go('plan', params.back)}>← К плану</button>
             )}
           </div>
-          {editing ? (
-            <TradeForm
-              key={editing.id}
-              initial={tradeToForm(editing)}
-              onSubmit={async (d) => {
-                await updateTrade(editing.id, d)
-                closeForm()
-              }}
-              onCancel={closeForm}
-            />
-          ) : (
-            <TradeForm
-              onSubmit={async (d) => {
-                await addTrade(d)
-                closeForm()
-              }}
-              onCancel={closeForm}
-            />
-          )}
+          <TradeForm
+            key={editing.id}
+            initial={tradeToForm(editing)}
+            onSave={(d) => updateTrade(editing.id, d)}
+            onClose={closeForm}
+          />
         </section>
       )}
 
@@ -342,7 +364,7 @@ export default function Trades({ params = {}, go }) {
                   return (
                     <tr key={t.id} title={t.conclusion || t.notes || ''}>
                       <td className="left">{new Date(t.openedAt).toLocaleDateString('ru-RU', { dateStyle: 'short' })}</td>
-                      <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol}</span></td>
+                      <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol || <span className="subtle">Не выбран</span>}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       <td className="left">{planOf(t) ? <span className="tag">{planOf(t).symbol} · {weekLabel(planOf(t).weekStart).replace(/ \d{4}$/, '')}</span> : <span className="subtle">—</span>}</td>
                       {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) : '—'}</td>}

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, createPlan, savePlan, removePlan, addTrade, updateTrade, uuid } from '../db.js'
 import { calcTrade, fmt, hasResult } from '../stats.js'
-import { emptyForm, tradeToForm } from './Trades.jsx'
+import { newTradeData, tradeToForm } from './Trades.jsx'
 import TradeModal from '../components/TradeModal.jsx'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
@@ -93,8 +93,13 @@ const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
 function PlanEditor({ plan, onDelete, go }) {
   const [p, setP] = useState(() => pick(plan))
-  // null — окно закрыто, {} — новая сделка, объект сделки — правка
+  // null — окно закрыто, иначе { trade, isNew }
   const [tradeModal, setTradeModal] = useState(null)
+  // Сделка создаётся сразу (и видна в списке плана и в таблице Trades), дальше форма сохраняет правки сама
+  const startTrade = async () => {
+    const trade = await addTrade(newTradeData({ symbol: latest.current.symbol, planId: plan.id }))
+    setTradeModal({ trade, isNew: true })
+  }
   const attached = useLiveQuery(
     () => db.trades.filter((t) => t.planId === plan.id && !t.deleted).toArray().then((a) => a.sort((x, y) => y.openedAt - x.openedAt)),
     [plan.id],
@@ -168,10 +173,10 @@ function PlanEditor({ plan, onDelete, go }) {
           </select>
         </label>
         <span className="spacer" />
-        <button onClick={() => setTradeModal({})}>+ Добавить трейд</button>
+        <button onClick={startTrade}>+ Добавить трейд</button>
       </div>
 
-      <TradesList trades={attached} onAdd={() => setTradeModal({})} onOpen={(t) => go('trades', { tradeId: t.id, back: { weekStart: plan.weekStart, planId: plan.id } })} />
+      <TradesList trades={attached} onAdd={startTrade}onOpen={(t) => go('trades', { tradeId: t.id, back: { weekStart: plan.weekStart, planId: plan.id } })} />
 
       <h3 className="section-title">Pre-Session</h3>
       <div className="row3">
@@ -231,14 +236,10 @@ function PlanEditor({ plan, onDelete, go }) {
 
       {tradeModal && (
         <TradeModal
-          title={(tradeModal.id ? 'Редактировать сделку' : 'Новая сделка') + (p.symbol ? ' · ' + p.symbol : '')}
-          initial={tradeModal.id ? tradeToForm(tradeModal) : { ...emptyForm(), symbol: p.symbol }}
+          title={(tradeModal.isNew ? 'Новая сделка' : 'Редактировать сделку') + (p.symbol ? ' · ' + p.symbol : '')}
+          initial={tradeToForm(tradeModal.trade)}
           onClose={() => setTradeModal(null)}
-          onSubmit={async (d) => {
-            if (tradeModal.id) await updateTrade(tradeModal.id, d)
-            else await addTrade({ ...d, planId: plan.id })
-            setTradeModal(null)
-          }}
+          onSave={(d) => updateTrade(tradeModal.trade.id, d)}
         />
       )}
     </>
