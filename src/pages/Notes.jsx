@@ -178,23 +178,24 @@ function NoteEditor({ note, trades, plans, go, onDelete }) {
   )
 }
 
-export default function Notes({ params = {}, go }) {
+export default function Notes({ params, go }) {
   const notes = useLiveQuery(() => db.notes.where('deleted').equals(0).reverse().sortBy('updatedAt'), [], [])
   const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray(), [], [])
   const plans = useLiveQuery(() => db.plans.where('deleted').equals(0).toArray(), [], [])
-  const [selId, setSelId] = useState(params.noteId || null)
+  const [selId, setSelId] = useState(params?.noteId || null)
   const [view, setView] = useState('active') // active | archive
   const [q, setQ] = useState('')
 
   // Пришли по ссылке с трейда / плана: открываем нужную заметку (и нужный список)
+  // (каждый вызов go() даёт новый params — повторный клик по вкладке Notes возвращает к списку)
   useEffect(() => {
-    if (params.noteId) setSelId(params.noteId)
-  }, [params.noteId])
+    setSelId(params?.noteId || null)
+  }, [params])
   const loaded = notes.length > 0
   useEffect(() => {
-    const n = params.noteId && notes.find((x) => x.id === params.noteId)
+    const n = params?.noteId && notes.find((x) => x.id === params.noteId)
     if (n) setView(n.archived ? 'archive' : 'active')
-  }, [params.noteId, loaded]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [params?.noteId, loaded]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const archivedCount = notes.filter((n) => n.archived).length
   const filtered = useMemo(() => {
@@ -211,59 +212,91 @@ export default function Notes({ params = {}, go }) {
     setSelId(n.id)
   }
 
+  // Открыта заметка: целая страница с кнопкой «назад»
+  if (selected) {
+    return (
+      <>
+        <div className="page-title">
+          <h2>Notes</h2>
+          <span className="spacer" />
+          <button type="button" className="ghost" onClick={() => setSelId(null)}>← Все заметки</button>
+        </div>
+        <NoteEditor
+          key={selected.id}
+          note={selected}
+          trades={trades}
+          plans={plans}
+          go={go}
+          onDelete={async () => {
+            await removeNote(selected.id)
+            setSelId(null)
+          }}
+        />
+      </>
+    )
+  }
+
+  // Список заметок: заметка открывается по клику на строку
   return (
     <>
       <div className="page-title">
         <h2>Notes</h2>
       </div>
-      <div className="notes-layout">
-        <section className="card" style={{ margin: 0 }}>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input placeholder="Поиск" value={q} onChange={(e) => setQ(e.target.value)} />
-            <button onClick={create}>+ Новая</button>
-          </div>
-          <div className="chips" style={{ margin: '12px 0 0' }}>
-            <button type="button" className={'chip' + (view === 'active' ? ' active' : '')} onClick={() => setView('active')}>Notes</button>
-            <button type="button" className={'chip' + (view === 'archive' ? ' active' : '')} onClick={() => setView('archive')}>
-              Archive{archivedCount > 0 && <span className="chip-n">{archivedCount}</span>}
-            </button>
-          </div>
-          <div className="notes-list">
-            {filtered.length === 0 && <div className="empty">{view === 'archive' ? 'Архив пуст' : 'Заметок пока нет'}</div>}
-            {filtered.map((n) => {
-              const used = (n.tradeIds || []).length + (n.planIds || []).length
-              return (
-                <button key={n.id} className={'note-item' + (n.id === selId ? ' active' : '')} onClick={() => setSelId(n.id)}>
-                  <span className="t">{n.title || 'Без названия'}</span>
-                  <span className="s">
-                    {new Date(n.date ? n.date + 'T12:00' : n.updatedAt).toLocaleDateString('ru-RU')}
-                    {used > 0 && ` · используется: ${used}`}
-                    {' · '}{(n.body || n.important || n.example || '').replace(/\s+/g, ' ').slice(0, 40) || 'пусто'}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </section>
-
-        {selected ? (
-          <NoteEditor
-            key={selected.id}
-            note={selected}
-            trades={trades}
-            plans={plans}
-            go={go}
-            onDelete={async () => {
-              await removeNote(selected.id)
-              setSelId(null)
-            }}
-          />
+      <section className="card">
+        <div className="toolbar">
+          <input style={{ maxWidth: 'none', flex: 1 }} placeholder="Поиск" value={q} onChange={(e) => setQ(e.target.value)} />
+          <button onClick={create}>+ Новая заметка</button>
+        </div>
+        <div className="chips" style={{ margin: '12px 0 14px' }}>
+          <button type="button" className={'chip' + (view === 'active' ? ' active' : '')} onClick={() => setView('active')}>Notes</button>
+          <button type="button" className={'chip' + (view === 'archive' ? ' active' : '')} onClick={() => setView('archive')}>
+            Archive{archivedCount > 0 && <span className="chip-n">{archivedCount}</span>}
+          </button>
+        </div>
+        {filtered.length === 0 ? (
+          <div className="empty">{view === 'archive' ? 'Архив пуст' : q ? 'Ничего не найдено' : 'Заметок пока нет. Нажми «+ Новая заметка»'}</div>
         ) : (
-          <section className="card" style={{ margin: 0 }}>
-            <div className="empty">Выбери заметку слева или создай новую</div>
-          </section>
+          <div className="tablewrap">
+            <table className="notes-table">
+              <thead>
+                <tr>
+                  <th className="left">Название</th>
+                  <th className="left">Date</th>
+                  <th className="left">Popularity</th>
+                  <th className="left">Latest Usage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((n) => {
+                  const u = noteUsage(n, trades, plans)
+                  const preview = (n.body || n.important || n.example || '').replace(/\s+/g, ' ').slice(0, 90)
+                  return (
+                    <tr key={n.id} tabIndex={0} onClick={() => setSelId(n.id)} onKeyDown={(e) => e.key === 'Enter' && setSelId(n.id)}>
+                      <td className="left">
+                        <div className="nt">{n.title || 'Без названия'}</div>
+                        {preview && <div className="np">{preview}</div>}
+                      </td>
+                      <td className="left">{new Date(n.date ? n.date + 'T12:00' : n.updatedAt).toLocaleDateString('ru-RU')}</td>
+                      <td className="left">
+                        {u.ts.length + u.ps.length === 0 ? (
+                          <span className="muted">—</span>
+                        ) : (
+                          <span className="nprop"><span className="v">
+                            <span className="pt">В трейдах: {u.ts.length}</span>
+                            <span className="muted">/</span>
+                            <span className="pp">В планах: {u.ps.length}</span>
+                          </span></span>
+                        )}
+                      </td>
+                      <td className="left">{u.last ? ago(u.last) : <span className="muted">—</span>}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
-      </div>
+      </section>
     </>
   )
 }

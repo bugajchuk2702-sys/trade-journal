@@ -1004,3 +1004,10 @@ form.trade .linkrow { margin: 0; }
 :root[data-style='ow'] .lchip-t, :root[data-style='ow'] .lchip-x { clip-path: none; font-style: normal; font-family: var(--font); }
 :root[data-style='ow'] .lchip-t:hover { color: var(--accent); }
 @media (max-width: 760px) { .linkrow { flex-direction: column; gap: 4px; } .linkrow > .plabel { width: auto; padding-top: 0; } }
+
+/* ===== Список заметок ===== */
+.notes-table tbody tr { cursor: pointer; }
+.notes-table tbody tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.notes-table .nt { font-weight: 600; }
+.notes-table .np { font-size: 12.5px; color: var(--text-2); max-width: 520px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notes-table .nprop .v { display: inline-flex; gap: 6px; align-items: center; min-height: 0; }
