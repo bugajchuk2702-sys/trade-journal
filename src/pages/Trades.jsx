@@ -8,16 +8,22 @@ import ShotCard from '../components/ShotCard.jsx'
 import AutoTextarea from '../components/AutoTextarea.jsx'
 import ParamsBlock, { StylePicker, AccountPicker, PlanPicker } from '../components/Params.jsx'
 
-export const toLocalInput = (ts) => {
+// Дата в формате YYYY-MM-DD по местному времени (для <input type="date">)
+export const toLocalDate = (ts) => {
   const d = new Date(ts)
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-  return d.toISOString().slice(0, 16)
+  return d.toISOString().slice(0, 10)
+}
+// Выбранный день -> метка времени (полдень по местному времени, чтобы день не «съезжал»)
+const dateToMs = (s) => {
+  const [y, m, d] = s.split('-').map(Number)
+  return new Date(y, m - 1, d, 12).getTime()
 }
 
 export const emptyForm = () => ({
   symbol: '',
   side: 'long',
-  openedAt: toLocalInput(Date.now()),
+  openedAt: toLocalDate(Date.now()),
   closedAt: '',
   planId: '',
   style: '',
@@ -39,8 +45,11 @@ const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 export const tradeToForm = (t) => ({
   ...emptyForm(),
   ...t,
-  openedAt: toLocalInput(t.openedAt),
-  closedAt: t.closedAt ? toLocalInput(t.closedAt) : '',
+  openedAt: toLocalDate(t.openedAt),
+  closedAt: t.closedAt ? toLocalDate(t.closedAt) : '',
+  // исходные метки времени: если день не меняли, сохраняем их как есть (порядок сделок не собьётся)
+  openedTs: t.openedAt,
+  closedTs: t.closedAt || null,
 })
 
 const signed = (n, d = 2, suffix = '') => (n == null || !isFinite(n) ? '—' : (n > 0 ? '+' : '') + fmt(n, d) + suffix)
@@ -55,8 +64,12 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
     onSubmit({
       symbol: f.symbol.trim().toUpperCase(),
       side: f.side,
-      openedAt: f.openedAt ? new Date(f.openedAt).getTime() : Date.now(),
-      closedAt: f.closedAt ? new Date(f.closedAt).getTime() : null,
+      openedAt: f.openedAt
+        ? (f.openedTs && toLocalDate(f.openedTs) === f.openedAt ? f.openedTs : dateToMs(f.openedAt))
+        : Date.now(),
+      closedAt: f.closedAt
+        ? (f.closedTs && toLocalDate(f.closedTs) === f.closedAt ? f.closedTs : dateToMs(f.closedAt))
+        : null,
       ...(hidePlan ? {} : { planId: f.planId || null }),
       style: f.style,
       account: f.account,
@@ -85,10 +98,10 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
         </select>
       </label>
       <label className="c4">Открыта
-        <input type="datetime-local" value={f.openedAt} onChange={set('openedAt')} />
+        <input type="date" value={f.openedAt} onChange={set('openedAt')} />
       </label>
       <label className="c4">Закрыта
-        <input type="datetime-local" value={f.closedAt} onChange={set('closedAt')} />
+        <input type="date" value={f.closedAt} onChange={set('closedAt')} />
       </label>
       <div className="c4"><StylePicker value={f.style} onChange={(v) => setF((x) => ({ ...x, style: v }))} /></div>
       <div className="c4">
@@ -328,7 +341,7 @@ export default function Trades({ params = {}, go }) {
                   const c = calcTrade(t)
                   return (
                     <tr key={t.id} title={t.conclusion || t.notes || ''}>
-                      <td className="left">{new Date(t.openedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                      <td className="left">{new Date(t.openedAt).toLocaleDateString('ru-RU', { dateStyle: 'short' })}</td>
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       <td className="left">{planOf(t) ? <span className="tag">{planOf(t).symbol} · {weekLabel(planOf(t).weekStart).replace(/ \d{4}$/, '')}</span> : <span className="subtle">—</span>}</td>
