@@ -1,7 +1,7 @@
 import React from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addNote, updateNote } from '../db.js'
-import LinkPicker, { LinkRow } from './LinkPicker.jsx'
+import LinkPicker from './LinkPicker.jsx'
 
 // Заметки, привязанные к трейду или плану недели, и добавление новых.
 // Связь хранится в самой заметке (tradeIds / planIds), поэтому видна с обеих сторон.
@@ -29,24 +29,38 @@ export default function NotesLinker({ kind, id, go }) {
     if (go) go('notes', { noteId: n.id })
   }
 
+  const preview = (n) => (n.body || n.important || n.example || '').replace(/\s+/g, ' ').trim().slice(0, 110)
+
   return (
-    <LinkRow
-      label="Notes"
-      chips={linked.map((n) => ({
-        id: n.id,
-        label: n.title || 'Без названия',
-        onOpen: go ? () => go('notes', { noteId: n.id }) : undefined,
-        onRemove: () => unlink(n),
-      }))}
-    >
-      <LinkPicker
-        label="+ Заметка"
-        items={free}
-        empty="Свободных заметок нет"
-        onPick={(i) => link(i.note)}
-        onCreate={create}
-        createLabel="+ Создать новую заметку"
-      />
-    </LinkRow>
+    <div className="nl-box">
+      <div className="nl-head">
+        <span className="nl-title">Заметки</span>
+        {linked.length > 0 && <span className="nl-count">{linked.length}</span>}
+        <LinkPicker
+          primary
+          label="+ Заметка"
+          items={free}
+          empty="Свободных заметок нет"
+          onPick={(i) => link(i.note)}
+          onCreate={create}
+          createLabel="+ Создать новую заметку"
+        />
+      </div>
+      {linked.length === 0 ? (
+        <div className="nl-empty">К {kind === 'trade' ? 'этому трейду' : 'этому плану'} заметки не привязаны</div>
+      ) : (
+        <div className="nl-list">
+          {linked.map((n) => (
+            <div className="nl-item" key={n.id}>
+              <button type="button" className="nl-open" onClick={go ? () => go('notes', { noteId: n.id }) : undefined} title="Открыть заметку">
+                <span className="nl-name">{n.title || 'Без названия'}</span>
+                {preview(n) && <span className="nl-prev">{preview(n)}</span>}
+              </button>
+              <button type="button" className="nl-x" onClick={() => unlink(n)} title="Убрать связь" aria-label={'Убрать ' + (n.title || 'заметку')}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
