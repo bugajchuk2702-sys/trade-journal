@@ -968,3 +968,37 @@ tfoot td { border-bottom: 0; font-weight: 600; padding-top: 14px; }
   :root[data-style='ow'] .acc-bar i { transform-origin: left; animation: ow-grow 0.7s var(--ow-ease) 0.35s backwards; }
   :root[data-style='ow'] .acc-form { animation: ow-drop 0.25s var(--ow-ease); }
 }
+
+/* =====================================================================
+   Заметки: свойства (Date, Popularity, Latest Usage, Archive) и связи
+   с трейдами и планами
+   ===================================================================== */
+.nprops { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px 20px; margin: 14px 0 8px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.nprop { min-width: 0; }
+.nprop .k { font-size: 13px; color: var(--text-2); margin-bottom: 6px; }
+.nprop .v { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-height: 34px; font-size: 14px; font-weight: 600; }
+.nprop .v .muted { color: var(--text-3); font-weight: 500; }
+.nprop .v .pt { color: var(--green); }
+.nprop .v .pp { color: var(--accent); }
+.nprop .v input[type='date'] { width: 100%; max-width: 100%; padding: 6px 10px; font-size: 14px; }
+.archchk { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; color: var(--text-2); }
+.archchk input { width: 18px; height: 18px; margin: 0; padding: 0; accent-color: var(--accent); }
+.linkrow { display: flex; align-items: flex-start; gap: 12px; margin: 10px 0; }
+.linkrow > .plabel { flex: none; width: 58px; padding-top: 7px; }
+.linkchips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.lchip { display: inline-flex; align-items: center; max-width: 100%; background: var(--surface-2); border-radius: 8px; overflow: hidden; }
+.lchip-t, .lchip-x { background: transparent; color: var(--text); border-radius: 0; box-shadow: none; clip-path: none; text-transform: none; letter-spacing: 0; font-style: normal; font-size: 13px; font-weight: 600; }
+.lchip-t { max-width: 280px; padding: 5px 4px 5px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lchip-t:hover { color: var(--accent); background: transparent; filter: none; }
+.lchip-x { padding: 5px 9px 5px 3px; color: var(--text-3); font-size: 11px; }
+.lchip-x:hover { color: var(--red); background: transparent; filter: none; }
+.lpick { position: relative; }
+.lpick-list { width: 340px; max-width: calc(100vw - 32px); }
+.lpick-q { width: 100%; margin-bottom: 4px; padding: 7px 10px; font-size: 13.5px; }
+.lpick-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.popt-plan .lpick-t { flex: 1; min-width: 0; text-align: left; }
+form.trade .linkrow { margin: 0; }
+:root[data-style='ow'] .lchip { border-radius: 2px; background: rgba(7, 13, 25, 0.65); box-shadow: inset 0 0 0 1px var(--line); }
+:root[data-style='ow'] .lchip-t, :root[data-style='ow'] .lchip-x { clip-path: none; font-style: normal; font-family: var(--font); }
+:root[data-style='ow'] .lchip-t:hover { color: var(--accent); }
+@media (max-width: 760px) { .linkrow { flex-direction: column; gap: 4px; } .linkrow > .plabel { width: auto; padding-top: 0; } }

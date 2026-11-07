@@ -88,9 +88,17 @@ export async function removePlan(id) {
 
 /* ---------- Заметки ---------- */
 
-export async function addNote() {
+// Заметка: date — дата заметки, archived — в архиве, tradeIds / planIds — к каким трейдам и планам привязана
+export async function addNote(data = {}) {
   const now = Date.now()
-  const note = { id: uuid(), title: '', body: '', createdAt: now, updatedAt: now, deleted: 0, synced: 0 }
+  const d = new Date(now)
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+  const note = {
+    id: uuid(), title: '', body: '',
+    date: d.toISOString().slice(0, 10), archived: false, tradeIds: [], planIds: [],
+    createdAt: now, updatedAt: now, deleted: 0, synced: 0,
+    ...data,
+  }
   await db.notes.add(note)
   return note
 }

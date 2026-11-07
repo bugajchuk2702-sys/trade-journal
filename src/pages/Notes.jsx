@@ -1,8 +1,34 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addNote, updateNote, removeNote } from '../db.js'
+import { weekLabel } from '../week.js'
+import DateInput from '../components/DateInput.jsx'
+import LinkPicker, { LinkRow } from '../components/LinkPicker.jsx'
+import { toLocalDate } from './Trades.jsx'
 
-function NoteEditor({ note, onDelete }) {
+const DAY = 86400000
+const startOfDay = (ts) => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime() }
+const shortDate = (ts) => new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+
+const tradeLabel = (t) => `${t.symbol || 'Без инструмента'} · ${t.side === 'long' ? 'Лонг' : 'Шорт'} · ${shortDate(t.openedAt)}`
+const planLabel = (p) => `${p.symbol || 'Общий'} · ${weekLabel(p.weekStart).replace(/ \d{4}$/, '')}`
+const planTs = (p) => Date.parse(p.weekStart + 'T12:00')
+
+// Сколько дней назад: «сегодня», «вчера», «4 дн. назад»
+const ago = (ts) => {
+  const n = Math.max(0, Math.round((startOfDay(Date.now()) - startOfDay(ts)) / DAY))
+  return n === 0 ? 'сегодня' : n === 1 ? 'вчера' : `${n} дн. назад`
+}
+
+// Где используется заметка: привязанные трейды и планы, последнее использование
+export function noteUsage(note, trades, plans) {
+  const ts = trades.filter((t) => (note.tradeIds || []).includes(t.id))
+  const ps = plans.filter((p) => (note.planIds || []).includes(p.id))
+  const dates = [...ts.map((t) => t.closedAt || t.openedAt), ...ps.map(planTs)].filter((x) => x && !Number.isNaN(x))
+  return { ts, ps, last: dates.length ? Math.max(...dates) : null }
+}
+
+function NoteEditor({ note, trades, plans, go, onDelete }) {
   const [title, setTitle] = useState(note.title)
   const [body, setBody] = useState(note.body)
   const latest = useRef({ title: note.title, body: note.body })
@@ -29,6 +55,12 @@ function NoteEditor({ note, onDelete }) {
     }, 500)
   }
 
+  const u = noteUsage(note, trades, plans)
+  const tradeIds = note.tradeIds || []
+  const planIds = note.planIds || []
+  const freeTrades = trades.filter((t) => !tradeIds.includes(t.id)).sort((a, b) => b.openedAt - a.openedAt)
+  const freePlans = plans.filter((p) => !planIds.includes(p.id)).sort((a, b) => (a.weekStart < b.weekStart ? 1 : -1))
+
   return (
     <section className="card">
       <div className="toolbar">
@@ -43,6 +75,78 @@ function NoteEditor({ note, onDelete }) {
         />
         <button className="danger" onClick={() => confirm('Удалить заметку?') && onDelete()}>Удалить</button>
       </div>
+
+      <div className="nprops">
+        <div className="nprop">
+          <div className="k">Date</div>
+          <div className="v">
+            <DateInput value={note.date || toLocalDate(note.createdAt)} onChange={(e) => e.target.value && updateNote(note.id, { date: e.target.value })} />
+          </div>
+        </div>
+        <div className="nprop">
+          <div className="k">Popularity</div>
+          <div className="v">
+            {u.ts.length + u.ps.length === 0 ? (
+              <span className="muted">Не используется</span>
+            ) : (
+              <>
+                <span className="pt">В трейдах: {u.ts.length}</span>
+                <span className="muted">/</span>
+                <span className="pp">В планах: {u.ps.length}</span>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="nprop">
+          <div className="k">Latest Usage</div>
+          <div className="v">
+            {u.last ? ago(u.last) : <span className="muted">—</span>}
+          </div>
+        </div>
+        <div className="nprop">
+          <div className="k">Archive</div>
+          <div className="v">
+            <label className="archchk">
+              <input type="checkbox" checked={!!note.archived} onChange={(e) => updateNote(note.id, { archived: e.target.checked })} />
+              <span>{note.archived ? 'В архиве' : 'Нет'}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <LinkRow
+        label="Trades"
+        chips={u.ts.sort((a, b) => b.openedAt - a.openedAt).map((t) => ({
+          id: t.id,
+          label: tradeLabel(t),
+          onOpen: () => go('trades', { tradeId: t.id }),
+          onRemove: () => updateNote(note.id, { tradeIds: tradeIds.filter((x) => x !== t.id) }),
+        }))}
+      >
+        <LinkPicker
+          label="+ Трейд"
+          items={freeTrades.map((t) => ({ id: t.id, label: tradeLabel(t) }))}
+          empty="Свободных трейдов нет"
+          onPick={(i) => updateNote(note.id, { tradeIds: [...tradeIds, i.id] })}
+        />
+      </LinkRow>
+      <LinkRow
+        label="Plans"
+        chips={u.ps.sort((a, b) => (a.weekStart < b.weekStart ? 1 : -1)).map((p) => ({
+          id: p.id,
+          label: planLabel(p),
+          onOpen: () => go('plan', { weekStart: p.weekStart, planId: p.id }),
+          onRemove: () => updateNote(note.id, { planIds: planIds.filter((x) => x !== p.id) }),
+        }))}
+      >
+        <LinkPicker
+          label="+ План"
+          items={freePlans.map((p) => ({ id: p.id, label: planLabel(p) }))}
+          empty="Свободных планов нет"
+          onPick={(i) => updateNote(note.id, { planIds: [...planIds, i.id] })}
+        />
+      </LinkRow>
+
       <textarea
         className="note-body"
         value={body}
@@ -57,20 +161,36 @@ function NoteEditor({ note, onDelete }) {
   )
 }
 
-export default function Notes() {
+export default function Notes({ params = {}, go }) {
   const notes = useLiveQuery(() => db.notes.where('deleted').equals(0).reverse().sortBy('updatedAt'), [], [])
-  const [selId, setSelId] = useState(null)
+  const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray(), [], [])
+  const plans = useLiveQuery(() => db.plans.where('deleted').equals(0).toArray(), [], [])
+  const [selId, setSelId] = useState(params.noteId || null)
+  const [view, setView] = useState('active') // active | archive
   const [q, setQ] = useState('')
 
+  // Пришли по ссылке с трейда / плана: открываем нужную заметку (и нужный список)
+  useEffect(() => {
+    if (params.noteId) setSelId(params.noteId)
+  }, [params.noteId])
+  const loaded = notes.length > 0
+  useEffect(() => {
+    const n = params.noteId && notes.find((x) => x.id === params.noteId)
+    if (n) setView(n.archived ? 'archive' : 'active')
+  }, [params.noteId, loaded]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const archivedCount = notes.filter((n) => n.archived).length
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
-    return s ? notes.filter((n) => `${n.title} ${n.body}`.toLowerCase().includes(s)) : notes
-  }, [notes, q])
+    const list = notes.filter((n) => (view === 'archive' ? n.archived : !n.archived))
+    return s ? list.filter((n) => `${n.title} ${n.body}`.toLowerCase().includes(s)) : list
+  }, [notes, q, view])
 
   const selected = notes.find((n) => n.id === selId) || null
 
   const create = async () => {
     const n = await addNote()
+    setView('active')
     setSelId(n.id)
   }
 
@@ -85,16 +205,27 @@ export default function Notes() {
             <input placeholder="Поиск" value={q} onChange={(e) => setQ(e.target.value)} />
             <button onClick={create}>+ Новая</button>
           </div>
+          <div className="chips" style={{ margin: '12px 0 0' }}>
+            <button type="button" className={'chip' + (view === 'active' ? ' active' : '')} onClick={() => setView('active')}>Notes</button>
+            <button type="button" className={'chip' + (view === 'archive' ? ' active' : '')} onClick={() => setView('archive')}>
+              Archive{archivedCount > 0 && <span className="chip-n">{archivedCount}</span>}
+            </button>
+          </div>
           <div className="notes-list">
-            {filtered.length === 0 && <div className="empty">Заметок пока нет</div>}
-            {filtered.map((n) => (
-              <button key={n.id} className={'note-item' + (n.id === selId ? ' active' : '')} onClick={() => setSelId(n.id)}>
-                <span className="t">{n.title || 'Без названия'}</span>
-                <span className="s">
-                  {new Date(n.updatedAt).toLocaleDateString('ru-RU')} · {(n.body || '').replace(/\s+/g, ' ').slice(0, 40) || 'пусто'}
-                </span>
-              </button>
-            ))}
+            {filtered.length === 0 && <div className="empty">{view === 'archive' ? 'Архив пуст' : 'Заметок пока нет'}</div>}
+            {filtered.map((n) => {
+              const used = (n.tradeIds || []).length + (n.planIds || []).length
+              return (
+                <button key={n.id} className={'note-item' + (n.id === selId ? ' active' : '')} onClick={() => setSelId(n.id)}>
+                  <span className="t">{n.title || 'Без названия'}</span>
+                  <span className="s">
+                    {new Date(n.date ? n.date + 'T12:00' : n.updatedAt).toLocaleDateString('ru-RU')}
+                    {used > 0 && ` · используется: ${used}`}
+                    {' · '}{(n.body || '').replace(/\s+/g, ' ').slice(0, 40) || 'пусто'}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         </section>
 
@@ -102,6 +233,9 @@ export default function Notes() {
           <NoteEditor
             key={selected.id}
             note={selected}
+            trades={trades}
+            plans={plans}
+            go={go}
             onDelete={async () => {
               await removeNote(selected.id)
               setSelId(null)

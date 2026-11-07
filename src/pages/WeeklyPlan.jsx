@@ -8,6 +8,7 @@ import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import WeeklyRecap from '../components/WeeklyRecap.jsx'
 import NotesCard from '../components/NotesCard.jsx'
+import NotesLinker from '../components/NotesLinker.jsx'
 import { SymbolInput, SymbolIcon, norm } from '../components/Symbols.jsx'
 
 // Поля плана. Старые поля (focus, levels, rules, goals, review, checklist)
@@ -178,6 +179,8 @@ function PlanEditor({ plan, onDelete, go }) {
 
       <TradesList trades={attached} onAdd={startTrade}onOpen={(t) => go('trades', { tradeId: t.id, back: { weekStart: plan.weekStart, planId: plan.id } })} />
 
+      <NotesLinker kind="plan" id={plan.id} go={go} />
+
       <h3 className="section-title">Pre-Session</h3>
       <div className="row3">
         <ShotCard title="W1" {...shot('w1')} />
@@ -238,6 +241,8 @@ function PlanEditor({ plan, onDelete, go }) {
         <TradeModal
           title={(tradeModal.isNew ? 'Новая сделка' : 'Редактировать сделку') + (p.symbol ? ' · ' + p.symbol : '')}
           initial={tradeToForm(tradeModal.trade)}
+          tradeId={tradeModal.trade.id}
+          go={go}
           onClose={() => setTradeModal(null)}
           onSave={(d) => updateTrade(tradeModal.trade.id, d)}
         />

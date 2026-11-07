@@ -7,6 +7,7 @@ import { weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import AutoTextarea from '../components/AutoTextarea.jsx'
 import DateInput from '../components/DateInput.jsx'
+import NotesLinker from '../components/NotesLinker.jsx'
 import ParamsBlock, { StylePicker, AccountPicker, PlanPicker } from '../components/Params.jsx'
 
 // Дата в формате YYYY-MM-DD по местному времени (для <input type="date">)
@@ -88,7 +89,7 @@ const AUTOSAVE_MS = 500
 
 // Форма сохраняется автоматически: каждое изменение уходит в базу через полсекунды,
 // а при закрытии формы несохранённое дописывается сразу.
-export function TradeForm({ initial, onSave, onClose, hidePlan }) {
+export function TradeForm({ initial, tradeId, go, onSave, onClose, hidePlan }) {
   const [f, setF] = useState(initial || emptyForm())
   const latest = useRef(f)
   const timer = useRef(null)
@@ -168,6 +169,7 @@ export function TradeForm({ initial, onSave, onClose, hidePlan }) {
       <label className="wide">Conclusion
         <AutoTextarea value={f.conclusion} onChange={set('conclusion')} />
       </label>
+      {tradeId && <div className="wide"><NotesLinker kind="trade" id={tradeId} go={go} /></div>}
       <div className="wide" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         <button type="button" onClick={() => { flush(); onClose && onClose() }}>Готово</button>
         <span className="hint">Сохраняется автоматически</span>
@@ -311,6 +313,8 @@ export default function Trades({ params = {}, go }) {
           <TradeForm
             key={editing.id}
             initial={tradeToForm(editing)}
+            tradeId={editing.id}
+            go={go}
             onSave={(d) => updateTrade(editing.id, d)}
             onClose={closeForm}
           />
