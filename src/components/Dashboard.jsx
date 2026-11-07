@@ -44,8 +44,7 @@ export default function Dashboard() {
     ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
     ['Винрейт', wr(s.winrate)],
     ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor)],
-    ['Винрейт лонг', wr(s.winrateLong)],
-    ['Винрейт шорт', wr(s.winrateShort)],
+    ['Винрейт лонг / шорт', wr(s.winrateLong) + ' / ' + wr(s.winrateShort), '', 'Доля прибыльных сделок: лонг / шорт', true],
     ['Время в позиции', hold(s.avgHold), '', 'Среднее время в позиции'],
     ['Средний R', fmt(s.avgR), sign(s.avgR)],
     ['Ср. % прибыли', pf(s.avgWinPct), s.avgWinPct != null ? 'pos' : ''],
@@ -78,8 +77,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="m-grid">
-            {items.map(([label, value, cls, tip]) => (
-              <div className="m" key={label} title={tip}>
+            {items.map(([label, value, cls, tip, wide]) => (
+              <div className={'m' + (wide ? ' wide' : '')} key={label} title={tip}>
                 <div className="l">{label}</div>
                 <div className={'v ' + (cls || '')}><AnimNum value={value} /></div>
               </div>
