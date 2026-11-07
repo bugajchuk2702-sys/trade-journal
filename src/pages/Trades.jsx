@@ -5,6 +5,7 @@ import { calcTrade, fmt, hasResult } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import { weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
+import AutoTextarea from '../components/AutoTextarea.jsx'
 import ParamsBlock, { StylePicker, AccountPicker, PlanPicker } from '../components/Params.jsx'
 
 export const toLocalInput = (ts) => {
@@ -124,7 +125,7 @@ export function TradeForm({ initial, onSubmit, onCancel, hidePlan }) {
         <ShotCard title="Result" img={f.resultImg} onImg={(v) => setF((x) => ({ ...x, resultImg: v }))} />
       </div>
       <label className="wide">Conclusion
-        <textarea value={f.conclusion} onChange={set('conclusion')} />
+        <AutoTextarea value={f.conclusion} onChange={set('conclusion')} />
       </label>
       <div className="wide" style={{ display: 'flex', gap: 8 }}>
         <button type="submit">{initial ? 'Сохранить' : 'Добавить сделку'}</button>

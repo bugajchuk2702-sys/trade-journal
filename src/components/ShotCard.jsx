@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import Lightbox from './Lightbox.jsx'
+import AutoTextarea from './AutoTextarea.jsx'
 
 // Уменьшаем скриншот до 1600px по ширине и сохраняем как JPEG (строка data URL):
 // так он весит сотни КБ, лежит прямо в записи плана и попадает в JSON-бэкап.
@@ -98,7 +99,7 @@ export default function ShotCard({ title, subtitle, onRemove, img, text, onImg, 
           }}
         />
       </div>
-      {onText && <textarea value={text} onChange={(e) => onText(e.target.value)} placeholder={placeholder} />}
+      {onText && <AutoTextarea value={text} onChange={(e) => onText(e.target.value)} placeholder={placeholder} />}
       {big && img && <Lightbox src={img} alt={title} onClose={() => setBig(false)} />}
     </section>
   )

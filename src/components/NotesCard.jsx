@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Lightbox from './Lightbox.jsx'
 import { toDataUrl } from './ShotCard.jsx'
+import AutoTextarea from './AutoTextarea.jsx'
 
 const isImage = (f) => f && f.type && f.type.startsWith('image/')
 
@@ -50,7 +51,7 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
     <section className="card weeknotes">
       {busy && <div className="hint" style={{ marginBottom: 8 }}>Добавляю скриншот…</div>}
 
-      <textarea
+      <AutoTextarea
         value={text}
         onChange={(e) => onText(e.target.value)}
         onPaste={onPaste}
