@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 // Кнопка с выпадающим списком и поиском: выбрать запись, чтобы привязать её
 // (заметку к трейду или плану, трейд или план к заметке).
 // items: [{ id, label, sub }]; onCreate — необязательная кнопка «создать новую».
-export default function LinkPicker({ label, items, onPick, onCreate, createLabel, empty = 'Ничего нет', primary }) {
+export default function LinkPicker({ label, items, onPick, onCreate, createLabel, empty = 'Ничего нет' }) {
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
   const wrap = useRef(null)
@@ -22,7 +22,7 @@ export default function LinkPicker({ label, items, onPick, onCreate, createLabel
 
   return (
     <div className="lpick" ref={wrap}>
-      <button type="button" className={primary ? 'small' : 'ghost small'} aria-expanded={open} onClick={() => { setOpen((o) => !o); setQ('') }}>{label}</button>
+      <button type="button" className="ghost small" aria-expanded={open} onClick={() => { setOpen((o) => !o); setQ('') }}>{label}</button>
       {open && (
         <div className="plist lpick-list" role="listbox">
           {items.length > 6 && (
