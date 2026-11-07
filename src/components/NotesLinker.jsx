@@ -37,7 +37,6 @@ export default function NotesLinker({ kind, id, go }) {
         <span className="nl-title">Заметки</span>
         {linked.length > 0 && <span className="nl-count">{linked.length}</span>}
         <LinkPicker
-          primary
           label="+ Заметка"
           items={free}
           empty="Свободных заметок нет"
