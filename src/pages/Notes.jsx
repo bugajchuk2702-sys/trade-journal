@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addNote, updateNote, removeNote } from '../db.js'
 import { weekLabel } from '../week.js'
 import DateInput from '../components/DateInput.jsx'
-import AutoTextarea from '../components/AutoTextarea.jsx'
+import NotesCard from '../components/NotesCard.jsx'
 import LinkPicker, { LinkRow } from '../components/LinkPicker.jsx'
 import { toLocalDate } from './Trades.jsx'
 
@@ -29,15 +29,19 @@ export function noteUsage(note, trades, plans) {
   return { ts, ps, last: dates.length ? Math.max(...dates) : null }
 }
 
+// В каждой карточке: текст + скриншоты (вставка Ctrl+V прямо в поле), поля text / text+'Imgs'
 const SECTIONS = [
   ['body', 'Описание', 'Что это и как работает'],
   ['important', 'Важно', 'На что обратить внимание, чего не делать'],
   ['example', 'Пример', 'Пример использования'],
-]
+].map(([key, title, ph]) => [key, title, ph + ' · Ctrl+V — вставить скриншот'])
 
 function NoteEditor({ note, trades, plans, go, onDelete }) {
   // body — «Описание» (старый общий текст остаётся здесь), important — «Важно», example — «Пример»
-  const [f, setF] = useState({ title: note.title || '', body: note.body || '', important: note.important || '', example: note.example || '' })
+  const [f, setF] = useState({
+    title: note.title || '', body: note.body || '', important: note.important || '', example: note.example || '',
+    bodyImgs: note.bodyImgs || [], importantImgs: note.importantImgs || [], exampleImgs: note.exampleImgs || [],
+  })
   const latest = useRef(f)
   const timer = useRef(null)
 
@@ -158,7 +162,15 @@ function NoteEditor({ note, trades, plans, go, onDelete }) {
     {SECTIONS.map(([key, title, ph]) => (
       <section className="card note-sec" key={key}>
         <div className="shot-head"><h2>{title}</h2></div>
-        <AutoTextarea value={f[key]} placeholder={ph} onChange={(e) => change({ [key]: e.target.value })} />
+        <NotesCard
+          bare
+          text={f[key]}
+          imgs={f[key + 'Imgs']}
+          placeholder={ph}
+          onText={(v) => change({ [key]: v })}
+          onAdd={(urls) => change({ [key + 'Imgs']: [...latest.current[key + 'Imgs'], ...urls] })}
+          onRemoveAt={(i) => change({ [key + 'Imgs']: latest.current[key + 'Imgs'].filter((_, j) => j !== i) })}
+        />
       </section>
     ))}
     <div className="hint">сохраняется автоматически</div>

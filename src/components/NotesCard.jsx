@@ -8,7 +8,7 @@ const isImage = (f) => f && f.type && f.type.startsWith('image/')
 // Карточка-заметка с «тихой» вставкой скриншотов: никакой зоны загрузки.
 // Нажми Ctrl+V прямо в текстовом поле (или перетащи картинку в него) —
 // скриншот появится под текстом в среднем размере.
-export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt, placeholder }) {
+export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt, placeholder, bare }) {
   const [big, setBig] = useState(null)
   const [busy, setBusy] = useState(false)
   const list = imgs || []
@@ -47,8 +47,10 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
     }
   }
 
+  // bare — без своей карточки: поле и скриншоты кладутся внутрь чужой
+  const Wrap = bare ? 'div' : 'section'
   return (
-    <section className="card weeknotes">
+    <Wrap className={bare ? undefined : 'card weeknotes'}>
       {busy && <div className="hint" style={{ marginBottom: 8 }}>Добавляю скриншот…</div>}
 
       <AutoTextarea
@@ -72,6 +74,6 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
       )}
 
       {big && <Lightbox src={big} onClose={() => setBig(null)} />}
-    </section>
+    </Wrap>
   )
 }
