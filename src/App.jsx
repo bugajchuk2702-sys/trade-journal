@@ -84,6 +84,16 @@ export default function App() {
     return a + b + c + d
   }, [], 0)
 
+  // Счётчик «не синхронизировано» имеет смысл только когда появится облачная синхронизация;
+  // сейчас все данные лежат только в этом браузере, и число лишь путало.
+  const SYNC_ENABLED = false
+  const statusText = [
+    online ? 'Онлайн' : 'Офлайн',
+    SYNC_ENABLED && pending > 0 && `не синхронизировано: ${pending}`,
+    persisted === false && 'хранилище не защищено',
+    `версия от ${new Date(__BUILD_TIME__).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}`,
+  ].filter(Boolean).join(' · ')
+
   const go = (tab, params = {}) => {
     setView({ tab, params })
     document.querySelector('.main')?.scrollTo({ top: 0 })
@@ -110,12 +120,7 @@ export default function App() {
         <span className="spacer" />
         <div className="status">
           <span className={'dot ' + (online ? 'ok' : 'off')} />
-          <span className="status-text" title="Время сборки этой версии">
-            {online ? 'Онлайн' : 'Офлайн'}
-            {pending > 0 && ` · не синхронизировано: ${pending}`}
-            {persisted === false && ' · хранилище не защищено'}
-            {` · версия от ${new Date(__BUILD_TIME__).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}`}
-          </span>
+          <span className="status-text" title={statusText}>{statusText}</span>
         </div>
         <div className="tabs stylesw" title="Стиль оформления">
           <button className={'tab' + (style === 'apple' ? ' active' : '')} onClick={() => setStyle('apple')}>Apple</button>
