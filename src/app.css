@@ -235,7 +235,7 @@ tbody tr:hover td { background: var(--surface-3); }
 .badge.be { background: var(--orange-soft); color: var(--orange); }
 /* ===== Главная: метрики и кривая капитала ===== */
 .dash { margin-top: 4px; }
-.dash-body { display: grid; grid-template-columns: minmax(360px, 5fr) 7fr; gap: 16px; height: 345px; }
+.dash-body { display: grid; grid-template-columns: minmax(360px, 5fr) 7fr; gap: 16px; height: 380px; }
 .dash .card { margin: 0; }
 .metrics { display: flex; flex-direction: column; padding: 14px 24px 12px; }
 .m-grid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 4px 18px; align-content: stretch; min-height: 0; }
@@ -685,7 +685,7 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
 :root[data-style='ow'] td.pos, :root[data-style='ow'] .pos, :root[data-style='ow'] .long { color: var(--green); }
 :root[data-style='ow'] td.neg, :root[data-style='ow'] .neg, :root[data-style='ow'] .short { color: var(--red); }
 :root[data-style='ow'] .metrics .l, :root[data-style='ow'] .recap-metrics .l { color: var(--text-2); font-size: 13.5px; }
-:root[data-style='ow'] .metrics .v { font-size: 32px; }
+:root[data-style='ow'] .metrics .v { font-size: 27px; }
 :root[data-style='ow'] .recap-metrics .v { font-size: 26px; }
 :root[data-style='ow'] .metrics .v.pos, :root[data-style='ow'] .recap-metrics .v.pos { color: var(--green); }
 :root[data-style='ow'] .metrics .v.neg, :root[data-style='ow'] .recap-metrics .v.neg { color: var(--red); }

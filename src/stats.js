@@ -89,6 +89,13 @@ export function summarize(trades) {
 
   const pnls = closed.map((t) => t.pnl)
 
+  // Винрейт по направлению и среднее время в позиции
+  const rate = (side) => {
+    const a = closed.filter((t) => (t.side === 'short' ? 'short' : 'long') === side)
+    return a.length ? (a.filter((t) => t.pnl > 0).length / a.length) * 100 : null
+  }
+  const holds = closed.filter((t) => t.openedAt && t.closedAt && t.closedAt >= t.openedAt).map((t) => t.closedAt - t.openedAt)
+
   // Проценты от размера счёта (только сделки, у которых размер счёта известен)
   const pct = closed.filter((t) => t.netPct != null)
   const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null)
@@ -108,6 +115,9 @@ export function summarize(trades) {
     winCount: wins.length,
     lossCount: losses.length,
     beCount: closed.length - wins.length - losses.length,
+    winrateLong: rate('long'),
+    winrateShort: rate('short'),
+    avgHold: holds.length ? holds.reduce((a, b) => a + b, 0) / holds.length : null,
     pctTotal: pct.length ? pe : null,
     avgWinPct: mean(pct.filter((t) => t.pnl > 0).map((t) => t.netPct)),
     avgLossPct: mean(pct.filter((t) => t.pnl < 0).map((t) => t.netPct)),

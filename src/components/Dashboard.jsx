@@ -32,11 +32,21 @@ export default function Dashboard() {
   const last = pc.curve[pc.curve.length - 1].equity
   const tone = last < 0 ? 'var(--red-fill)' : 'var(--green-fill)'
 
+  // «1 д 0 ч»
+  const hold = (ms) => {
+    if (ms == null) return '—'
+    const h = Math.round(ms / 3600000)
+    return `${Math.floor(h / 24)} д ${h % 24} ч`
+  }
+  const wr = (v) => (v == null ? '—' : fmt(v, 1) + '%')
   const pf = (v) => (v == null ? '—' : (v > 0 ? '+' : '') + fmt(v) + '%')
   const items = [
     ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
-    ['Винрейт', s.winrate == null ? '—' : fmt(s.winrate, 1) + '%'],
+    ['Винрейт', wr(s.winrate)],
     ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor)],
+    ['Винрейт лонг', wr(s.winrateLong)],
+    ['Винрейт шорт', wr(s.winrateShort)],
+    ['Время в позиции', hold(s.avgHold), '', 'Среднее время в позиции'],
     ['Средний R', fmt(s.avgR), sign(s.avgR)],
     ['Ср. % прибыли', pf(s.avgWinPct), s.avgWinPct != null ? 'pos' : ''],
     ['Ср. % убытка', pf(s.avgLossPct), s.avgLossPct != null ? 'neg' : ''],
@@ -68,8 +78,8 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="m-grid">
-            {items.map(([label, value, cls]) => (
-              <div className="m" key={label}>
+            {items.map(([label, value, cls, tip]) => (
+              <div className="m" key={label} title={tip}>
                 <div className="l">{label}</div>
                 <div className={'v ' + (cls || '')}><AnimNum value={value} /></div>
               </div>
