@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { addPayout, updatePayout, removePayout } from '../../db.js'
 import { fmt, toNum } from '../../stats.js'
 import { money } from './ui.jsx'
+import DateInput from '../../components/DateInput.jsx'
 
 const today = () => {
   const d = new Date()
@@ -99,7 +100,7 @@ export default function Payouts({ accounts, payouts }) {
 
       {form && (
         <form className="acc-form" onSubmit={submit}>
-          <label>Дата<input type="date" value={form.f.date} onChange={set('date')} /></label>
+          <label>Дата<DateInput value={form.f.date} onChange={set('date')} /></label>
           <label>Название<input value={form.f.title} placeholder="Payout" autoComplete="off" onChange={set('title')} /></label>
           <label>Счёт
             <select value={form.f.account} onChange={set('account')}>

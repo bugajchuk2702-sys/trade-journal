@@ -6,6 +6,7 @@ import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import { weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import AutoTextarea from '../components/AutoTextarea.jsx'
+import DateInput from '../components/DateInput.jsx'
 import ParamsBlock, { StylePicker, AccountPicker, PlanPicker } from '../components/Params.jsx'
 
 // Дата в формате YYYY-MM-DD по местному времени (для <input type="date">)
@@ -125,10 +126,10 @@ export function TradeForm({ initial, onSave, onClose, hidePlan }) {
         </select>
       </label>
       <label className="c4">Открыта
-        <input type="date" value={f.openedAt} onChange={set('openedAt')} />
+        <DateInput value={f.openedAt} onChange={set('openedAt')} />
       </label>
       <label className="c4">Закрыта
-        <input type="date" value={f.closedAt} onChange={set('closedAt')} />
+        <DateInput value={f.closedAt} onChange={set('closedAt')} />
       </label>
       <div className="c4"><StylePicker value={f.style} onChange={(v) => upd({ style: v })} /></div>
       <div className="c4">
