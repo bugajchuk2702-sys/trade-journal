@@ -7,15 +7,27 @@ import AnimNum, { heroMotion } from '../AnimNum.jsx'
 
 const sign = (n) => (n == null || !isFinite(n) ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
+// Переключатель периода: текущий месяц или всё время
+const RangeToggle = ({ value, onChange }) => (
+  <div className="chips">
+    <button type="button" className={'chip' + (value === 'month' ? ' active' : '')} onClick={() => onChange('month')} title="С 1-го числа текущего месяца">Месяц</button>
+    <button type="button" className={'chip' + (value === 'all' ? ' active' : '')} onClick={() => onChange('all')}>Всё время</button>
+  </div>
+)
+
 // Слева карточка со всеми метриками, справа кривая капитала.
 // Считается по всем сделкам.
 export default function Dashboard() {
   const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray(), [], [])
-  const s = useMemo(() => summarize(trades), [trades])
+  const [mRange, setMRange] = useState('all') // период метрик слева (у кривой свой переключатель)
+  const monthStart = useMemo(() => { const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); return d.getTime() }, [])
+  const s = useMemo(
+    () => summarize(mRange === 'month' ? trades.filter((t) => (t.closedAt || t.openedAt) >= monthStart) : trades),
+    [trades, mRange, monthStart]
+  )
 
   // Кривая: в % от размера счёта, за текущий месяц или за всё время
   const [range, setRange] = useState('all') // month | all
-  const monthStart = useMemo(() => { const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); return d.getTime() }, [])
   const pc = useMemo(() => pctCurve(trades, range === 'month' ? monthStart : 0), [trades, range, monthStart])
   const last = pc.curve[pc.curve.length - 1].equity
   const tone = last < 0 ? 'var(--red-fill)' : 'var(--green-fill)'
@@ -39,7 +51,10 @@ export default function Dashboard() {
       <div className="dash-body">
         <div className="card metrics">
           <div className="m-total">
-            <div className="tt-title">Total Trades</div>
+            <div className="tt-head">
+              <div className="tt-title">Total Trades</div>
+              <RangeToggle value={mRange} onChange={setMRange} />
+            </div>
             <div className="tt-row">
               <b>{s.total} Trades</b>
               <span className="tt-sep">|</span>
@@ -65,10 +80,7 @@ export default function Dashboard() {
         <div className="card curve" style={{ '--tone': tone }}>
           <div className="curve-head">
             <span className="curve-title">Рост счёта, %</span>
-            <div className="chips">
-              <button type="button" className={'chip' + (range === 'month' ? ' active' : '')} onClick={() => setRange('month')} title="С 1-го числа текущего месяца">Месяц</button>
-              <button type="button" className={'chip' + (range === 'all' ? ' active' : '')} onClick={() => setRange('all')}>Всё время</button>
-            </div>
+            <RangeToggle value={range} onChange={setRange} />
           </div>
           <div className="curve-plot">
             {pc.count === 0 ? (
