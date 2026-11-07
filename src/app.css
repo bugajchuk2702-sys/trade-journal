@@ -251,6 +251,8 @@ tbody tr:hover td { background: var(--surface-3); }
 :root[data-style='ow'] .tt-title { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.05em; font-size: 18px; }
 :root[data-style='ow'] .tt-row { font-size: 17px; }
 .metrics .m.wide { grid-column: span 2; }
+.metrics .v2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; }
+.metrics .v2 i { font-style: normal; font-weight: 400; color: var(--text-3); margin-left: 8px; }
 .metrics .m { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
 .metrics .l { font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .metrics .v { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
