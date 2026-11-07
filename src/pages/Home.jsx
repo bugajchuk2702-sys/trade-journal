@@ -8,6 +8,14 @@ import { SymbolIcon } from '../components/Symbols.jsx'
 // Итог недели по инструменту (второй элемент — цвет значка)
 const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
 
+// Плитка с числом на карточке плана; ноль приглушён
+const Stat = ({ n, label, muted }) => (
+  <div className={'pc-stat' + (muted || n === 0 ? ' zero' : '')}>
+    <b>{n}</b>
+    <span>{label}</span>
+  </div>
+)
+
 // Главная: сверху планы текущей недели по инструментам, ниже метрики и кривая капитала
 export default function Home({ go }) {
   const current = mondayOf()
@@ -41,20 +49,17 @@ export default function Home({ go }) {
           const items = p.checklist || []
           const done = items.filter((x) => x.done).length
           const bias = RESULT[p.result]
-          // Заметка с карточки: сначала самое свежее обновление, потом старые текстовые поля
-          const text = [p.updates?.[0]?.text, p.beforeText, p.h4Text, p.d1Text, p.w1Text, p.focus, p.levels]
-            .map((s) => (s || '').trim())
-            .find(Boolean)
           return (
             <button key={p.id} className="plan-card" onClick={() => go('plan', { weekStart: ws, planId: p.id })}>
               <div className="plan-card-head">
                 <span className="sym">{p.symbol && <SymbolIcon symbol={p.symbol} size={26} />}{p.symbol || 'Общий план'}</span>
                 {bias && <span className={'badge ' + bias[1]}>{bias[0]}</span>}
               </div>
-              <div className="ex">{text || 'Заметок пока нет'}</div>
-              {items.length > 0 && <div className="hint">Чек-лист: {done}/{items.length}</div>}
-              {counts[p.id] > 0 && <div className="hint">Trades: {counts[p.id]}</div>}
-              {(p.updates || []).length > 0 && <div className="hint">Updates: {p.updates.length}</div>}
+              <div className="pc-stats">
+                <Stat n={counts[p.id] || 0} label="Trades" />
+                <Stat n={(p.updates || []).length} label="Updates" />
+                {items.length > 0 && <Stat n={`${done}/${items.length}`} label="Чек-лист" muted={done === 0} />}
+              </div>
             </button>
           )
         })}
