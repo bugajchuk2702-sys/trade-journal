@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addNote, updateNote, removeNote } from '../db.js'
 import { weekLabel } from '../week.js'
 import DateInput from '../components/DateInput.jsx'
+import AutoTextarea from '../components/AutoTextarea.jsx'
 import LinkPicker, { LinkRow } from '../components/LinkPicker.jsx'
 import { toLocalDate } from './Trades.jsx'
 
@@ -28,10 +29,16 @@ export function noteUsage(note, trades, plans) {
   return { ts, ps, last: dates.length ? Math.max(...dates) : null }
 }
 
+const SECTIONS = [
+  ['body', 'Описание', 'Что это и как работает'],
+  ['important', 'Важно', 'На что обратить внимание, чего не делать'],
+  ['example', 'Пример', 'Пример использования'],
+]
+
 function NoteEditor({ note, trades, plans, go, onDelete }) {
-  const [title, setTitle] = useState(note.title)
-  const [body, setBody] = useState(note.body)
-  const latest = useRef({ title: note.title, body: note.body })
+  // body — «Описание» (старый общий текст остаётся здесь), important — «Важно», example — «Пример»
+  const [f, setF] = useState({ title: note.title || '', body: note.body || '', important: note.important || '', example: note.example || '' })
+  const latest = useRef(f)
   const timer = useRef(null)
 
   useEffect(
@@ -47,6 +54,7 @@ function NoteEditor({ note, trades, plans, go, onDelete }) {
   )
 
   const change = (patch) => {
+    setF((x) => ({ ...x, ...patch }))
     latest.current = { ...latest.current, ...patch }
     clearTimeout(timer.current)
     timer.current = setTimeout(() => {
@@ -62,16 +70,14 @@ function NoteEditor({ note, trades, plans, go, onDelete }) {
   const freePlans = plans.filter((p) => !planIds.includes(p.id)).sort((a, b) => (a.weekStart < b.weekStart ? 1 : -1))
 
   return (
+    <div className="note-col">
     <section className="card">
       <div className="toolbar">
         <input
           style={{ maxWidth: 'none', flex: 1, fontWeight: 600 }}
-          value={title}
+          value={f.title}
           placeholder="Заголовок"
-          onChange={(e) => {
-            setTitle(e.target.value)
-            change({ title: e.target.value })
-          }}
+          onChange={(e) => change({ title: e.target.value })}
         />
         <button className="danger" onClick={() => confirm('Удалить заметку?') && onDelete()}>Удалить</button>
       </div>
@@ -147,17 +153,16 @@ function NoteEditor({ note, trades, plans, go, onDelete }) {
         />
       </LinkRow>
 
-      <textarea
-        className="note-body"
-        value={body}
-        placeholder="Текст заметки"
-        onChange={(e) => {
-          setBody(e.target.value)
-          change({ body: e.target.value })
-        }}
-      />
-      <div className="hint" style={{ marginTop: 6 }}>сохраняется автоматически</div>
     </section>
+
+    {SECTIONS.map(([key, title, ph]) => (
+      <section className="card note-sec" key={key}>
+        <div className="shot-head"><h2>{title}</h2></div>
+        <AutoTextarea value={f[key]} placeholder={ph} onChange={(e) => change({ [key]: e.target.value })} />
+      </section>
+    ))}
+    <div className="hint">сохраняется автоматически</div>
+    </div>
   )
 }
 
@@ -183,7 +188,7 @@ export default function Notes({ params = {}, go }) {
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
     const list = notes.filter((n) => (view === 'archive' ? n.archived : !n.archived))
-    return s ? list.filter((n) => `${n.title} ${n.body}`.toLowerCase().includes(s)) : list
+    return s ? list.filter((n) => `${n.title} ${n.body} ${n.important || ''} ${n.example || ''}`.toLowerCase().includes(s)) : list
   }, [notes, q, view])
 
   const selected = notes.find((n) => n.id === selId) || null
@@ -221,7 +226,7 @@ export default function Notes({ params = {}, go }) {
                   <span className="s">
                     {new Date(n.date ? n.date + 'T12:00' : n.updatedAt).toLocaleDateString('ru-RU')}
                     {used > 0 && ` · используется: ${used}`}
-                    {' · '}{(n.body || '').replace(/\s+/g, ' ').slice(0, 40) || 'пусто'}
+                    {' · '}{(n.body || n.important || n.example || '').replace(/\s+/g, ' ').slice(0, 40) || 'пусто'}
                   </span>
                 </button>
               )
