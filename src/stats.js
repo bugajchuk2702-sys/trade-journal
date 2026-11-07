@@ -109,5 +109,25 @@ export function summarize(trades) {
   }
 }
 
+// Кривая роста в % от размера счёта: у каждой сделки результат делится на размер её счёта,
+// дальше проценты суммируются. since — с какой даты (мс) считать; кривая всегда стартует с нуля.
+export function pctCurve(trades, since = 0) {
+  const closed = trades
+    .map((t) => ({ ...t, ...calcTrade(t) }))
+    .filter((t) => t.closed && (t.closedAt || t.openedAt) >= since)
+    .sort((a, b) => (a.closedAt || a.openedAt) - (b.closedAt || b.openedAt) || (a.createdAt || 0) - (b.createdAt || 0))
+  let eq = 0
+  let withPct = 0
+  const curve = [{ n: 0, equity: 0, date: null }]
+  closed.forEach((t, i) => {
+    if (t.netPct != null) {
+      eq += t.netPct
+      withPct += 1
+    }
+    curve.push({ n: i + 1, equity: Number(eq.toFixed(2)), date: t.closedAt || t.openedAt })
+  })
+  return { curve, count: closed.length, withPct }
+}
+
 export const fmt = (n, d = 2) =>
   n == null || !isFinite(n) ? '—' : Number(n).toLocaleString('ru-RU', { maximumFractionDigits: d, minimumFractionDigits: d })
