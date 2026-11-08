@@ -63,7 +63,7 @@ export default function Home({ go }) {
                 <span className="sym">{p.symbol && <SymbolIcon symbol={p.symbol} size={26} />}{p.symbol || 'Общий план'}</span>
                 {bias && <span className={'badge ' + bias[1]}>{bias[0]}</span>}
               </div>
-              <TradeCounts {...(stats[p.id] || {})} />
+              <TradeCounts compact {...(stats[p.id] || {})} />
             </button>
           )
         })}

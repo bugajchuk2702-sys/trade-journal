@@ -1,11 +1,16 @@
 import React from 'react'
 
-// «4 Trades | 4 / 0 / 0 / 0» — всего, прибыльные, убыточные, безубыток, открытые
-export default function TradeCounts({ total = 0, win = 0, loss = 0, be = 0, open = 0 }) {
+// «4 Trades | 4 / 0 / 0 / 0» — всего, прибыльные, убыточные, безубыток, открытые.
+// compact — только «4 / 0 / 0 / 0», без «N Trades |»
+export default function TradeCounts({ total = 0, win = 0, loss = 0, be = 0, open = 0, compact }) {
   return (
     <div className="tt-row">
-      <b>{total} Trades</b>
-      <span className="tt-sep">|</span>
+      {!compact && (
+        <>
+          <b>{total} Trades</b>
+          <span className="tt-sep">|</span>
+        </>
+      )}
       <span className="tt-g" title="Прибыльные">{win}</span>
       <span className="tt-sl">/</span>
       <span className="tt-r" title="Убыточные">{loss}</span>
