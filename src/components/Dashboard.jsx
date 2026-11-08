@@ -22,6 +22,7 @@ export default function Dashboard() {
   const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray(), [], [])
   const [mRange, setMRange] = useState('all') // период метрик слева (у кривой свой переключатель)
   const monthStart = useMemo(() => { const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); return d.getTime() }, [])
+  const plans = useLiveQuery(() => db.plans.where('deleted').equals(0).toArray(), [], [])
   const s = useMemo(
     () => summarize(mRange === 'month' ? trades.filter((t) => (t.closedAt || t.openedAt) >= monthStart) : trades),
     [trades, mRange, monthStart]
@@ -34,12 +35,21 @@ export default function Dashboard() {
   const tone = last < 0 ? 'var(--red-fill)' : 'var(--green-fill)'
 
   const hold = fmtHold
+  // Винрейт нарратива: доля планов с итогом «Отработал» среди планов с выбранным Narrative Result.
+  // За месяц берутся планы недель, начавшихся с 1-го числа.
+  const narr = useMemo(() => {
+    const ms = new Date(monthStart)
+    const from = ms.getFullYear() + '-' + String(ms.getMonth() + 1).padStart(2, '0') + '-01'
+    const set = plans.filter((p) => (p.narrative === 'worked' || p.narrative === 'failed') && (mRange === 'all' || p.weekStart >= from))
+    const worked = set.filter((p) => p.narrative === 'worked').length
+    return { worked, total: set.length, rate: set.length ? (worked / set.length) * 100 : 0 }
+  }, [plans, mRange, monthStart])
   const wr = (v) => fmt(v || 0, 1) + '%'
   const pf = (v) => ((v || 0) > 0 ? '+' : '') + fmt(v || 0) + '%'
   const items = [
     ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
     ['Винрейт', wr(s.winrate)],
-    ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor || 0)],
+    ['Винрейт нарратива', wr(narr.rate), '', narr.total ? `Отработал ${narr.worked} из ${narr.total} планов` : 'Пока нет планов с выбранным Narrative Result'],
     [['Винрейт лонг', 'Винрейт шорт'], [wr(s.winrateLong), wr(s.winrateShort)], '', 'Доля прибыльных сделок: лонг / шорт', true],
     ['Время в позиции', hold(s.avgHold), '', 'Среднее время в позиции'],
     ['Средний R', fmt(s.avgR || 0), sign(s.avgR)],
