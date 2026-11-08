@@ -8,6 +8,8 @@ import TradeCounts from '../components/TradeCounts.jsx'
 import { calcTrade } from '../stats.js'
 
 // Итог недели по инструменту (второй элемент — цвет значка)
+// Narrative Result плана: отработал / не отработал (класс — цвет бейджа)
+const NARRATIVE = { worked: ['Отработал', 'profit'], failed: ['Не отработал', 'loss'] }
 const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
 
 // Главная: сверху планы текущей недели по инструментам, ниже метрики и кривая капитала
@@ -57,13 +59,17 @@ export default function Home({ go }) {
       <div className="plan-cards">
         {plans.map((p) => {
           const bias = RESULT[p.result]
+          const narr = NARRATIVE[p.narrative]
           return (
             <button key={p.id} className="plan-card" onClick={() => go('plan', { weekStart: ws, planId: p.id })}>
               <div className="plan-card-head">
                 <span className="sym">{p.symbol && <SymbolIcon symbol={p.symbol} size={26} />}{p.symbol || 'Общий план'}</span>
                 {bias && <span className={'badge ' + bias[1]}>{bias[0]}</span>}
               </div>
-              <TradeCounts compact {...(stats[p.id] || {})} />
+              <div className="pc-foot">
+                <TradeCounts compact {...(stats[p.id] || {})} />
+                {narr && <span className={'badge ' + narr[1]} title="Narrative Result">{narr[0]}</span>}
+              </div>
             </button>
           )
         })}

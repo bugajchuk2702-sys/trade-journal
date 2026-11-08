@@ -1033,7 +1033,8 @@ form.trade .linkrow { margin: 0; }
 .notes-table .nt { font-weight: 600; }
 .notes-table .np { font-size: 12.5px; color: var(--text-2); max-width: 520px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .notes-table .nprop .v { display: inline-flex; gap: 6px; align-items: center; min-height: 0; }
-.plan-card .tt-row { font-size: 17px; margin-top: 4px; }
+.plan-card .tt-row { font-size: 17px; }
+.pc-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; }
 :root[data-style='ow'] .plan-card .tt-row { font-size: 19px; }
 
 /* Hero: безубыток — тот же жёлто-оранжевый, что третье число в «0 / 0 / 0 / 0» (синий «orange» сливался с фоном) */
