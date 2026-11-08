@@ -64,11 +64,21 @@ export default function Home({ go }) {
             <button key={p.id} className="plan-card" onClick={() => go('plan', { weekStart: ws, planId: p.id })}>
               <div className="plan-card-head">
                 <span className="sym">{p.symbol && <SymbolIcon symbol={p.symbol} size={26} />}{p.symbol || 'Общий план'}</span>
-                {bias && <span className={'badge ' + bias[1]}>{bias[0]}</span>}
+                {bias && (
+                  <span className="pc-badge">
+                    <span className="pc-cap">Weekly Result</span>
+                    <span className={'badge ' + bias[1]}>{bias[0]}</span>
+                  </span>
+                )}
               </div>
               <div className="pc-foot">
                 <TradeCounts compact {...(stats[p.id] || {})} />
-                {narr && <span className={'badge ' + narr[1]} title="Narrative Result">{narr[0]}</span>}
+                {narr && (
+                  <span className="pc-badge">
+                    <span className="pc-cap">Narrative Result</span>
+                    <span className={'badge ' + narr[1]}>{narr[0]}</span>
+                  </span>
+                )}
               </div>
             </button>
           )
