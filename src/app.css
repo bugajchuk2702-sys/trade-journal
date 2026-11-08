@@ -1033,3 +1033,9 @@ form.trade .linkrow { margin: 0; }
 .notes-table .nprop .v { display: inline-flex; gap: 6px; align-items: center; min-height: 0; }
 .plan-card .tt-row { font-size: 17px; margin-top: 4px; }
 :root[data-style='ow'] .plan-card .tt-row { font-size: 19px; }
+
+/* Hero: безубыток — тёмно-оранжевый (синий «orange» сливался с фоном) */
+:root[data-style='ow'] { --be: #ff9a3c; --be-soft: rgba(224, 112, 10, 0.3); }
+:root[data-style='ow'] :is(.badge.be, .tpill.be, select.res.be) { background-color: var(--be-soft); color: var(--be); }
+:root[data-style='ow'] .rdot.be { background: #e0700a; }
+:root[data-style='ow'] .acc-wl .be b { color: var(--be); }
