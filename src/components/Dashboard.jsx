@@ -43,7 +43,7 @@ export default function Dashboard() {
     ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
     ['Винрейт', wr(s.winrate)],
     ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor || 0)],
-    ['Винрейт лонг / шорт', [wr(s.winrateLong), wr(s.winrateShort)], '', 'Доля прибыльных сделок: лонг / шорт', true],
+    [['Винрейт лонг', 'Винрейт шорт'], [wr(s.winrateLong), wr(s.winrateShort)], '', 'Доля прибыльных сделок: лонг / шорт', true],
     ['Время в позиции', hold(s.avgHold), '', 'Среднее время в позиции'],
     ['Средний R', fmt(s.avgR || 0), sign(s.avgR)],
     ['Ср. % прибыли', pf(s.avgWinPct), s.avgWinPct != null ? 'pos' : ''],
@@ -77,13 +77,17 @@ export default function Dashboard() {
           </div>
           <div className="m-grid">
             {items.map(([label, value, cls, tip, wide]) => (
-              <div className={'m' + (wide ? ' wide' : '')} key={label} title={tip}>
-                <div className="l">{label}</div>
+              <div className={'m' + (wide ? ' wide' : '')} key={String(label)} title={tip}>
+                {Array.isArray(label) ? (
+                  <div className="l v2"><span>{label[0]}</span><span>{label[1]}</span></div>
+                ) : (
+                  <div className="l">{label}</div>
+                )}
                 <div className={'v ' + (cls || '')}>
                   {Array.isArray(value) ? (
                     // два значения строго по колонкам сетки: слева лонг, справа шорт
                     <div className="v2">
-                      <span><AnimNum value={value[0]} /><i>/</i></span>
+                      <span><AnimNum value={value[0]} /></span>
                       <span><AnimNum value={value[1]} /></span>
                     </div>
                   ) : (
