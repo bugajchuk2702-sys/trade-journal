@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { db } from '../db.js'
+import TradeCounts from './TradeCounts.jsx'
 import { summarize, pctCurve, fmt } from '../stats.js'
 import AnimNum, { heroMotion } from '../AnimNum.jsx'
 
@@ -63,17 +64,7 @@ export default function Dashboard() {
               <div className="tt-title">Total Trades</div>
               <RangeToggle value={mRange} onChange={setMRange} />
             </div>
-            <div className="tt-row">
-              <b>{s.total} Trades</b>
-              <span className="tt-sep">|</span>
-              <span className="tt-g" title="Прибыльные">{s.winCount}</span>
-              <span className="tt-sl">/</span>
-              <span className="tt-r" title="Убыточные">{s.lossCount}</span>
-              <span className="tt-sl">/</span>
-              <span className="tt-o" title="Безубыток">{s.beCount}</span>
-              <span className="tt-sl">/</span>
-              <span className="tt-b" title="Открытые">{s.open}</span>
-            </div>
+            <TradeCounts total={s.total} win={s.winCount} loss={s.lossCount} be={s.beCount} open={s.open} />
           </div>
           <div className="m-grid">
             {items.map(([label, value, cls, tip, wide]) => (
