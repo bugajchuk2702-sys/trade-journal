@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { db } from '../db.js'
 import TradeCounts from './TradeCounts.jsx'
-import { summarize, pctCurve, fmt } from '../stats.js'
+import { summarize, pctCurve, fmt, fmtHold } from '../stats.js'
 import AnimNum, { heroMotion } from '../AnimNum.jsx'
 
 const sign = (n) => (n == null || !isFinite(n) ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
@@ -33,11 +33,7 @@ export default function Dashboard() {
   const last = pc.curve[pc.curve.length - 1].equity
   const tone = last < 0 ? 'var(--red-fill)' : 'var(--green-fill)'
 
-  // «1 д 0 ч»
-  const hold = (ms) => {
-    const h = Math.round((ms || 0) / 3600000)
-    return `${Math.floor(h / 24)} д ${h % 24} ч`
-  }
+  const hold = fmtHold
   const wr = (v) => fmt(v || 0, 1) + '%'
   const pf = (v) => ((v || 0) > 0 ? '+' : '') + fmt(v || 0) + '%'
   const items = [

@@ -159,5 +159,11 @@ export function pctCurve(trades, since = 0) {
   return { curve, count: closed.length, withPct }
 }
 
+// Среднее время в позиции: «1 д 0 ч»
+export const fmtHold = (ms) => {
+  const h = Math.round((ms || 0) / 3600000)
+  return `${Math.floor(h / 24)} д ${h % 24} ч`
+}
+
 export const fmt = (n, d = 2) =>
   n == null || !isFinite(n) ? '—' : Number(n).toLocaleString('ru-RU', { maximumFractionDigits: d, minimumFractionDigits: d })

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db.js'
-import { calcTrade, summarize, fmt } from '../stats.js'
+import { summarize, fmt, fmtHold } from '../stats.js'
 import AnimNum from '../AnimNum.jsx'
 
 const sign = (n) => (n == null || !isFinite(n) ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
@@ -34,17 +34,14 @@ export default function WeeklyRecap({ symbol, weekStart }) {
 
   const s = useMemo(() => summarize(trades), [trades])
 
+  const pf = (v) => ((v || 0) > 0 ? '+' : '') + fmt(v || 0) + '%'
   const items = [
-    ['Закрыто', s.count],
-    ['Открыто', s.open],
-    ['PnL', fmt(s.totalPnl), sign(s.totalPnl)],
-    ['Винрейт', s.winrate == null ? '—' : fmt(s.winrate, 1) + '%'],
-    ['Профит-фактор', s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor)],
-    ['Средний R', fmt(s.avgR), sign(s.avgR)],
-    ['Лучшая', fmt(s.best), sign(s.best)],
-    ['Худшая', fmt(s.worst), sign(s.worst)],
-    ['Макс. просадка', fmt(s.maxDd), s.maxDd > 0 ? 'neg' : ''],
-    ['Комиссии', fmt(s.fees)],
+    ['Сделок', s.total],
+    ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
+    ['Винрейт', fmt(s.winrate || 0, 1) + '%'],
+    ['Средний R', fmt(s.avgR || 0), sign(s.avgR)],
+    ['Макс. просадка', (s.maxDdPct > 0 ? '-' : '') + fmt(s.maxDdPct || 0) + '%', s.maxDdPct > 0 ? 'neg' : ''],
+    ['Время в позиции', fmtHold(s.avgHold)],
   ]
 
   return (
@@ -66,38 +63,6 @@ export default function WeeklyRecap({ symbol, weekStart }) {
                 <div className={'v ' + (cls || '')}><AnimNum value={value} /></div>
               </div>
             ))}
-          </div>
-
-          <div className="tablewrap">
-            <table>
-              <thead>
-                <tr>
-                  <th className="left">Дата</th>
-                  <th className="left">Сторона</th>
-                  <th>Вход</th>
-                  <th>Выход</th>
-                  <th>PnL</th>
-                  <th>R</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trades.map((t) => {
-                  const c = calcTrade(t)
-                  return (
-                    <tr key={t.id} title={t.notes || ''}>
-                      <td className="left">
-                        {new Date(t.closedAt || t.openedAt).toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' })}
-                      </td>
-                      <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
-                      <td>{fmt(t.entry, 4)}</td>
-                      <td>{c.closed ? fmt(t.exit, 4) : 'открыта'}</td>
-                      <td className={sign(c.pnl)}>{fmt(c.pnl)}</td>
-                      <td className={sign(c.r)}>{fmt(c.r)}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
           </div>
         </>
       )}
