@@ -284,6 +284,8 @@ select.res option { background: var(--surface); color: var(--text); }
 select.res option[value='profit'] { color: var(--green) !important; }
 select.res option[value='loss'] { color: var(--red) !important; }
 select.res option[value='be'] { color: var(--orange) !important; }
+select.res option[value='worked'] { color: var(--green) !important; }
+select.res option[value='failed'] { color: var(--red) !important; }
 .shot-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
 .shot-head h2 { margin: 0; }
 .shotcard textarea { min-height: 80px; }

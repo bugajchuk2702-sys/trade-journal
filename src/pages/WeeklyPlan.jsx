@@ -15,6 +15,7 @@ import { SymbolInput, SymbolIcon, norm } from '../components/Symbols.jsx'
 // остаются в базе нетронутыми, просто не показываются на странице.
 const FIELDS = [
   'symbol', 'result',
+  'narrative', // Narrative Result: '' | 'worked' | 'failed'
   'w1Img', 'w1Text', 'd1Img', 'd1Text', 'h4Img', 'h4Text',
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
@@ -171,6 +172,18 @@ function PlanEditor({ plan, onDelete, go }) {
             <option value="profit">Прибыльная</option>
             <option value="loss">Убыточная</option>
             <option value="be">Безубыточная</option>
+          </select>
+        </label>
+        <label style={{ width: 200 }}>
+          Narrative Result
+          <select
+            className={'res ' + ({ worked: 'profit', failed: 'loss' }[p.narrative] || '')}
+            value={p.narrative}
+            onChange={(e) => update({ narrative: e.target.value })}
+          >
+            <option value="">Не выбран</option>
+            <option value="worked">Отработал</option>
+            <option value="failed">Не отработал</option>
           </select>
         </label>
         <span className="spacer" />
