@@ -40,7 +40,7 @@ const pick = (p) => Object.fromEntries(FIELDS.map((k) => [k, p[k] ?? blank[k]]))
 const money = (n) => fmt(n, 2).replace(/,00$/, '') + '$'
 
 // Цвет метки инструмента (как теги в Notion)
-const TAG_TINT = { BTC: '247,147,26', XAUUSD: '240,180,36', EURUSD: '70,110,220', GBPUSD: '200,70,90', GER40: '230,190,40', JP225: '220,50,60', AUDUSD: '40,120,200' }
+const TAG_TINT = { BTC: '247,147,26', XAUUSD: '240,180,36', EURUSD: '70,110,220', GBPUSD: '200,70,90', GER40: '230,190,40', JP225: '220,50,60' }
 
 function TradeRow({ t, n, onOpen }) {
   const c = calcTrade(t)

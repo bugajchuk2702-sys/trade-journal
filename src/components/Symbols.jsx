@@ -113,7 +113,6 @@ export const SYMBOLS = [
   { code: 'XAU/USD', icons: ['XAU'] },
   { code: 'BTC', icons: ['BTC'] },
   { code: 'JP225', icons: ['JP'] },
-  { code: 'AUD/USD', icons: ['AU', 'US'] },
 ]
 
 function One({ kind, uid }) {
