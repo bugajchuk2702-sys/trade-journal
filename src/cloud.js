@@ -38,6 +38,7 @@ let retryT = null
 let remoteSha = null
 let lastBody = null
 let lastPull = 0
+let lastMs = 0
 let uploaded = new Set(gh ? read('trade-journal-gh-imgs:' + gh.repo) || [] : [])
 
 const isDirty = () => localStorage.getItem(DIRTY_KEY) === '1'
@@ -67,6 +68,7 @@ async function ghFetch(method, path, body, accept) {
     e.status = r.status
     let msg = ''
     try { msg = (await r.json()).message || '' } catch { /* ignore */ }
+    e.msg = msg
     // 403/429 с упоминанием лимита — это не «нет прав», а просьба подождать
     if (r.status === 429 || (r.status === 403 && (/rate limit|abuse|retry/i.test(msg) || r.headers.get('retry-after') || r.headers.get('x-ratelimit-remaining') === '0'))) e.limit = true
     throw e
@@ -127,16 +129,48 @@ async function inflate(v) {
   return v
 }
 
-async function uploadImages(uploads) {
-  for (const [name, url] of uploads) {
-    if (uploaded.has(name)) continue
+// По одному файлу через Contents API — запасной путь и для 1–3 новых скриншотов
+async function uploadImages(list) {
+  let done = 0
+  if (list.length) emit({ progress: { done, total: list.length } })
+  for (const [name, url] of list) {
     try {
       await ghApi('PUT', '/contents/' + IMG_DIR + name, { message: 'Скриншот ' + name.slice(0, 8), content: url.slice(url.indexOf(',') + 1) })
     } catch (e) {
       if (e.status !== 422) throw e // 422 — такой файл уже есть
     }
     markUploaded(name)
+    emit({ progress: { done: ++done, total: list.length } })
   }
+}
+
+// Много скриншотов: файлы заливаются параллельно и ложатся одним коммитом (через Git Data API).
+// Пока заливали, файл данных в облаке мог измениться — тогда ветка не сдвинется (422) и всё сверится заново.
+const BATCH_MIN = 4
+async function commitBatch(files, message) {
+  const blob = {}
+  const total = files.length
+  let done = 0
+  const queue = [...files]
+  emit({ progress: { done, total } })
+  await Promise.all(Array.from({ length: Math.min(6, queue.length) }, async () => {
+    for (let f; (f = queue.shift()); ) {
+      blob[f[0]] = (await ghApi('POST', '/git/blobs', { content: f[1], encoding: 'base64' })).sha
+      emit({ progress: { done: ++done, total } })
+    }
+  }))
+  if (!gh.branch) { gh.branch = (await ghApi('GET', '')).default_branch; write(KEY, gh) }
+  const head = (await ghApi('GET', '/git/ref/heads/' + gh.branch)).object.sha
+  let cur = null
+  try { cur = (await ghApi('GET', '/contents/' + PATH + '?ref=' + head)).sha } catch (e) { if (e.status !== 404) throw e }
+  if (cur !== remoteSha) { const e = new Error('conflict'); e.conflict = true; throw e }
+  const base = (await ghApi('GET', '/git/commits/' + head)).tree.sha
+  const tree = await ghApi('POST', '/git/trees', { base_tree: base, tree: files.map(([path]) => ({ path, mode: '100644', type: 'blob', sha: blob[path] })) })
+  const commit = await ghApi('POST', '/git/commits', { message, tree: tree.sha, parents: [head] })
+  try {
+    await ghApi('PATCH', '/git/refs/heads/' + gh.branch, { sha: commit.sha })
+  } catch (e) { if (e.status === 422) e.conflict = true; throw e }
+  return blob[PATH]
 }
 
 /* ---------- слияние и отправка ---------- */
@@ -209,7 +243,7 @@ function schedulePush() {
   setDirty(true)
   emit({ status: 'saving' })
   clearTimeout(pushT)
-  pushT = setTimeout(() => push(), 4000)
+  pushT = setTimeout(() => push(), 1500)
 }
 
 async function push(retry = 0) {
@@ -219,21 +253,36 @@ async function push(retry = 0) {
   if (pushing) { pushAgain = true; return }
   pushing = true
   try {
+    const t0 = Date.now()
     const { body, uploads } = await snapshot()
     const text = JSON.stringify(body)
     if (text !== lastBody || remoteSha == null) {
-      await uploadImages(uploads)
-      const payload = { message: 'Сохранение ' + new Date().toISOString(), content: b64e(JSON.stringify({ app: 'trade-journal', version: 4, savedAt: Date.now(), ...body })) }
-      if (remoteSha) payload.sha = remoteSha
-      const j = await ghApi('PUT', '/contents/' + PATH, payload)
-      remoteSha = j.content.sha
+      const fresh = [...uploads].filter(([name]) => !uploaded.has(name))
+      const data = b64e(JSON.stringify({ app: 'trade-journal', version: 4, savedAt: Date.now(), ...body }))
+      let sent = false
+      if (fresh.length >= BATCH_MIN) {
+        try {
+          remoteSha = await commitBatch([...fresh.map(([n, u]) => [IMG_DIR + n, u.slice(u.indexOf(',') + 1)]), [PATH, data]], 'Сохранение ' + new Date().toISOString())
+          fresh.forEach(([n]) => markUploaded(n))
+          sent = true
+        } catch (e) {
+          if (e.conflict || e.limit || e instanceof TypeError) throw e // остальное — пробуем по одному файлу
+        }
+      }
+      if (!sent) {
+        await uploadImages(fresh)
+        const payload = { message: 'Сохранение ' + new Date().toISOString(), content: data }
+        if (remoteSha) payload.sha = remoteSha
+        remoteSha = (await ghApi('PUT', '/contents/' + PATH, payload)).content.sha
+      }
       lastBody = text
     }
+    lastMs = Date.now() - t0
     setDirty(false)
-    emit({ status: 'synced', lastSync: Date.now(), message: '' })
+    emit({ status: 'synced', lastSync: Date.now(), lastMs, progress: null, message: '' })
   } catch (e) {
     if ((e.status === 409 || e.status === 422) && retry < 3) { pushing = false; await pull(retry + 1); return }
-    emit({ status: failState(e) })
+    emit({ status: failState(e), progress: null })
   }
   pushing = false
   if (pushAgain) { pushAgain = false; push() }
@@ -275,6 +324,7 @@ export async function connect(repoIn, tokenIn) {
       gh = prev
       return { ok: false, message: 'Этот репозиторий публичный: ваши данные видели бы все. Откройте его Settings → Danger Zone → Change visibility → Private и повторите.' }
     }
+    gh.branch = info.default_branch
     write(KEY, gh)
     remoteSha = null
     lastBody = null

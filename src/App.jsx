@@ -110,7 +110,7 @@ export default function App() {
         <span className="spacer" />
         <button className={'icon-btn cloud-st ' + cloud.status} onClick={() => go('data', { section: 'cloud' })} title={cloud.message || 'Облачное сохранение'}>
           <span className={'dot ' + CLOUD_DOT[cloud.status]} />
-          {cloud.status === 'local' ? 'Не в облаке' : CLOUD_LABEL[cloud.status]}
+          {cloud.status === 'local' ? 'Не в облаке' : cloud.status === 'saving' && cloud.progress ? `Сохраняется ${cloud.progress.done}/${cloud.progress.total}` : CLOUD_LABEL[cloud.status]}
         </button>
         <div className="status">
           <span className={'dot ' + (online ? 'ok' : 'off')} />

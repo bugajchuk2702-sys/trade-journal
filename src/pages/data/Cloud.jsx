@@ -35,7 +35,7 @@ export default function Cloud() {
     <section className="card cloud">
       <div className="toolbar">
         <h2 style={{ margin: 0 }}>Облако</h2>
-        <span className="cloud-state"><span className={'dot ' + CLOUD_DOT[c.status]} />{CLOUD_LABEL[c.status]}</span>
+        <span className="cloud-state"><span className={'dot ' + CLOUD_DOT[c.status]} />{CLOUD_LABEL[c.status]}{c.status === 'saving' && c.progress ? `: скриншоты ${c.progress.done} из ${c.progress.total}` : ''}</span>
       </div>
 
       {!connected ? (
@@ -77,7 +77,7 @@ export default function Cloud() {
           <dl className="cloud-info">
             <div><dt>Репозиторий</dt><dd>{c.repo}</dd></div>
             <div><dt>Файл</dt><dd>trade-journal-data.json (скриншоты — в папке images)</dd></div>
-            {c.lastSync > 0 && <div><dt>Последнее сохранение</dt><dd>{when(c.lastSync)}</dd></div>}
+            {c.lastSync > 0 && <div><dt>Последнее сохранение</dt><dd>{when(c.lastSync)}{c.lastMs > 0 && <span className="acc-note"> · заняло {(c.lastMs / 1000).toFixed(1).replace('.', ',')} с</span>}</dd></div>}
           </dl>
           {c.message && <div className="acc-error cloud-msg">{c.message}</div>}
           <div className="acc-form-btns cloud-btns">
