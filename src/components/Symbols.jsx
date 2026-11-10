@@ -52,6 +52,13 @@ const FLAGS = {
       <circle cx="12" cy="12" r="6" fill="#c8102e" />
     </Flag>
   ),
+  CH: (id) => (
+    <Flag id={id}>
+      <rect width="24" height="24" fill="#d52b1e" />
+      <rect x="9.6" y="4.6" width="4.8" height="14.8" fill="#fff" />
+      <rect x="4.6" y="9.6" width="14.8" height="4.8" fill="#fff" />
+    </Flag>
+  ),
   AU: (id) => (
     <Flag id={id}>
       <rect width="24" height="24" fill="#1c2f7a" />
@@ -113,6 +120,8 @@ export const SYMBOLS = [
   { code: 'XAU/USD', icons: ['XAU'] },
   { code: 'BTC', icons: ['BTC'] },
   { code: 'JP225', icons: ['JP'] },
+  { code: 'AUD/USD', icons: ['AU', 'US'] },
+  { code: 'USD/CHF', icons: ['US', 'CH'] },
 ]
 
 function One({ kind, uid }) {
