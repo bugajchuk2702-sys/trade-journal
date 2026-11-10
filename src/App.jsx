@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db, requestPersistentStorage } from './db.js'
+import { requestPersistentStorage } from './db.js'
 import Home from './pages/Home.jsx'
 import WeeklyPlan from './pages/WeeklyPlan.jsx'
 import Trades from './pages/Trades.jsx'
 import Mpa from './pages/Mpa.jsx'
 import Notes from './pages/Notes.jsx'
 import Data from './pages/Data.jsx'
+import { initCloud, useCloud } from './cloud.js'
+import { CLOUD_LABEL, CLOUD_DOT } from './pages/data/Cloud.jsx'
 
 const TABS = [
   { id: 'plan', label: 'Weekly Plan', Page: WeeklyPlan },
@@ -72,24 +73,13 @@ export default function App() {
 
   useEffect(() => {
     requestPersistentStorage().then(setPersisted)
+    initCloud()
   }, [])
 
-  const pending = useLiveQuery(async () => {
-    const [a, b, c, d] = await Promise.all([
-      db.trades.where('synced').equals(0).count(),
-      db.plans.where('synced').equals(0).count(),
-      db.notes.where('synced').equals(0).count(),
-      db.payouts.where('synced').equals(0).count(),
-    ])
-    return a + b + c + d
-  }, [], 0)
+  const cloud = useCloud()
 
-  // Счётчик «не синхронизировано» имеет смысл только когда появится облачная синхронизация;
-  // сейчас все данные лежат только в этом браузере, и число лишь путало.
-  const SYNC_ENABLED = false
   const statusText = [
     online ? 'Онлайн' : 'Офлайн',
-    SYNC_ENABLED && pending > 0 && `не синхронизировано: ${pending}`,
     persisted === false && 'хранилище не защищено',
     `версия от ${new Date(__BUILD_TIME__).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}`,
   ].filter(Boolean).join(' · ')
@@ -118,6 +108,10 @@ export default function App() {
           ))}
         </nav>
         <span className="spacer" />
+        <button className={'icon-btn cloud-st ' + cloud.status} onClick={() => go('data', { section: 'cloud' })} title={cloud.message || 'Облачное сохранение'}>
+          <span className={'dot ' + CLOUD_DOT[cloud.status]} />
+          {cloud.status === 'local' ? 'Не в облаке' : CLOUD_LABEL[cloud.status]}
+        </button>
         <div className="status">
           <span className={'dot ' + (online ? 'ok' : 'off')} />
           <span className="status-text" title={statusText}>{statusText}</span>

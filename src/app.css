@@ -1047,3 +1047,28 @@ form.trade .linkrow { margin: 0; }
 :root[data-style='ow'] :is(.badge.be, .tpill.be, select.res.be) { background-color: var(--be-soft); color: var(--be); }
 :root[data-style='ow'] .rdot.be { background: #f5a524; }
 :root[data-style='ow'] .acc-wl .be b { color: var(--be); }
+
+/* =====================================================================
+   Облачное сохранение: индикатор в шапке и раздел Data → Облако
+   ===================================================================== */
+.dot.warn { background: #f5a524; }
+.cloud-st { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; padding: 5px 12px; white-space: nowrap; }
+.cloud-st .dot { flex: none; }
+.cloud-st.error { color: var(--red); }
+.cloud-st.saving .dot, .cloud-st.pending .dot { animation: cloud-pulse 1.4s ease-in-out infinite; }
+@keyframes cloud-pulse { 50% { opacity: 0.35; } }
+.cloud-state { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.cloud-lead { color: var(--text-2); font-size: 14px; line-height: 1.55; max-width: 62ch; margin: 0 0 16px; }
+.cloud .acc-form { max-width: 560px; }
+.cloud-how { color: var(--text-2); font-size: 13px; max-width: 62ch; }
+.cloud-how summary { cursor: pointer; padding: 4px 0; }
+.cloud-how ol { margin: 8px 0 0; padding-left: 20px; line-height: 1.6; }
+.cloud-info { margin: 0 0 16px; display: grid; gap: 8px; }
+.cloud-info > div { display: flex; gap: 12px; flex-wrap: wrap; font-size: 14px; }
+.cloud-info dt { color: var(--text-2); min-width: 170px; }
+.cloud-info dd { margin: 0; font-weight: 500; }
+.cloud-msg { margin-bottom: 12px; }
+.cloud-btns { margin-bottom: 4px; }
+.cloud-foot { margin: 10px 0 0; max-width: 62ch; }
+:root[data-style='ow'] .cloud-st { text-transform: none; letter-spacing: normal; }
+@media (prefers-reduced-motion: reduce) { .cloud-st .dot { animation: none !important; } }
