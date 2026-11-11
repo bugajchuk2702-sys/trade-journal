@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
-import { calcTrade, fmt, hasResult } from '../stats.js'
+import { calcTrade, fmt, hasResult, toNum } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import ShotCard from '../components/ShotCard.jsx'
 import AutoTextarea from '../components/AutoTextarea.jsx'
@@ -359,7 +359,9 @@ export default function Trades({ params = {}, go }) {
                   <th className="left">Инструмент</th>
                   <th className="left">Сторона</th>
                   {hasNums && <th className="left">Result</th>}
+                  {hasNums && <th>Risk</th>}
                   {hasNums && <th>PnL</th>}
+                  {hasNums && <th>Net</th>}
                   {hasNums && <th>R</th>}
                   <th />
                 </tr>
@@ -373,7 +375,9 @@ export default function Trades({ params = {}, go }) {
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol || <span className="subtle">Не выбран</span>}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       {hasNums && <td className="left">{hasResult(t) ? <ResultPill c={c} /> : <span className="subtle">—</span>}</td>}
+                      {hasNums && <td>{toNum(t.riskPct) == null ? '—' : String(+toNum(t.riskPct).toFixed(2)).replace('.', ',') + '%'}</td>}
                       {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) : '—'}</td>}
+                      {hasNums && <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>}
                       {hasNums && <td className={sign(c.r)}>{fmt(c.r)}</td>}
                       <td>
                         <button className="ghost small" onClick={() => openEdit(t)}>Изм.</button>{' '}
