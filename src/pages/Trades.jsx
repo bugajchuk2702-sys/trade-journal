@@ -3,7 +3,6 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
 import { calcTrade, fmt, hasResult } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
-import { weekLabel } from '../week.js'
 import ShotCard from '../components/ShotCard.jsx'
 import AutoTextarea from '../components/AutoTextarea.jsx'
 import DateInput from '../components/DateInput.jsx'
@@ -40,6 +39,12 @@ export const emptyForm = () => ({
   resultImg: '',
   conclusion: '',
 })
+
+// Итог сделки: Win / Loss / BE, пока не закрыта — Open (как в плане недели)
+function ResultPill({ c }) {
+  const res = !c.closed ? 'open' : c.pnl > 0 ? 'win' : c.pnl < 0 ? 'loss' : 'be'
+  return <span className={'tpill ' + res}><i />{{ open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]}</span>
+}
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
@@ -219,8 +224,6 @@ export default function Trades({ params = {}, go }) {
   const [anchor, setAnchor] = useState(() => new Date())
   const fileRef = useRef(null)
 
-  const plans = useLiveQuery(() => db.plans.filter((p) => !p.deleted).toArray(), [], [])
-  const planOf = (t) => plans.find((p) => p.id === t.planId)
 
   // Пришли из плана по клику на сделку — сразу открываем её на правку
   useEffect(() => {
@@ -355,11 +358,9 @@ export default function Trades({ params = {}, go }) {
                   <th className="left">Дата</th>
                   <th className="left">Инструмент</th>
                   <th className="left">Сторона</th>
-                  <th className="left">План</th>
+                  {hasNums && <th className="left">Result</th>}
                   {hasNums && <th>PnL</th>}
-                  {hasNums && <th>Net</th>}
                   {hasNums && <th>R</th>}
-                  <th className="left">Скриншоты</th>
                   <th />
                 </tr>
               </thead>
@@ -371,15 +372,9 @@ export default function Trades({ params = {}, go }) {
                       <td className="left">{new Date(t.openedAt).toLocaleDateString('ru-RU', { dateStyle: 'short' })}</td>
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol || <span className="subtle">Не выбран</span>}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
-                      <td className="left">{planOf(t) ? <span className="tag">{planOf(t).symbol} · {weekLabel(planOf(t).weekStart).replace(/ \d{4}$/, '')}</span> : <span className="subtle">—</span>}</td>
+                      {hasNums && <td className="left">{hasResult(t) ? <ResultPill c={c} /> : <span className="subtle">—</span>}</td>}
                       {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) : '—'}</td>}
-                      {hasNums && <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>}
                       {hasNums && <td className={sign(c.r)}>{fmt(c.r)}</td>}
-                      <td className="left">
-                        {[['W1', t.w1], ['D1', t.d1], ['H4', t.h4], ['Result', t.resultImg]].filter(([, v]) => v).map(([k]) => (
-                          <span className="tag" key={k}>{k}</span>
-                        ))}
-                      </td>
                       <td>
                         <button className="ghost small" onClick={() => openEdit(t)}>Изм.</button>{' '}
                         <button className="danger small" onClick={() => confirm('Удалить сделку?') && removeTrade(t.id)}>✕</button>
