@@ -232,7 +232,7 @@ export default function Accounts() {
                   <th>Размер</th>
                   <th>Сделок</th>
                   <th>Winrate</th>
-                  <th>PnL, $</th>
+                  <th>PnL</th>
                   <th>Profit</th>
                   <th>Avg R</th>
                   <th>Max DD</th>
@@ -247,7 +247,7 @@ export default function Accounts() {
                     <td>{r.size > 0 ? money(r.size) : '—'}</td>
                     <td>{r.st.count}</td>
                     <td>{r.st.winrate == null ? '—' : pct(r.st.winrate, 1)}</td>
-                    <td className={sign(r.st.pnl)}>{r.st.count ? signed(r.st.pnl) : '—'}</td>
+                    <td className={sign(r.st.pnl)}>{r.st.count ? signed(r.st.pnl) + ' $' : '—'}</td>
                     <td className={sign(r.st.pnlPct)}>{r.st.count ? signed(r.st.pnlPct, 2, '%') : '—'}</td>
                     <td className={sign(r.st.avgR)}>{r.st.avgR == null ? '—' : signed(r.st.avgR)}</td>
                     <td>{r.st.ddPct == null || !r.st.count ? '—' : pct(r.st.ddPct, 2)}</td>

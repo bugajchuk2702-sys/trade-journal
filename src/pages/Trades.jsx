@@ -376,7 +376,7 @@ export default function Trades({ params = {}, go }) {
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       {hasNums && <td className="left">{hasResult(t) ? <ResultPill c={c} /> : <span className="subtle">—</span>}</td>}
                       {hasNums && <td>{toNum(t.riskPct) == null ? '—' : String(+toNum(t.riskPct).toFixed(2)).replace('.', ',') + '%'}</td>}
-                      {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) : '—'}</td>}
+                      {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) + ' $' : '—'}</td>}
                       {hasNums && <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>}
                       {hasNums && <td className={sign(c.r)}>{fmt(c.r)}</td>}
                       <td>
