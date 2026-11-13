@@ -13,6 +13,10 @@ const has = (v) => toNum(v) != null
 // Есть ли у сделки результат: новый (PnL в $) или старый (цены входа / выхода)
 export const hasResult = (t) => has(t.pnlUsd) || has(t.entry)
 
+// Итог сделки: то, что выбрал сам трейдер (Win / Loss / BE), а если не выбрал — по знаку PnL
+const RESULTS = ['win', 'loss', 'be']
+export const resOf = (t, pnl) => (RESULTS.includes(t.result) ? t.result : pnl > 0 ? 'win' : pnl < 0 ? 'loss' : 'be')
+
 export function calcTrade(t) {
   // Новая схема: PnL в долларах, риск в % от счёта, размер счёта запоминается в сделке
   if (has(t.pnlUsd)) {
@@ -21,7 +25,7 @@ export function calcTrade(t) {
     const risk = toNum(t.riskPct) || 0
     const netPct = acc > 0 ? (pnl / acc) * 100 : null
     const r = acc > 0 && risk > 0 ? pnl / ((acc * risk) / 100) : null
-    return { closed: true, pnl, r, netPct }
+    return { closed: true, res: resOf(t, pnl), pnl, r, netPct }
   }
   const entry = Number(t.entry)
   const exit = t.exit === '' || t.exit == null ? null : Number(t.exit)
@@ -31,7 +35,7 @@ export function calcTrade(t) {
   const dir = t.side === 'short' ? -1 : 1
 
   if (exit == null || !isFinite(exit)) {
-    return { closed: false, pnl: null, r: null, netPct: null }
+    return { closed: false, res: null, pnl: null, r: null, netPct: null }
   }
   const gross = (exit - entry) * size * dir
   const pnl = gross - fees
@@ -41,7 +45,7 @@ export function calcTrade(t) {
     const risk = Math.abs(entry - stop) * size
     if (risk > 0) r = pnl / risk
   }
-  return { closed: true, pnl, r, netPct: null }
+  return { closed: true, res: resOf(t, pnl), pnl, r, netPct: null }
 }
 
 export function summarize(trades) {
@@ -50,8 +54,8 @@ export function summarize(trades) {
     .filter((t) => t.closed)
     .sort((a, b) => (a.closedAt || a.openedAt) - (b.closedAt || b.openedAt) || (a.createdAt || 0) - (b.createdAt || 0))
 
-  const wins = closed.filter((t) => t.pnl > 0)
-  const losses = closed.filter((t) => t.pnl < 0)
+  const wins = closed.filter((t) => t.res === 'win')
+  const losses = closed.filter((t) => t.res === 'loss')
   const totalPnl = closed.reduce((s, t) => s + t.pnl, 0)
   const grossWin = wins.reduce((s, t) => s + t.pnl, 0)
   const grossLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0))
@@ -72,10 +76,10 @@ export function summarize(trades) {
     equity += t.pnl
     peak = Math.max(peak, equity)
     maxDd = Math.max(maxDd, peak - equity)
-    if (t.pnl > 0) {
+    if (t.res === 'win') {
       winStreak += 1
       lossStreak = 0
-    } else if (t.pnl < 0) {
+    } else if (t.res === 'loss') {
       lossStreak += 1
       winStreak = 0
     } else {
@@ -92,7 +96,7 @@ export function summarize(trades) {
   // Винрейт по направлению и среднее время в позиции
   const rate = (side) => {
     const a = closed.filter((t) => (t.side === 'short' ? 'short' : 'long') === side)
-    return a.length ? (a.filter((t) => t.pnl > 0).length / a.length) * 100 : null
+    return a.length ? (a.filter((t) => t.res === 'win').length / a.length) * 100 : null
   }
   const holds = closed.filter((t) => t.openedAt && t.closedAt && t.closedAt >= t.openedAt).map((t) => t.closedAt - t.openedAt)
 
@@ -119,8 +123,8 @@ export function summarize(trades) {
     winrateShort: rate('short'),
     avgHold: holds.length ? holds.reduce((a, b) => a + b, 0) / holds.length : null,
     pctTotal: pct.length ? pe : null,
-    avgWinPct: mean(pct.filter((t) => t.pnl > 0).map((t) => t.netPct)),
-    avgLossPct: mean(pct.filter((t) => t.pnl < 0).map((t) => t.netPct)),
+    avgWinPct: mean(pct.filter((t) => t.res === 'win').map((t) => t.netPct)),
+    avgLossPct: mean(pct.filter((t) => t.res === 'loss').map((t) => t.netPct)),
     maxDdPct: pct.length ? maxDdPct : null,
     winrate: closed.length ? (wins.length / closed.length) * 100 : null,
     totalPnl,

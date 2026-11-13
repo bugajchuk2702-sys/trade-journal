@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
-import { calcTrade, fmt, hasResult, toNum } from '../stats.js'
+import { calcTrade, fmt, hasResult, resOf, toNum } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import ShotCard from '../components/ShotCard.jsx'
 import AutoTextarea from '../components/AutoTextarea.jsx'
@@ -32,6 +32,7 @@ export const emptyForm = () => ({
   accountSize: '',
   riskPct: '',
   pnlUsd: '',
+  result: '', // '' = по PnL, иначе win / loss / be — как решил сам трейдер
   params: {},
   w1: '',
   d1: '',
@@ -42,9 +43,11 @@ export const emptyForm = () => ({
 
 // Итог сделки: Win / Loss / BE, пока не закрыта — Open (как в плане недели)
 function ResultPill({ c }) {
-  const res = !c.closed ? 'open' : c.pnl > 0 ? 'win' : c.pnl < 0 ? 'loss' : 'be'
-  return <span className={'tpill ' + res}><i />{{ open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]}</span>
+  const res = c.closed ? c.res : 'open'
+  return <span className={'tpill ' + res}><i />{res === 'open' ? 'Open' : RES_LABEL[res]}</span>
 }
+
+const RES_LABEL = { win: 'Win', loss: 'Loss', be: 'BE' }
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
@@ -77,6 +80,7 @@ const formToTrade = (f, hidePlan) => ({
   accountSize: f.accountSize,
   riskPct: f.riskPct,
   pnlUsd: f.pnlUsd,
+  result: f.result || '',
   params: f.params || {},
   w1: f.w1,
   d1: f.d1,
@@ -101,6 +105,7 @@ export function TradeForm({ initial, tradeId, go, onSave, onClose, hidePlan }) {
   const saveRef = useRef(onSave)
   saveRef.current = onSave
   const net = calcTrade({ pnlUsd: f.pnlUsd, accountSize: f.accountSize, riskPct: f.riskPct })
+  const auto = net.closed ? resOf({}, net.pnl) : '' // что получилось бы по знаку PnL
 
   const flush = () => {
     if (!timer.current) return
@@ -162,6 +167,14 @@ export function TradeForm({ initial, tradeId, go, onSave, onClose, hidePlan }) {
           {net.r == null ? '—' : fmt(net.r, 2) + ' RR'}
         </div>
       </div>
+      <label className="c4">Result
+        <select className={'res ' + ({ win: 'profit', loss: 'loss', be: 'be' }[f.result || auto] || '')} value={f.result} onChange={set('result')}>
+          <option value="">{auto ? 'Авто · ' + RES_LABEL[auto] : 'Авто (по PnL)'}</option>
+          <option value="win">Win</option>
+          <option value="loss">Loss</option>
+          <option value="be">BE</option>
+        </select>
+      </label>
 
       <ParamsBlock value={f.params} onChange={(v) => upd({ params: v })} />
       <div className="wide form-sec">Скриншоты</div>

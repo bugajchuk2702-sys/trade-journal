@@ -45,7 +45,7 @@ const TAG_TINT = { BTC: '247,147,26', XAUUSD: '240,180,36', EURUSD: '70,110,220'
 function TradeRow({ t, n, onOpen }) {
   const c = calcTrade(t)
   const hasNums = hasResult(t)
-  const res = !c.closed ? 'open' : c.pnl > 0 ? 'win' : c.pnl < 0 ? 'loss' : 'be'
+  const res = c.closed ? c.res : 'open'
   const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]
   const tint = TAG_TINT[norm(t.symbol)]
   return (

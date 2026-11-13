@@ -28,8 +28,8 @@ export const byStatus = (a, b) =>
 export function accountStats(own, size) {
   const s = summarize(own)
   const calc = own.map(calcTrade).filter((c) => c.closed)
-  const wins = calc.filter((c) => c.pnl > 0).length
-  const losses = calc.filter((c) => c.pnl < 0).length
+  const wins = calc.filter((c) => c.res === 'win').length
+  const losses = calc.filter((c) => c.res === 'loss').length
   const rs = calc.filter((c) => c.r != null)
   const pnlPct = size > 0 ? (s.totalPnl / size) * 100 : calc.reduce((x, c) => x + (c.netPct || 0), 0)
   return {

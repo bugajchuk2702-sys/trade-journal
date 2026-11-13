@@ -24,7 +24,7 @@ const GROUPS = [
 function stat(arr) {
   const c = arr.map(calcTrade).filter((x) => x.closed)
   const rs = c.filter((x) => x.r != null)
-  const wins = c.filter((x) => x.pnl > 0).length
+  const wins = c.filter((x) => x.res === 'win').length
   return {
     n: c.length,
     winrate: c.length ? (wins / c.length) * 100 : 0,

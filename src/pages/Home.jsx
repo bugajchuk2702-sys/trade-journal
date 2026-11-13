@@ -34,8 +34,8 @@ export default function Home({ go }) {
             const x = (m[t.planId] ||= { total: 0, win: 0, loss: 0, be: 0, open: 0 })
             x.total += 1
             if (!c.closed) x.open += 1
-            else if (c.pnl > 0) x.win += 1
-            else if (c.pnl < 0) x.loss += 1
+            else if (c.res === 'win') x.win += 1
+            else if (c.res === 'loss') x.loss += 1
             else x.be += 1
             return m
           }, {})
