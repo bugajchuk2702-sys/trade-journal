@@ -96,7 +96,8 @@ export function summarize(trades) {
   // Винрейт по направлению и среднее время в позиции
   const rate = (side) => {
     const a = closed.filter((t) => (t.side === 'short' ? 'short' : 'long') === side)
-    return a.length ? (a.filter((t) => t.res === 'win').length / a.length) * 100 : null
+    const d = a.filter((t) => t.res !== 'be') // безубыточные в винрейт не входят
+    return d.length ? (d.filter((t) => t.res === 'win').length / d.length) * 100 : null
   }
   const holds = closed.filter((t) => t.openedAt && t.closedAt && t.closedAt >= t.openedAt).map((t) => t.closedAt - t.openedAt)
 
@@ -126,7 +127,7 @@ export function summarize(trades) {
     avgWinPct: mean(pct.filter((t) => t.res === 'win').map((t) => t.netPct)),
     avgLossPct: mean(pct.filter((t) => t.res === 'loss').map((t) => t.netPct)),
     maxDdPct: pct.length ? maxDdPct : null,
-    winrate: closed.length ? (wins.length / closed.length) * 100 : null,
+    winrate: wins.length + losses.length ? (wins.length / (wins.length + losses.length)) * 100 : null, // без BE
     totalPnl,
     fees,
     expectancy: closed.length ? totalPnl / closed.length : null,

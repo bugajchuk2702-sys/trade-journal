@@ -25,9 +25,10 @@ function stat(arr) {
   const c = arr.map(calcTrade).filter((x) => x.closed)
   const rs = c.filter((x) => x.r != null)
   const wins = c.filter((x) => x.res === 'win').length
+  const decided = c.filter((x) => x.res !== 'be').length // винрейт считается без BE
   return {
     n: c.length,
-    winrate: c.length ? (wins / c.length) * 100 : 0,
+    winrate: decided ? (wins / decided) * 100 : 0,
     pnl: c.reduce((s, x) => s + x.pnl, 0),
     avgR: rs.length ? rs.reduce((s, x) => s + x.r, 0) / rs.length : null,
   }

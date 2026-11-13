@@ -48,9 +48,9 @@ export default function Dashboard() {
   const pf = (v) => ((v || 0) > 0 ? '+' : '') + fmt(v || 0) + '%'
   const items = [
     ['PnL %', pf(s.pctTotal), sign(s.pctTotal)],
-    ['Винрейт', wr(s.winrate)],
+    ['Винрейт', wr(s.winrate), '', 'Доля прибыльных сделок, безубыточные (BE) не считаются'],
     ['Винрейт нарратива', wr(narr.rate), '', narr.total ? `Отработал ${narr.worked} из ${narr.total} планов` : 'Пока нет планов с выбранным Narrative Result'],
-    [['Винрейт лонг', 'Винрейт шорт'], [wr(s.winrateLong), wr(s.winrateShort)], '', 'Доля прибыльных сделок: лонг / шорт', true],
+    [['Винрейт лонг', 'Винрейт шорт'], [wr(s.winrateLong), wr(s.winrateShort)], '', 'Доля прибыльных сделок без BE: лонг / шорт', true],
     ['Время в позиции', hold(s.avgHold), '', 'Среднее время в позиции'],
     ['Средний R', fmt(s.avgR || 0), sign(s.avgR)],
     ['Ср. % прибыли', pf(s.avgWinPct), s.avgWinPct != null ? 'pos' : ''],
