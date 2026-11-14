@@ -384,7 +384,7 @@ export default function Trades({ params = {}, go }) {
                 {filtered.map((t) => {
                   const c = calcTrade(t)
                   return (
-                    <tr key={t.id} title={t.conclusion || t.notes || ''}>
+                    <tr key={t.id} className={c.res === 'missed' ? 'is-missed' : ''} title={t.conclusion || t.notes || ''}>
                       <td className="left">{new Date(t.openedAt).toLocaleDateString('ru-RU', { dateStyle: 'short' })}</td>
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol || <span className="subtle">Не выбран</span>}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>

@@ -50,7 +50,7 @@ function TradeRow({ t, n, onOpen }) {
   const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE', missed: 'Missed' }[res]
   const tint = TAG_TINT[norm(t.symbol)]
   return (
-    <button type="button" className="trow" onClick={() => onOpen(t)} title="Открыть сделку на вкладке Trades">
+    <button type="button" className={'trow' + (res === 'missed' ? ' is-missed' : '')} onClick={() => onOpen(t)} title="Открыть сделку на вкладке Trades">
       <svg className="trow-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
         <path d="M3.5 1.5h6l3 3v10h-9z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
         <path d="M9.5 1.5v3h3M5.5 9.5l1.7-1.7 1.6 1.4 2-2.4" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />

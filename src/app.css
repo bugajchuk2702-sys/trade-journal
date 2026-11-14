@@ -1075,3 +1075,10 @@ form.trade .linkrow { margin: 0; }
 .cloud-foot { margin: 10px 0 0; max-width: 62ch; }
 :root[data-style='ow'] .cloud-st { text-transform: none; letter-spacing: normal; }
 @media (prefers-reduced-motion: reduce) { .cloud-st .dot { animation: none !important; } }
+
+/* Missed — упущенные позиции: всё серое, чтобы сразу было видно, что в статистику они не входят */
+.tpill.missed, :root[data-style='ow'] .tpill.missed { background: rgba(140, 148, 162, 0.18); color: #8f98a8; }
+tr.is-missed td, .trow.is-missed .trow-meta, .trow.is-missed .trow-side { color: #8f98a8 !important; }
+tr.is-missed td .pos, tr.is-missed td .neg, .trow.is-missed .pos, .trow.is-missed .neg { color: #8f98a8 !important; }
+tr.is-missed td:not(:last-child) { opacity: 0.72; }
+tr.is-missed .symcell img, tr.is-missed .symcell svg { filter: grayscale(1); }
