@@ -11,12 +11,12 @@ export const toNum = (v) => {
 const has = (v) => toNum(v) != null
 
 // Есть ли у сделки результат: новый (PnL в $) или старый (цены входа / выхода)
-export const hasResult = (t) => has(t.pnlUsd) || has(t.entry)
+export const isMissed = (t) => t.result === 'missed'
+export const hasResult = (t) => has(t.pnlUsd) || has(t.entry) || isMissed(t) // у Missed метка видна даже без PnL
 
 // Итог сделки: то, что выбрал сам трейдер (Win / Loss / BE), а если не выбрал — по знаку PnL
 // missed — упущенная / не замеченная позиция: в статистику не входит совсем
 const RESULTS = ['win', 'loss', 'be', 'missed']
-export const isMissed = (t) => t.result === 'missed'
 export const resOf = (t, pnl) => (RESULTS.includes(t.result) ? t.result : pnl > 0 ? 'win' : pnl < 0 ? 'loss' : 'be')
 
 export function calcTrade(t) {
@@ -37,7 +37,7 @@ export function calcTrade(t) {
   const dir = t.side === 'short' ? -1 : 1
 
   if (exit == null || !isFinite(exit)) {
-    return { closed: false, res: null, pnl: null, r: null, netPct: null }
+    return { closed: false, res: isMissed(t) ? 'missed' : null, pnl: null, r: null, netPct: null }
   }
   const gross = (exit - entry) * size * dir
   const pnl = gross - fees
