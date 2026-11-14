@@ -231,22 +231,24 @@ function PlanEditor({ plan, onDelete, go }) {
       )}
 
       <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Recap</h3>
-      <div className="row3">
+      <div className="row2">
         <ShotCard title="D1" {...shot('recapD1')} />
         <ShotCard title="H4" {...shot('recapH4')} />
-        <WeeklyRecap symbol={p.symbol} weekStart={plan.weekStart} />
       </div>
 
       <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Notes</h3>
-      <NotesCard
-        title="Заметки недели"
-        text={p.weekNotes}
-        imgs={p.weekNotesImgs}
-        onText={(v) => update({ weekNotes: v })}
-        onAdd={addNoteImgs}
-        onRemoveAt={removeNoteImg}
-        placeholder="Любые заметки по неделе"
-      />
+      <div className="notes-recap">
+        <NotesCard
+          title="Заметки недели"
+          text={p.weekNotes}
+          imgs={p.weekNotesImgs}
+          onText={(v) => update({ weekNotes: v })}
+          onAdd={addNoteImgs}
+          onRemoveAt={removeNoteImg}
+          placeholder="Любые заметки по неделе"
+        />
+        <WeeklyRecap symbol={p.symbol} weekStart={plan.weekStart} />
+      </div>
 
       <div className="plan-footer">
         <button className="danger" onClick={() => confirm('Удалить этот план?') && onDelete()}>Удалить план</button>
