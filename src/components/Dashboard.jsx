@@ -70,7 +70,7 @@ export default function Dashboard() {
               <div className="tt-title">Total Trades</div>
               <RangeToggle value={mRange} onChange={setMRange} />
             </div>
-            <TradeCounts total={s.total} win={s.winCount} loss={s.lossCount} be={s.beCount} open={s.open} />
+            <TradeCounts total={s.total} win={s.winCount} loss={s.lossCount} be={s.beCount} open={s.open} missed={s.missed} />
           </div>
           <div className="m-grid">
             {items.map(([label, value, cls, tip, wide]) => (

@@ -119,6 +119,7 @@ export function summarize(all) {
   return {
     count: closed.length,
     total: trades.length,
+    missed: all.length - trades.length,
     open: trades.length - closed.length,
     winCount: wins.length,
     lossCount: losses.length,

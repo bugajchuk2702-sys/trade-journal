@@ -250,7 +250,7 @@ tbody tr:hover td { background: var(--surface-3); }
 .tt-row { font-size: 15px; font-variant-numeric: tabular-nums; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 7px; }
 .tt-row b { font-weight: 700; }
 .tt-sep, .tt-sl { color: var(--text-3); }
-.tt-g { color: var(--green); font-weight: 600; } .tt-r { color: var(--red); font-weight: 600; } .tt-o { color: #f5a524; font-weight: 600; } .tt-b { color: #4aa3ff; font-weight: 600; }
+.tt-g { color: var(--green); font-weight: 600; } .tt-r { color: var(--red); font-weight: 600; } .tt-o { color: #f5a524; font-weight: 600; } .tt-b { color: #4aa3ff; font-weight: 600; } .tt-m { color: #8f98a8; font-weight: 600; }
 :root[data-style='ow'] .tt-title { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.05em; font-size: 18px; }
 :root[data-style='ow'] .tt-row { font-size: 17px; }
 .metrics .m.wide { grid-column: span 2; }
