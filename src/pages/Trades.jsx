@@ -47,7 +47,7 @@ function ResultPill({ c }) {
   return <span className={'tpill ' + res}><i />{res === 'open' ? 'Open' : RES_LABEL[res]}</span>
 }
 
-const RES_LABEL = { win: 'Win', loss: 'Loss', be: 'BE' }
+const RES_LABEL = { win: 'Win', loss: 'Loss', be: 'BE', missed: 'Missed' }
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
 
@@ -173,6 +173,7 @@ export function TradeForm({ initial, tradeId, go, onSave, onClose, hidePlan }) {
           <option value="win">Win</option>
           <option value="loss">Loss</option>
           <option value="be">BE</option>
+          <option value="missed">Missed — не считать в статистике</option>
         </select>
       </label>
 

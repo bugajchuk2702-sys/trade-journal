@@ -14,7 +14,9 @@ const has = (v) => toNum(v) != null
 export const hasResult = (t) => has(t.pnlUsd) || has(t.entry)
 
 // Итог сделки: то, что выбрал сам трейдер (Win / Loss / BE), а если не выбрал — по знаку PnL
-const RESULTS = ['win', 'loss', 'be']
+// missed — упущенная / не замеченная позиция: в статистику не входит совсем
+const RESULTS = ['win', 'loss', 'be', 'missed']
+export const isMissed = (t) => t.result === 'missed'
 export const resOf = (t, pnl) => (RESULTS.includes(t.result) ? t.result : pnl > 0 ? 'win' : pnl < 0 ? 'loss' : 'be')
 
 export function calcTrade(t) {
@@ -48,7 +50,8 @@ export function calcTrade(t) {
   return { closed: true, res: resOf(t, pnl), pnl, r, netPct: null }
 }
 
-export function summarize(trades) {
+export function summarize(all) {
+  const trades = all.filter((t) => !isMissed(t))
   const closed = trades
     .map((t) => ({ ...t, ...calcTrade(t) }))
     .filter((t) => t.closed)
@@ -146,7 +149,8 @@ export function summarize(trades) {
 
 // Кривая роста в % от размера счёта: у каждой сделки результат делится на размер её счёта,
 // дальше проценты суммируются. since — с какой даты (мс) считать; кривая всегда стартует с нуля.
-export function pctCurve(trades, since = 0) {
+export function pctCurve(all, since = 0) {
+  const trades = all.filter((t) => !isMissed(t))
   const closed = trades
     .map((t) => ({ ...t, ...calcTrade(t) }))
     .filter((t) => t.closed && (t.closedAt || t.openedAt) >= since)

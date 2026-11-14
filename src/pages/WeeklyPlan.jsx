@@ -47,7 +47,7 @@ function TradeRow({ t, n, onOpen }) {
   const c = calcTrade(t)
   const hasNums = hasResult(t)
   const res = c.closed ? c.res : 'open'
-  const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE' }[res]
+  const label = { open: 'Open', win: 'Win', loss: 'Loss', be: 'BE', missed: 'Missed' }[res]
   const tint = TAG_TINT[norm(t.symbol)]
   return (
     <button type="button" className="trow" onClick={() => onOpen(t)} title="Открыть сделку на вкладке Trades">

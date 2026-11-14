@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db.js'
 import { ACC_KEY } from '../../components/Params.jsx'
-import { calcTrade, summarize, toNum } from '../../stats.js'
+import { calcTrade, isMissed, summarize, toNum } from '../../stats.js'
 
 // Статусы счёта в порядке «важности» — по нему сортируются карточки
 export const STATUSES = ['Ongoing', 'Funded', 'Demo', 'Passed', 'Failed']
@@ -27,7 +27,7 @@ export const byStatus = (a, b) =>
 // Сводка по сделкам счёта. size — размер счёта, от него считаются % прибыли и просадки.
 export function accountStats(own, size) {
   const s = summarize(own)
-  const calc = own.map(calcTrade).filter((c) => c.closed)
+  const calc = own.filter((t) => !isMissed(t)).map(calcTrade).filter((c) => c.closed)
   const wins = calc.filter((c) => c.res === 'win').length
   const losses = calc.filter((c) => c.res === 'loss').length
   const rs = calc.filter((c) => c.r != null)

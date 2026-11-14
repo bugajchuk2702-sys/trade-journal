@@ -5,7 +5,7 @@ import { mondayOf, shiftWeek, weekLabel } from '../week.js'
 import Dashboard from '../components/Dashboard.jsx'
 import { SymbolIcon } from '../components/Symbols.jsx'
 import TradeCounts from '../components/TradeCounts.jsx'
-import { calcTrade } from '../stats.js'
+import { calcTrade, isMissed } from '../stats.js'
 
 // Итог недели по инструменту (второй элемент — цвет значка)
 // Narrative Result плана: отработал / не отработал (класс — цвет бейджа)
@@ -26,7 +26,7 @@ export default function Home({ go }) {
   const stats = useLiveQuery(
     () =>
       db.trades
-        .filter((t) => !t.deleted && t.planId)
+        .filter((t) => !t.deleted && t.planId && !isMissed(t))
         .toArray()
         .then((a) =>
           a.reduce((m, t) => {

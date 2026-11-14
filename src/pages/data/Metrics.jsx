@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db.js'
-import { calcTrade, fmt, summarize } from '../../stats.js'
+import { calcTrade, fmt, isMissed, summarize } from '../../stats.js'
 import AnimNum from '../../AnimNum.jsx'
 import { PARAMS, STYLE, useParamOptions } from '../../components/Params.jsx'
 import { useAccounts, bucket } from './accounts.js'
@@ -80,7 +80,7 @@ export default function Metrics() {
     for (const t of all) if (t.account) set.add(t.account)
     return [...set]
   }, [list, all])
-  const trades = useMemo(() => (acc ? all.filter((t) => t.account === acc) : all), [all, acc])
+  const trades = useMemo(() => all.filter((t) => !isMissed(t) && (!acc || t.account === acc)), [all, acc])
   const closedN = (arr) => arr.filter((t) => calcTrade(t).closed).length
 
   const s = useMemo(() => summarize(trades), [trades])
