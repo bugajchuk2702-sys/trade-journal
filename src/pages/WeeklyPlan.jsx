@@ -20,6 +20,7 @@ const FIELDS = [
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
   'recapD1Img', // скриншот D1 в блоке Weekly Recap
+  'recapH4Img', // скриншот H4 там же
   'weekNotes', // «Заметки недели»: текст
   'weekNotesImgs', // скриншоты к заметкам недели (вставляются скрыто, Ctrl+V)
 ]
@@ -230,8 +231,9 @@ function PlanEditor({ plan, onDelete, go }) {
       )}
 
       <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Recap</h3>
-      <div className="row2">
+      <div className="row3">
         <ShotCard title="D1" {...shot('recapD1')} />
+        <ShotCard title="H4" {...shot('recapH4')} />
         <WeeklyRecap symbol={p.symbol} weekStart={plan.weekStart} />
       </div>
 
