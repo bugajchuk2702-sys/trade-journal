@@ -77,7 +77,7 @@ export default function ShotCard({ title, subtitle, onRemove, img, text, onImg, 
       >
         {img ? (
           <>
-            <img src={img} alt={title} onClick={() => setBig(true)} title="Нажми, чтобы открыть крупно" />
+            <img src={img} alt={title} onClick={() => setBig(true)} aria-label="Открыть крупно" />
             <div className="shot-actions">
               <button type="button" className="ghost small" onClick={() => fileRef.current?.click()}>Заменить</button>
               <button type="button" className="danger small" onClick={() => onImg('')}>Убрать</button>

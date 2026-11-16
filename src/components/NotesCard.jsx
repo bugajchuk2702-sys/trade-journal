@@ -66,7 +66,7 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
         <div className="gallery-md">
           {list.map((src, i) => (
             <div className="g-item" key={i}>
-              <img src={src} alt={`Скриншот ${i + 1}`} onClick={() => setBig(src)} title="Нажми, чтобы открыть крупно" />
+              <img src={src} alt={`Скриншот ${i + 1}`} onClick={() => setBig(src)} aria-label="Открыть крупно" />
               <button type="button" className="g-x" title="Убрать скриншот" onClick={() => onRemoveAt(i)}>✕</button>
             </div>
           ))}
