@@ -4,7 +4,7 @@ import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '
 import { calcTrade, fmt, hasResult, resOf, toNum } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import ShotCard from '../components/ShotCard.jsx'
-import AutoTextarea from '../components/AutoTextarea.jsx'
+import NotesCard from '../components/NotesCard.jsx'
 import DateInput from '../components/DateInput.jsx'
 import NotesLinker from '../components/NotesLinker.jsx'
 import ParamsBlock, { StylePicker, AccountPicker, PlanPicker } from '../components/Params.jsx'
@@ -39,6 +39,7 @@ export const emptyForm = () => ({
   h4: '',
   resultImg: '',
   conclusion: '',
+  conclusionImgs: [],
 })
 
 // Итог сделки: Win / Loss / BE, пока не закрыта — Open (как в плане недели)
@@ -87,6 +88,7 @@ const formToTrade = (f, hidePlan) => ({
   h4: f.h4,
   resultImg: f.resultImg,
   conclusion: f.conclusion,
+  conclusionImgs: f.conclusionImgs || [],
 })
 
 // Заготовка новой сделки. Запись создаётся сразу, как только нажали «Новая сделка»,
@@ -185,9 +187,17 @@ export function TradeForm({ initial, tradeId, go, onSave, onClose, hidePlan }) {
         <ShotCard title="H4" img={f.h4} onImg={(v) => upd({ h4: v })} />
         <ShotCard title="Result" img={f.resultImg} onImg={(v) => upd({ resultImg: v })} />
       </div>
-      <label className="wide">Conclusion
-        <AutoTextarea value={f.conclusion} onChange={set('conclusion')} />
-      </label>
+      <div className="wide field-block">
+        <span className="field-label">Conclusion</span>
+        <NotesCard
+          bare
+          text={f.conclusion}
+          imgs={f.conclusionImgs}
+          onText={(v) => upd({ conclusion: v })}
+          onAdd={(urls) => upd({ conclusionImgs: [...(latest.current.conclusionImgs || []), ...urls] })}
+          onRemoveAt={(i) => upd({ conclusionImgs: (latest.current.conclusionImgs || []).filter((_, k) => k !== i) })}
+        />
+      </div>
       {tradeId && <div className="wide"><NotesLinker kind="trade" id={tradeId} go={go} /></div>}
       <div className="wide" style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         <button type="button" onClick={() => { flush(); onClose && onClose() }}>Готово</button>

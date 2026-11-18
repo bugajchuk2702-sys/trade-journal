@@ -1082,3 +1082,7 @@ tr.is-missed td, .trow.is-missed .trow-meta, .trow.is-missed .trow-side { color:
 tr.is-missed td .pos, tr.is-missed td .neg, .trow.is-missed .pos, .trow.is-missed .neg { color: #8f98a8 !important; }
 tr.is-missed td:not(:last-child) { opacity: 0.72; }
 tr.is-missed .symcell img, tr.is-missed .symcell svg { filter: grayscale(1); }
+
+/* Conclusion со скриншотами: подпись как у остальных полей формы */
+.field-block { display: flex; flex-direction: column; gap: 6px; }
+.field-block .field-label { font-size: 12.5px; font-weight: 500; color: var(--text-2); }
