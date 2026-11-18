@@ -419,8 +419,8 @@ form.trade .trade-shots { align-items: stretch; }
   .trade-shots > .card, .trade-shots > .card:nth-child(4) { grid-column: 1; }
 }
 /* Result — по центру под рядом W1 / D1 / H4 */
-.trade-shots > .card:nth-child(4) { grid-column: 1 / -1; width: 50%; justify-self: center; }
-@media (max-width: 760px) { .trade-shots > .card:nth-child(4) { width: auto; } }
+.trade-shots > .card:nth-child(4), .trade-shots > .card:nth-child(5) { grid-column: span 3; width: auto; }
+@media (max-width: 760px) { .trade-shots > .card:nth-child(4), .trade-shots > .card:nth-child(5) { grid-column: 1 / -1; } }
 /* Parameters: список выпадающих выборов */
 .params { display: block; }
 .params-head { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text-2); padding: 4px 2px; margin-bottom: 8px; font-size: 14px; font-weight: 700; letter-spacing: 0; text-transform: none; box-shadow: none; clip-path: none; border: 0; }

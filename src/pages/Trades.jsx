@@ -37,6 +37,7 @@ export const emptyForm = () => ({
   w1: '',
   d1: '',
   h4: '',
+  h1: '',
   resultImg: '',
   conclusion: '',
   conclusionImgs: [],
@@ -86,6 +87,7 @@ const formToTrade = (f, hidePlan) => ({
   w1: f.w1,
   d1: f.d1,
   h4: f.h4,
+  h1: f.h1,
   resultImg: f.resultImg,
   conclusion: f.conclusion,
   conclusionImgs: f.conclusionImgs || [],
@@ -185,6 +187,7 @@ export function TradeForm({ initial, tradeId, go, onSave, onClose, hidePlan }) {
         <ShotCard title="W1" img={f.w1} onImg={(v) => upd({ w1: v })} />
         <ShotCard title="D1" img={f.d1} onImg={(v) => upd({ d1: v })} />
         <ShotCard title="H4" img={f.h4} onImg={(v) => upd({ h4: v })} />
+        <ShotCard title="H1" img={f.h1} onImg={(v) => upd({ h1: v })} />
         <ShotCard title="Result" img={f.resultImg} onImg={(v) => upd({ resultImg: v })} />
       </div>
       <div className="wide field-block">
