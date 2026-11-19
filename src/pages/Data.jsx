@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Accounts from './data/Accounts.jsx'
 import Metrics from './data/Metrics.jsx'
 import Cloud from './data/Cloud.jsx'
+import Trash from './data/Trash.jsx'
 
 // Раздел Data: справочники и сводки по данным журнала
 const SECTIONS = [
   { id: 'accounts', label: 'Accounts', Page: Accounts },
   { id: 'metrics', label: 'Metrics', Page: Metrics },
   { id: 'cloud', label: 'Облако', Page: Cloud },
+  { id: 'trash', label: 'Корзина', Page: Trash },
 ]
 
 export default function Data({ params }) {
