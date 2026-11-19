@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, createPlan, savePlan, removePlan, addTrade, updateTrade, uuid } from '../db.js'
-import { calcTrade, fmt, hasResult } from '../stats.js'
+import { byOpened, byOpenedDesc, calcTrade, fmt, hasResult } from '../stats.js'
 import { newTradeData, tradeToForm } from './Trades.jsx'
 import TradeModal from '../components/TradeModal.jsx'
 import { mondayOf, shiftWeek, weekLabel } from '../week.js'
@@ -76,7 +76,7 @@ function TradeRow({ t, n, onOpen }) {
 
 // Трейды плана — компактный список в стиле Notion
 function TradesList({ trades, onAdd, onOpen }) {
-  const ordered = [...trades].sort((a, b) => a.openedAt - b.openedAt || (a.createdAt || 0) - (b.createdAt || 0))
+  const ordered = [...trades].sort(byOpened)
   // Пока из плана не добавлено ни одного трейда, блок не показываем
   if (ordered.length === 0) return null
   return (
@@ -104,7 +104,7 @@ function PlanEditor({ plan, onDelete, go }) {
     setTradeModal({ trade, isNew: true })
   }
   const attached = useLiveQuery(
-    () => db.trades.filter((t) => t.planId === plan.id && !t.deleted).toArray().then((a) => a.sort((x, y) => y.openedAt - x.openedAt)),
+    () => db.trades.filter((t) => t.planId === plan.id && !t.deleted).toArray().then((a) => a.sort(byOpenedDesc)),
     [plan.id],
     []
   )

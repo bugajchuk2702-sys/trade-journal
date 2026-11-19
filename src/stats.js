@@ -177,3 +177,10 @@ export const fmtHold = (ms) => {
 
 export const fmt = (n, d = 2) =>
   n == null || !isFinite(n) ? '—' : Number(n).toLocaleString('ru-RU', { maximumFractionDigits: d, minimumFractionDigits: d })
+
+// Порядок сделок: по дню открытия, а внутри дня — в порядке создания
+// (время у сделок бывает «полдень», поэтому по самому времени внутри дня не сортируем)
+const dayKey = (ms) => { const d = new Date(ms); return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate() }
+export const byOpened = (a, b) =>
+  dayKey(a.openedAt) - dayKey(b.openedAt) || (a.createdAt || 0) - (b.createdAt || 0) || (a.openedAt - b.openedAt)
+export const byOpenedDesc = (a, b) => byOpened(b, a)

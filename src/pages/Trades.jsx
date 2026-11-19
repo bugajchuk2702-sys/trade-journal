@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, addTrade, updateTrade, removeTrade, exportJson, importJson } from '../db.js'
-import { calcTrade, fmt, hasResult, resOf, toNum } from '../stats.js'
+import { byOpenedDesc, calcTrade, fmt, hasResult, resOf, toNum } from '../stats.js'
 import { SymbolInput, SymbolIcon } from '../components/Symbols.jsx'
 import ShotCard from '../components/ShotCard.jsx'
 import NotesCard from '../components/NotesCard.jsx'
@@ -263,7 +263,7 @@ export default function Trades({ params = {}, go }) {
     })
   }, [params.tradeId])
 
-  const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).reverse().sortBy('openedAt'), [], [])
+  const trades = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray().then((a) => a.sort(byOpenedDesc)), [], [])
 
   const [from, to] = mode === 'all' ? [null, null] : periodRange(mode, anchor)
   const inPeriod = useMemo(
