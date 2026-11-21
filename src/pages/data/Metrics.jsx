@@ -133,8 +133,10 @@ export default function Metrics() {
           {overview.map(([label, value, cls, sub]) => (
             <div className="m" key={label}>
               <div className="l">{label}</div>
-              <div className={'v ' + cls}><AnimNum value={value} /></div>
-              {sub && <div className="m-sub"><TradeCounts compact short win={sub.win} loss={sub.loss} be={sub.be} /></div>}
+              <div className={'v ' + cls}>
+                <AnimNum value={value} />
+                {sub && <span className="v-sub"><span className="tt-sep">|</span><TradeCounts compact short win={sub.win} loss={sub.loss} be={sub.be} /></span>}
+              </div>
             </div>
           ))}
         </div>
