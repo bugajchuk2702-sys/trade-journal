@@ -3,7 +3,7 @@ import { requestPersistentStorage } from './db.js'
 import Home from './pages/Home.jsx'
 import WeeklyPlan from './pages/WeeklyPlan.jsx'
 import Trades from './pages/Trades.jsx'
-import Mpa from './pages/Mpa.jsx'
+import Performance from './pages/Performance.jsx'
 import Notes from './pages/Notes.jsx'
 import Data from './pages/Data.jsx'
 import { initCloud, useCloud } from './cloud.js'
@@ -12,7 +12,7 @@ import { CLOUD_LABEL, CLOUD_DOT } from './pages/data/Cloud.jsx'
 const TABS = [
   { id: 'plan', label: 'Weekly Plan', Page: WeeklyPlan },
   { id: 'trades', label: 'Trades', Page: Trades },
-  { id: 'mpa', label: 'MPA', Page: Mpa },
+  { id: 'performance', label: 'Performance', Page: Performance },
   { id: 'notes', label: 'Notes', Page: Notes },
   { id: 'data', label: 'Data', Page: Data },
 ]
