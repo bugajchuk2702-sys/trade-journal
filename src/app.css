@@ -1181,6 +1181,5 @@ tr.perf-row { cursor: pointer; }
 .perf-cols .perf-plans, .perf-cols .tablewrap { margin-bottom: 12px; }
 .perf-cols .perf-more { margin-top: auto; }
 .recap-metrics .v .v-sub { display: inline-flex; align-items: baseline; gap: 8px; margin-left: 8px; font-weight: 600; white-space: nowrap; }
-.recap-metrics .v .v-sub .tt-row { font-size: 15px; flex-wrap: nowrap; }
-:root[data-style='ow'] .recap-metrics .v .v-sub .tt-row { font-size: 17px; }
-.recap-metrics .v .v-sub > .tt-sep { font-size: 15px; font-weight: 400; font-style: normal; }
+.recap-metrics .v .v-sub, .recap-metrics .v .v-sub .tt-row, :root[data-style='ow'] .recap-metrics .v .v-sub .tt-row { font-size: inherit; font-weight: inherit; font-style: inherit; flex-wrap: nowrap; }
+.recap-metrics .v .v-sub > .tt-sep { font-weight: 400; font-style: normal; }
