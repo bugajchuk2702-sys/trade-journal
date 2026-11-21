@@ -1315,3 +1315,6 @@ tr.perf-row { cursor: pointer; }
 /* День только с безубыточными сделками */
 .cal-day.be { background: var(--orange-soft); border-color: color-mix(in srgb, var(--orange-fill) 40%, transparent); }
 .cal-day.be .cal-v { color: var(--orange); }
+/* В Hero «BE» — жёлто-оранжевый (--be), как в плашках сделок */
+:root[data-style='ow'] .cal-day.be { background: var(--be-soft); border-color: color-mix(in srgb, var(--be) 45%, transparent); }
+:root[data-style='ow'] .cal-day.be .cal-v { color: var(--be); }
