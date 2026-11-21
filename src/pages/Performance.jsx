@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { db, uuid } from '../db.js'
+import { db, uuid, addNote } from '../db.js'
 import { byOpenedDesc, calcTrade, fmt, hasResult, isMissed, summarize } from '../stats.js'
 import TradeCounts from '../components/TradeCounts.jsx'
 import RichEditor, { cleanHtml } from '../components/RichEditor.jsx'
@@ -165,7 +165,7 @@ function PrevRecs({ mode, prevFrom }) {
 }
 
 // Ошибки и заметки периода: хранятся в базе одним списком, к периоду относятся по дате записи
-function Log({ from, to }) {
+function Log({ from, to, go }) {
   const row = useLiveQuery(() => db.meta.get(LOG_KEY), [], undefined)
   const all = row?.value || []
   const [drafts, setDrafts] = useState({ error: '', note: '' })
@@ -179,6 +179,19 @@ function Log({ from, to }) {
     if (!text) return
     save([...all, { id: uuid(), kind, text, at: stamp() }])
     setDrafts({ ...drafts, [kind]: '' })
+  }
+  // Заметка из списка открывается в разделе Notes: берём связанную, иначе находим по названию или создаём
+  const openNote = async (x) => {
+    let id = x.noteId
+    const cur = id ? await db.notes.get(id) : null
+    if (!cur || cur.deleted) {
+      const title = x.text.trim()
+      const found = (await db.notes.where('deleted').equals(0).toArray()).find((n) => (n.title || '').trim().toLowerCase() === title.toLowerCase())
+      id = found ? found.id : (await addNote({ title })).id
+      const fresh = (await db.meta.get(LOG_KEY))?.value || []
+      await save(fresh.map((y) => (y.id === x.id ? { ...y, noteId: id } : y)))
+    }
+    go?.('notes', { noteId: id })
   }
   const kinds = [['error', 'Ошибки', 'Новая ошибка…', 'Добавить ошибку'], ['note', 'Заметки', 'Новая заметка…', 'Добавить заметку']]
   return (
@@ -195,7 +208,9 @@ function Log({ from, to }) {
                 {items.map((x) => (
                   <li key={x.id}>
                     <span className="perf-date">{ago(x.at)}</span>
-                    <span className="perf-text">{x.text}</span>
+                    {kind === 'note'
+                      ? <button type="button" className="perf-text perf-link" title="Открыть в Notes" onClick={() => openNote(x)}>{x.text}</button>
+                      : <span className="perf-text">{x.text}</span>}
                     <button type="button" className="pdel" aria-label="Удалить" title="Удалить" onClick={() => save(all.filter((y) => y.id !== x.id))}>✕</button>
                   </li>
                 ))}
@@ -388,7 +403,7 @@ export default function Performance({ go }) {
 
       <div className={NOTE_MODES.has(mode) ? 'perf-bottom' : undefined}>
         {NOTE_MODES.has(mode) && <PeriodNotes mode={mode} from={from} />}
-        <Log from={from} to={to} />
+        <Log from={from} to={to} go={go} />
       </div>
     </>
   )
