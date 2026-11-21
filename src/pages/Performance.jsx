@@ -7,7 +7,7 @@ import RichEditor, { cleanHtml } from '../components/RichEditor.jsx'
 import Lightbox from '../components/Lightbox.jsx'
 import { iso, weekLabel } from '../week.js'
 import { labelOf, planInRange, rangeOf, shift } from '../period.js'
-import { SymbolIcon } from '../components/Symbols.jsx'
+import { SymbolIcon, SymbolInput } from '../components/Symbols.jsx'
 import DateInput from '../components/DateInput.jsx'
 import AnimNum from '../AnimNum.jsx'
 import { ResultPill } from './Trades.jsx'
@@ -32,25 +32,82 @@ function More({ total, open, onToggle }) {
   )
 }
 
-// Рекап по дням недели: у каждого дня свой текст со скриншотами, хранится в базе по дате
+// Рекап по дням недели: у каждого дня «Общее» и вкладки по парам, в каждой свой текст со скриншотами.
+// Хранится в базе по дате: { html — «Общее», pairs: { 'EURUSD': html } }
 const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница']
+const hasContent = (h) => !!h && (/<img/i.test(h) || h.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim() !== '')
+
+function RecapDay({ day, planSyms, value, today }) {
+  const [tab, setTab] = useState('') // '' — «Общее», иначе название пары
+  const [adding, setAdding] = useState(false)
+  const [sym, setSym] = useState('')
+  const pairs = value.pairs || {}
+  const extra = Object.keys(pairs).filter((x) => !planSyms.includes(x))
+  const syms = [...planSyms, ...extra]
+  const key = 'recap:' + day.date
+  // Всегда читаем свежую запись, чтобы правки разных вкладок не затирали друг друга
+  const patch = async (fn) => db.meta.put({ key, value: fn((await db.meta.get(key))?.value || {}) })
+  const cur = syms.includes(tab) ? tab : ''
+  const html = cur ? pairs[cur] || '' : value.html || ''
+  const save = (h) => patch((c) => (cur ? { ...c, pairs: { ...(c.pairs || {}), [cur]: h } } : { ...c, html: h }))
+  const addPair = (e) => {
+    e?.preventDefault()
+    const v = sym.trim().toUpperCase()
+    if (!v) return
+    if (!syms.includes(v)) patch((c) => ({ ...c, pairs: { ...(c.pairs || {}), [v]: '' } }))
+    setTab(v); setSym(''); setAdding(false)
+  }
+  const removePair = () => {
+    if (hasContent(html) && !confirm('Удалить пару ' + cur + ' и её заметки за этот день?')) return
+    patch((c) => { const pr = { ...(c.pairs || {}) }; delete pr[cur]; return { ...c, pairs: pr } })
+    setTab('')
+  }
+  return (
+    <div className={'card recap-day' + (today ? ' today' : '')}>
+      <h3>{day.name} · {day.date}</h3>
+      <div className="recap-tabs">
+        <button type="button" className={'chip' + (cur === '' ? ' active' : '')} onClick={() => setTab('')}>
+          Общее{hasContent(value.html) && cur !== '' && <i className="rc-dot" />}
+        </button>
+        {syms.map((x) => (
+          <button type="button" key={x} className={'chip' + (cur === x ? ' active' : '')} onClick={() => setTab(x)}>
+            <SymbolIcon symbol={x} size={16} />{x}{hasContent(pairs[x]) && cur !== x && <i className="rc-dot" />}
+          </button>
+        ))}
+        {!adding && <button type="button" className="chip add" onClick={() => setAdding(true)}>+ Пара</button>}
+      </div>
+      {adding && (
+        <form className="addrow recap-add" onSubmit={addPair}>
+          <SymbolInput autoFocus style={{ flex: 1 }} value={sym} onChange={setSym} placeholder="Выбери инструмент" />
+          <button type="submit">Добавить</button>
+          <button type="button" className="ghost" onClick={() => { setAdding(false); setSym('') }}>Отмена</button>
+        </form>
+      )}
+      <RichEditor
+        key={key + '|' + cur}
+        value={html}
+        placeholder={cur ? `Заметки по ${cur}… вставь скриншот прямо в текст.` : 'Заметки за день… вставь скриншот прямо в текст.'}
+        onChange={save}
+      />
+      {cur && extra.includes(cur) && <button type="button" className="ghost small recap-del" onClick={removePair}>Убрать пару {cur}</button>}
+    </div>
+  )
+}
+
 function Recap({ from }) {
   const rows = useLiveQuery(() => db.meta.where('key').startsWith('recap:').toArray(), [], [])
-  const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value?.html || '']))
+  const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value || {}]))
+  const weekIso = iso(from)
+  // Пары недели — из планов этой недели
+  const plans = useLiveQuery(() => db.plans.where('weekStart').equals(weekIso).and((p) => !p.deleted).toArray(), [weekIso], [])
+  const planSyms = [...new Set(plans.map((p) => (p.symbol || '').trim()).filter(Boolean))]
   const today = iso(new Date())
   const days = DAYS.map((name, i) => { const d = new Date(from); d.setDate(from.getDate() + i); return { name, date: iso(d) } })
   return (
     <section className="recap">
       <h2 className="section-title">Рекап</h2>
       {days.map((d) => (
-        <div className={'card recap-day' + (d.date === today ? ' today' : '')} key={d.date}>
-          <h3>{d.name} · {d.date}</h3>
-          <RichEditor
-            value={byKey['recap:' + d.date] || ''}
-            placeholder="Заметки за день… вставь скриншот прямо в текст."
-            onChange={(html) => db.meta.put({ key: 'recap:' + d.date, value: { html } })}
-          />
-        </div>
+        <RecapDay key={d.date} day={d} planSyms={planSyms} value={byKey['recap:' + d.date] || {}} today={d.date === today} />
       ))}
     </section>
   )

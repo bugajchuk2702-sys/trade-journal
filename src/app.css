@@ -1318,3 +1318,10 @@ tr.perf-row { cursor: pointer; }
 /* В Hero «BE» — жёлто-оранжевый (--be), как в плашках сделок */
 :root[data-style='ow'] .cal-day.be { background: var(--be-soft); border-color: color-mix(in srgb, var(--be) 45%, transparent); }
 :root[data-style='ow'] .cal-day.be .cal-v { color: var(--be); }
+
+/* Рекап: вкладки пар внутри дня */
+.recap-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.recap-tabs .chip { gap: 7px; padding: 6px 13px; font-size: 13.5px; }
+.rc-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
+.recap-add { margin-bottom: 10px; }
+.recap-del { margin-top: 10px; }
