@@ -22,8 +22,8 @@ const FIELDS = [
   'w1Img', 'w1Text', 'd1Img', 'd1Text', 'h4Img', 'h4Text',
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
-  'recapD1Img', // скриншот D1 в блоке Weekly Recap
-  'recapH4Img', // скриншот H4 там же
+  'recapD1Img', // старый блок Weekly Recap (убран с экрана, рекап теперь в Performance); данные остаются в базе
+  'recapH4Img',
   'weekNotes', // «Заметки недели»: текст
   'weekNotesImgs', // скриншоты к заметкам недели (вставляются скрыто, Ctrl+V)
 ]
@@ -232,12 +232,6 @@ function PlanEditor({ plan, onDelete, go }) {
           ))}
         </div>
       )}
-
-      <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Recap</h3>
-      <div className="row2">
-        <ShotCard title="D1" {...shot('recapD1')} />
-        <ShotCard title="H4" {...shot('recapH4')} />
-      </div>
 
       <h3 className="section-title" style={{ marginTop: 22 }}>Weekly Notes</h3>
       <div className="notes-recap">
