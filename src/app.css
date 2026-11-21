@@ -1325,3 +1325,5 @@ tr.perf-row { cursor: pointer; }
 .rc-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
 .recap-add { margin-bottom: 10px; }
 .recap-del { margin-top: 10px; }
+
+.recap-empty { padding: 22px 0; }

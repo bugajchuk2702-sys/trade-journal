@@ -38,7 +38,7 @@ const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Чет�
 const hasContent = (h) => !!h && (/<img/i.test(h) || h.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim() !== '')
 
 function RecapDay({ day, planSyms, value, today }) {
-  const [tab, setTab] = useState('') // '' — «Общее», иначе название пары
+  const [tab, setTab] = useState(null) // название пары; '' — старые заметки дня без пары
   const [adding, setAdding] = useState(false)
   const [sym, setSym] = useState('')
   const pairs = value.pairs || {}
@@ -47,8 +47,10 @@ function RecapDay({ day, planSyms, value, today }) {
   const key = 'recap:' + day.date
   // Всегда читаем свежую запись, чтобы правки разных вкладок не затирали друг друга
   const patch = async (fn) => db.meta.put({ key, value: fn((await db.meta.get(key))?.value || {}) })
-  const cur = syms.includes(tab) ? tab : ''
-  const html = cur ? pairs[cur] || '' : value.html || ''
+  // «Общее» (заметки без пары) осталось только у дней, где такие заметки уже были написаны
+  const legacy = hasContent(value.html)
+  const cur = syms.includes(tab) || (tab === '' && legacy) ? tab : syms[0] ?? (legacy ? '' : null)
+  const html = cur ? pairs[cur] || '' : cur === '' ? value.html || '' : ''
   const save = (h) => patch((c) => (cur ? { ...c, pairs: { ...(c.pairs || {}), [cur]: h } } : { ...c, html: h }))
   const addPair = (e) => {
     e?.preventDefault()
@@ -66,9 +68,9 @@ function RecapDay({ day, planSyms, value, today }) {
     <div className={'card recap-day' + (today ? ' today' : '')}>
       <h3>{day.name} · {day.date}</h3>
       <div className="recap-tabs">
-        <button type="button" className={'chip' + (cur === '' ? ' active' : '')} onClick={() => setTab('')}>
-          Общее{hasContent(value.html) && cur !== '' && <i className="rc-dot" />}
-        </button>
+        {legacy && (
+          <button type="button" className={'chip' + (cur === '' ? ' active' : '')} onClick={() => setTab('')} title="Заметки дня, написанные до появления пар">Общее</button>
+        )}
         {syms.map((x) => (
           <button type="button" key={x} className={'chip' + (cur === x ? ' active' : '')} onClick={() => setTab(x)}>
             <SymbolIcon symbol={x} size={16} />{x}{hasContent(pairs[x]) && cur !== x && <i className="rc-dot" />}
@@ -83,12 +85,16 @@ function RecapDay({ day, planSyms, value, today }) {
           <button type="button" className="ghost" onClick={() => { setAdding(false); setSym('') }}>Отмена</button>
         </form>
       )}
-      <RichEditor
-        key={key + '|' + cur}
-        value={html}
-        placeholder={cur ? `Заметки по ${cur}… вставь скриншот прямо в текст.` : 'Заметки за день… вставь скриншот прямо в текст.'}
-        onChange={save}
-      />
+      {cur === null ? (
+        <div className="empty recap-empty">Добавь пару, чтобы вести по ней рекап дня</div>
+      ) : (
+        <RichEditor
+          key={key + '|' + cur}
+          value={html}
+          placeholder={cur ? `Заметки по ${cur}… вставь скриншот прямо в текст.` : 'Заметки за день… вставь скриншот прямо в текст.'}
+          onChange={save}
+        />
+      )}
       {cur && extra.includes(cur) && <button type="button" className="ghost small recap-del" onClick={removePair}>Убрать пару {cur}</button>}
     </div>
   )
