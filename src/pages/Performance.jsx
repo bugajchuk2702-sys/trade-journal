@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, uuid } from '../db.js'
 import { byOpenedDesc, calcTrade, fmt, hasResult, isMissed, summarize } from '../stats.js'
@@ -17,6 +17,7 @@ import { sign, signed } from './data/ui.jsx'
 // Performance: итоги за период — сводка, планы, ошибки/заметки и сделки
 const MODES = [['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 'Квартал'], ['custom', 'Свой']]
 const LOG_KEY = 'perfLog'
+const LIMIT = 5 // сколько планов и сделок видно сразу, остальные сворачиваются
 
 const dayStart = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
 const fromIso = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d) }
@@ -64,6 +65,16 @@ function labelOf(mode, from, to) {
 }
 
 const ago = (ms) => new Date(ms).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+
+// Кнопка «Показать ещё / Свернуть» под длинным списком
+function More({ total, open, onToggle }) {
+  if (total <= LIMIT) return null
+  return (
+    <button type="button" className="ghost small perf-more" aria-expanded={open} onClick={onToggle}>
+      {open ? 'Свернуть' : `Показать ещё ${total - LIMIT}`}
+    </button>
+  )
+}
 
 // Рекап по дням недели: у каждого дня свой текст со скриншотами, хранится в базе по дате
 const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница']
@@ -194,6 +205,8 @@ export default function Performance({ go }) {
   const [custom, setCustom] = useState(() => { const t = new Date(); const a = new Date(t); a.setDate(t.getDate() - 29); return { from: iso(a), to: iso(t) } })
   const [acc, setAcc] = useState('')
   const { list } = useAccounts()
+  const [openPlans, setOpenPlans] = useState(false)
+  const [openTrades, setOpenTrades] = useState(false)
 
   const all = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray().then((a) => a.sort(byOpenedDesc)), [], [])
   const plans = useLiveQuery(() => db.plans.filter((p) => !p.deleted).toArray(), [], [])
@@ -201,6 +214,7 @@ export default function Performance({ go }) {
   const [from, to] = rangeOf(mode, anchor, custom)
   const [curFrom] = rangeOf(mode, new Date(), custom)
   const isCurrent = from.getTime() === curFrom.getTime()
+  useEffect(() => { setOpenPlans(false); setOpenTrades(false) }, [mode, acc, from.getTime(), to.getTime()])
 
   const names = useMemo(() => {
     const set = new Set(list.filter((a) => !a.archived).map((a) => a.name))
@@ -293,7 +307,7 @@ export default function Performance({ go }) {
         <h2 style={{ marginTop: 0 }}>Планы за период</h2>
         {periodPlans.length === 0 ? <div className="subtle">Планов за этот период нет</div> : (
           <ul className="perf-plans">
-            {periodPlans.map((p) => (
+            {(openPlans ? periodPlans : periodPlans.slice(0, LIMIT)).map((p) => (
               <li key={p.id}>
                 <button type="button" className="perf-plan" onClick={() => go('plan', { weekStart: p.weekStart, planId: p.id })}>
                   <span className="perf-plan-top">
@@ -317,6 +331,7 @@ export default function Performance({ go }) {
             ))}
           </ul>
         )}
+        <More total={periodPlans.length} open={openPlans} onToggle={() => setOpenPlans((o) => !o)} />
       </section>
       <section className="card">
         <h2 style={{ marginTop: 0 }}>Сделки за период</h2>
@@ -327,7 +342,7 @@ export default function Performance({ go }) {
                 <tr><th className="left">Дата</th><th className="left">Инструмент</th><th className="left">Сторона</th><th className="left">Result</th><th>Net</th><th>R</th></tr>
               </thead>
               <tbody>
-                {inPeriod.map((t) => {
+                {(openTrades ? inPeriod : inPeriod.slice(0, LIMIT)).map((t) => {
                   const c = calcTrade(t)
                   return (
                     <tr key={t.id} className={'perf-row' + (c.res === 'missed' ? ' is-missed' : '')} onClick={() => go('trades', { tradeId: t.id })}>
@@ -344,6 +359,7 @@ export default function Performance({ go }) {
             </table>
           </div>
         )}
+        <More total={inPeriod.length} open={openTrades} onToggle={() => setOpenTrades((o) => !o)} />
       </section>
       </div>
 

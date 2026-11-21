@@ -1174,3 +1174,4 @@ tr.perf-row { cursor: pointer; }
 .recap-fields { display: flex; flex-direction: column; gap: 18px; }
 .perf-bottom .perf-add { flex-direction: column; align-items: stretch; }
 @media (max-width: 1000px) { .perf-bottom { grid-template-columns: 1fr; } }
+.perf-more { margin-top: 10px; width: 100%; }
