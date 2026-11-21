@@ -44,7 +44,7 @@ export const emptyForm = () => ({
 })
 
 // Итог сделки: Win / Loss / BE, пока не закрыта — Open (как в плане недели)
-function ResultPill({ c }) {
+export function ResultPill({ c }) {
   const res = c.res === 'missed' ? 'missed' : c.closed ? c.res : 'open'
   return <span className={'tpill ' + res}><i />{res === 'open' ? 'Open' : RES_LABEL[res]}</span>
 }

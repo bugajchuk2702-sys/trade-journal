@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db.js'
-import { calcTrade, fmt, isMissed, summarize } from '../../stats.js'
+import { calcTrade, fmt, isMissed } from '../../stats.js'
 import AnimNum from '../../AnimNum.jsx'
 import { PARAMS, STYLE, addOption, clearOption, dropOption, renameOption, useParamOptions } from '../../components/Params.jsx'
 import { useAccounts, bucket } from './accounts.js'
 import { Ring, pct, sign, signed } from './ui.jsx'
+import { overviewOf } from './overview.js'
 
 // Блоки в том же порядке, что и в Notion: две колонки, слева направо
 const pOf = (key) => PARAMS.find((p) => p.key === key)
@@ -111,17 +112,7 @@ export default function Metrics() {
   const trades = useMemo(() => all.filter((t) => !isMissed(t) && (!acc || t.account === acc)), [all, acc])
   const closedN = (arr) => arr.filter((t) => calcTrade(t).closed).length
 
-  const s = useMemo(() => summarize(trades), [trades])
-  const rSum = useMemo(() => trades.map(calcTrade).filter((c) => c.closed && c.r != null).reduce((x, c) => x + c.r, 0), [trades])
-  const overview = [
-    ['Trades', String(s.count), ''],
-    ['Winrate', s.winrate == null ? '—' : pct(s.winrate, 1), ''],
-    ['PnL', s.count ? signed(s.totalPnl, 2) + ' $' : '—', sign(s.totalPnl)],
-    ['Σ R', s.avgR == null ? '—' : signed(rSum, 2), sign(rSum)],
-    ['Avg R', s.avgR == null ? '—' : signed(s.avgR, 2), sign(s.avgR)],
-    ['Profit factor', s.profitFactor == null ? '—' : s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor, 2), ''],
-    ['Max drawdown', s.maxDdPct == null ? '—' : pct(s.maxDdPct, 2), ''],
-  ]
+  const overview = useMemo(() => overviewOf(trades), [trades])
 
   return (
     <>
