@@ -73,7 +73,7 @@ function RecapDay({ day, planSyms, value, today }) {
         )}
         {syms.map((x) => (
           <button type="button" key={x} className={'chip' + (cur === x ? ' active' : '')} onClick={() => setTab(x)}>
-            <SymbolIcon symbol={x} size={16} />{x}{hasContent(pairs[x]) && cur !== x && <i className="rc-dot" />}
+            <SymbolIcon symbol={x} size={12} />{x}{hasContent(pairs[x]) && cur !== x && <i className="rc-dot" />}
           </button>
         ))}
         {!adding && <button type="button" className="chip add" onClick={() => setAdding(true)}>+ Пара</button>}

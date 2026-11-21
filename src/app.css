@@ -1330,3 +1330,12 @@ tr.perf-row { cursor: pointer; }
 .recap-empty { padding: 22px 0; }
 
 .mt-ico { display: inline-flex; align-items: center; flex: none; }
+
+/* Рекап: день крупнее, вкладки пар мелкие */
+.recap-day h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.01em; }
+.recap-day.today h3::after { font-size: 12px; }
+.recap-tabs { gap: 6px; margin-bottom: 10px; }
+.recap-tabs .chip { gap: 5px; padding: 3px 10px; font-size: 12px; line-height: 1.3; }
+.recap-tabs .chip .sico, .recap-tabs .chip .symico { transform: none; }
+:root[data-style='ow'] .recap-day h3 { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.02em; font-size: 28px; }
+:root[data-style='ow'] .recap-tabs .chip { padding: 3px 12px; font-size: 13px; line-height: 1.3; min-height: 0; }
