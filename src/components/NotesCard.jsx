@@ -53,25 +53,27 @@ export default function NotesCard({ title, text, imgs, onText, onAdd, onRemoveAt
     <Wrap className={bare ? undefined : 'card weeknotes'}>
       {busy && <div className="hint" style={{ marginBottom: 8 }}>Добавляю скриншот…</div>}
 
-      <AutoTextarea
-        value={text}
-        onChange={(e) => onText(e.target.value)}
-        onPaste={onPaste}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={onDrop}
-        placeholder={placeholder}
-      />
+      <div className="nc-box">
+        <AutoTextarea
+          value={text}
+          onChange={(e) => onText(e.target.value)}
+          onPaste={onPaste}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={onDrop}
+          placeholder={placeholder}
+        />
 
-      {list.length > 0 && (
-        <div className="gallery-md">
-          {list.map((src, i) => (
-            <div className="g-item" key={i}>
-              <img src={src} alt={`Скриншот ${i + 1}`} onClick={() => setBig(src)} aria-label="Открыть крупно" />
-              <button type="button" className="g-x" title="Убрать скриншот" onClick={() => onRemoveAt(i)}>✕</button>
-            </div>
-          ))}
-        </div>
-      )}
+        {list.length > 0 && (
+          <div className="gallery-md">
+            {list.map((src, i) => (
+              <div className="g-item" key={i}>
+                <img src={src} alt={`Скриншот ${i + 1}`} onClick={() => setBig(src)} aria-label="Открыть крупно" />
+                <button type="button" className="g-x" title="Убрать скриншот" onClick={() => onRemoveAt(i)}>✕</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {big && <Lightbox src={big} onClose={() => setBig(null)} />}
     </Wrap>
