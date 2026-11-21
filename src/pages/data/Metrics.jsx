@@ -5,7 +5,7 @@ import { calcTrade, fmt, isMissed, summarize } from '../../stats.js'
 import AnimNum from '../../AnimNum.jsx'
 import { PARAMS, STYLE, useParamOptions } from '../../components/Params.jsx'
 import { useAccounts, bucket } from './accounts.js'
-import { Ring, money, pct, sign, signed } from './ui.jsx'
+import { Ring, pct, sign, signed } from './ui.jsx'
 
 // Блоки в том же порядке, что и в Notion: две колонки, слева направо
 const pOf = (key) => PARAMS.find((p) => p.key === key)
@@ -92,7 +92,7 @@ export default function Metrics() {
     ['Σ R', s.avgR == null ? '—' : signed(rSum, 2), sign(rSum)],
     ['Avg R', s.avgR == null ? '—' : signed(s.avgR, 2), sign(s.avgR)],
     ['Profit factor', s.profitFactor == null ? '—' : s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor, 2), ''],
-    ['Max drawdown', s.count ? money(s.maxDd, 2) : '—', ''],
+    ['Max drawdown', s.maxDdPct == null ? '—' : pct(s.maxDdPct, 2), ''],
   ]
 
   return (
