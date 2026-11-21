@@ -18,7 +18,7 @@ export function cleanHtml(html) {
         const ok =
           (el.tagName === 'FONT' && n === 'color' && COLOR_RE.test(a.value)) ||
           (el.tagName === 'SPAN' && n === 'style' && /^color:\s*[^;]+;?$/i.test(a.value) && COLOR_RE.test(a.value.replace(/^color:\s*/i, '').replace(/;$/, ''))) ||
-          (el.tagName === 'DIV' && n === 'class' && a.value === 'callout') ||
+          (el.tagName === 'DIV' && n === 'class' && (a.value === 'callout' || a.value === 're-gal')) ||
           (el.tagName === 'IMG' && n === 'src' && /^data:image\/(png|jpeg|jpg|webp|gif);base64,/.test(a.value)) ||
           (el.tagName === 'IMG' && n === 'alt')
         if (!ok) el.removeAttribute(n)
@@ -46,6 +46,8 @@ export default function RichEditor({ value, onChange, placeholder }) {
   const [colors, setColors] = useState(false)
   const [busy, setBusy] = useState(false)
   const fileRef = useRef(null)
+  const wrapRef = useRef(null)
+  const [hov, setHov] = useState(null) // картинка под курсором: показываем на ней кнопку «убрать»
 
   // Подтягиваем значение извне (облако, другой день), пока пользователь не печатает
   useEffect(() => {
@@ -104,14 +106,64 @@ export default function RichEditor({ value, onChange, placeholder }) {
     changed()
   }
 
+  // Скриншоты идут в «галерею»: подряд вставленные картинки встают рядом (по две в ряд), а не друг под другом
+  const isEmptyBlock = (n) => n && n.nodeType === 1 && !n.classList.contains('re-gal') && !n.querySelector('img') && !n.textContent.trim()
+  const placeImage = (url) => {
+    const root = ref.current
+    if (!root) return
+    root.focus()
+    const img = document.createElement('img')
+    img.src = url
+    img.alt = 'Скриншот'
+    // верхний блок редактора, в котором стоит курсор
+    const sel = window.getSelection()
+    let anchor = sel.rangeCount && root.contains(sel.anchorNode) && sel.anchorNode !== root ? sel.anchorNode : null
+    while (anchor && anchor.parentNode !== root) anchor = anchor.parentNode
+    let gal = null
+    if (anchor && anchor.classList?.contains('re-gal')) gal = anchor
+    else if (isEmptyBlock(anchor) && anchor.previousElementSibling?.classList.contains('re-gal')) gal = anchor.previousElementSibling
+    if (!gal) {
+      gal = document.createElement('div')
+      gal.className = 're-gal'
+      if (!anchor) root.appendChild(gal)
+      else if (isEmptyBlock(anchor)) root.insertBefore(gal, anchor)
+      else root.insertBefore(gal, anchor.nextSibling)
+    }
+    gal.appendChild(img)
+    // под галереей всегда есть пустая строка для текста
+    let tail = gal.nextElementSibling
+    if (!isEmptyBlock(tail)) {
+      tail = document.createElement('div')
+      tail.appendChild(document.createElement('br'))
+      root.insertBefore(tail, gal.nextSibling)
+    }
+    const r = document.createRange()
+    r.setStart(tail, 0)
+    r.collapse(true)
+    sel.removeAllRanges()
+    sel.addRange(r)
+  }
+  const removeImage = (img) => {
+    const g = img.parentNode
+    img.remove()
+    if (g?.classList?.contains('re-gal') && !g.querySelector('img')) g.remove()
+    setHov(null)
+    changed()
+  }
+  const onOver = (e) => {
+    if (e.target.tagName !== 'IMG') return
+    const w = wrapRef.current?.getBoundingClientRect()
+    const r = e.target.getBoundingClientRect()
+    if (w) setHov({ img: e.target, top: r.top - w.top + 8, left: r.right - w.left - 36 })
+  }
+
   const insertImages = async (files) => {
     if (!files.length) return
     setBusy(true)
     try {
       for (const f of files) {
         const url = await toDataUrl(f)
-        ref.current?.focus()
-        document.execCommand('insertHTML', false, `<img src="${url}" alt="Скриншот"><div><br></div>`)
+        placeImage(url)
       }
       changed()
     } catch {
@@ -137,7 +189,7 @@ export default function RichEditor({ value, onChange, placeholder }) {
   )
 
   return (
-    <div className="re">
+    <div className="re" ref={wrapRef} onMouseLeave={() => setHov(null)}>
       <div className="re-bar" role="toolbar" aria-label="Форматирование">
         <B title="Жирный" onClick={() => cmd('bold')}><b>B</b></B>
         <B title="Курсив" onClick={() => cmd('italic')}><i>I</i></B>
@@ -174,8 +226,10 @@ export default function RichEditor({ value, onChange, placeholder }) {
         onPaste={onPaste}
         onDrop={onDrop}
         onDragOver={(e) => e.preventDefault()}
+        onMouseOver={onOver}
         onClick={(e) => { if (e.target.tagName === 'IMG') setBig(e.target.src) }}
       />
+      {hov && <button type="button" className="re-imgdel" style={{ top: hov.top, left: hov.left }} title="Убрать скриншот" aria-label="Убрать скриншот" onMouseDown={(e) => e.preventDefault()} onClick={() => removeImage(hov.img)}>✕</button>}
       {big && <Lightbox src={big} onClose={() => setBig(null)} />}
     </div>
   )

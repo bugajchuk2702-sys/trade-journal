@@ -1339,3 +1339,11 @@ tr.perf-row { cursor: pointer; }
 .recap-tabs .chip .sico, .recap-tabs .chip .symico { transform: none; }
 :root[data-style='ow'] .recap-day h3 { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.02em; font-size: 28px; }
 :root[data-style='ow'] .recap-tabs .chip { padding: 3px 12px; font-size: 13px; line-height: 1.3; min-height: 0; }
+
+/* Скриншоты в редакторе: подряд вставленные встают рядом (по две в ряд) */
+.re { position: relative; }
+.re-gal { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin: 10px 0; }
+.re-gal:empty { display: none; }
+.re-gal img { flex: 1 1 0; min-width: calc(50% - 4px); width: auto; max-width: 100%; margin: 0; }
+.re-imgdel { position: absolute; z-index: 5; width: 28px; height: 28px; min-width: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 0; background: rgba(0,0,0,.65); color: #fff; font-size: 13px; line-height: 1; box-shadow: none; clip-path: none; transform: none; cursor: pointer; }
+.re-imgdel:hover { background: var(--red, #e5484d); filter: none; }
