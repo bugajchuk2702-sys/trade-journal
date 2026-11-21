@@ -9,9 +9,9 @@ export function overviewOf(trades) {
   return [
     ['Trades', String(s.count), ''],
     ['Winrate', s.winrate == null ? '—' : pct(s.winrate, 1), ''],
-    ['PnL', s.count ? signed(s.totalPnl, 2) + ' $' : '—', sign(s.totalPnl)],
-    ['Σ R', s.avgR == null ? '—' : signed(rSum, 2), sign(rSum)],
-    ['Avg R', s.avgR == null ? '—' : signed(s.avgR, 2), sign(s.avgR)],
+    ['PnL', s.pctTotal == null ? '—' : signed(s.pctTotal, 2) + '%', sign(s.pctTotal)],
+    ['RR', s.avgR == null ? '—' : signed(rSum, 2), sign(rSum)],
+    ['Avg RR', s.avgR == null ? '—' : signed(s.avgR, 2), sign(s.avgR)],
     ['Profit factor', s.profitFactor == null ? '—' : s.profitFactor === Infinity ? '∞' : fmt(s.profitFactor, 2), ''],
     ['Max drawdown', s.maxDdPct == null ? '—' : pct(s.maxDdPct, 2), ''],
   ]
