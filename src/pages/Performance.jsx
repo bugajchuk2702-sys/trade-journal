@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, uuid } from '../db.js'
-import { byOpenedDesc, calcTrade, fmt, hasResult, isMissed } from '../stats.js'
+import { byOpenedDesc, calcTrade, fmt, hasResult, isMissed, summarize } from '../stats.js'
+import TradeCounts from '../components/TradeCounts.jsx'
 import { iso, weekLabel } from '../week.js'
 import { SymbolIcon } from '../components/Symbols.jsx'
 import DateInput from '../components/DateInput.jsx'
@@ -82,6 +83,7 @@ function Log({ from, to }) {
   return (
     <section className="card">
       <h2 style={{ marginTop: 0 }}>Ошибки и заметки</h2>
+      <div className="perf-logs">
       {kinds.map(([kind, title, ph, btn]) => {
         const items = mine.filter((x) => x.kind === kind)
         return (
@@ -110,6 +112,7 @@ function Log({ from, to }) {
           </div>
         )
       })}
+      </div>
     </section>
   )
 }
@@ -149,7 +152,17 @@ export default function Performance({ go }) {
       .sort((a, b) => (a.weekStart < b.weekStart ? 1 : a.weekStart > b.weekStart ? -1 : (a.createdAt || 0) - (b.createdAt || 0)))
   }, [plans, from.getTime(), to.getTime()]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const closedN = (arr) => arr.filter((t) => calcTrade(t).closed).length
+  // Итоги по каждому плану: его сделки (с учётом выбранного счёта), без привязки к периоду
+  const planStats = useMemo(() => {
+    const out = {}
+    for (const p of periodPlans) {
+      const own = all.filter((t) => t.planId === p.id && (!acc || t.account === acc))
+      const sm = summarize(own)
+      const rs = own.filter((t) => !isMissed(t)).map(calcTrade).filter((c) => c.closed && c.r != null)
+      out[p.id] = { sm, rr: rs.length ? rs.reduce((x, c) => x + c.r, 0) : null }
+    }
+    return out
+  }, [periodPlans, all, acc])
 
   return (
     <>
@@ -202,26 +215,32 @@ export default function Performance({ go }) {
         )}
       </section>
 
-      <div className="perf-cols">
-        <section className="card">
-          <h2 style={{ marginTop: 0 }}>Планы за период</h2>
-          {periodPlans.length === 0 ? <div className="subtle">Планов за этот период нет</div> : (
-            <ul className="perf-plans">
-              {periodPlans.map((p) => (
-                <li key={p.id}>
-                  <button type="button" className="perf-plan" onClick={() => go('plan', { weekStart: p.weekStart, planId: p.id })}>
-                    {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
-                    <span className="perf-plan-name">{p.symbol || 'Общий план'}</span>
-                    <span className="subtle">{weekLabel(p.weekStart).replace(/ \d{4}$/, '')}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-        <Log from={from} to={to} />
-      </div>
-
+      <section className="card">
+        <h2 style={{ marginTop: 0 }}>Планы за период</h2>
+        {periodPlans.length === 0 ? <div className="subtle">Планов за этот период нет</div> : (
+          <ul className="perf-plans">
+            {periodPlans.map((p) => (
+              <li key={p.id}>
+                <button type="button" className="perf-plan" onClick={() => go('plan', { weekStart: p.weekStart, planId: p.id })}>
+                  {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
+                  <span className="perf-plan-name">{p.symbol || 'Общий план'}</span>
+                  <span className="subtle perf-plan-week">{weekLabel(p.weekStart).replace(/ \d{4}$/, '')}</span>
+                  {(() => {
+                    const { sm, rr } = planStats[p.id]
+                    return (
+                      <>
+                        <TradeCounts total={sm.total} win={sm.winCount} loss={sm.lossCount} be={sm.beCount} open={sm.open} missed={sm.missed} />
+                        <span className={'perf-plan-n ' + sign(sm.pctTotal)} title="Net %">{sm.pctTotal == null ? '—' : signed(sm.pctTotal, 2, '%')}</span>
+                        <span className={'perf-plan-n ' + sign(rr)} title="RR">{rr == null ? '—' : signed(rr, 2) + ' RR'}</span>
+                      </>
+                    )
+                  })()}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
       <section className="card">
         <h2 style={{ marginTop: 0 }}>Сделки за период</h2>
         {inPeriod.length === 0 ? <div className="empty">Нет сделок за этот период</div> : (
@@ -250,6 +269,8 @@ export default function Performance({ go }) {
           </div>
         )}
       </section>
+
+      <Log from={from} to={to} />
     </>
   )
 }

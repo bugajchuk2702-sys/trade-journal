@@ -1122,3 +1122,11 @@ tr.is-missed .symcell img, tr.is-missed .symcell svg { filter: grayscale(1); }
 .perf-add { display: flex; gap: 8px; margin-top: 8px; }
 .perf-add input { flex: 1; min-width: 0; }
 tr.perf-row { cursor: pointer; }
+.perf-plan .tt-row { margin: 0; }
+.perf-plan-week { min-width: 130px; text-align: right; }
+.perf-plan-n { min-width: 74px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.perf-plan-n.pos { color: var(--green); } .perf-plan-n.neg { color: var(--red); }
+@media (max-width: 760px) { .perf-plan { flex-wrap: wrap; } }
+.perf-logs { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.perf-logs .perf-log + .perf-log { margin-top: 0; }
+@media (max-width: 900px) { .perf-logs { grid-template-columns: 1fr; gap: 18px; } }
