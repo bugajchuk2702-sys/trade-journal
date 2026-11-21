@@ -1432,13 +1432,11 @@ tr.perf-row { cursor: pointer; }
 :root[data-style='ow'][data-ow-theme='light'] .rdot.be { background: #e59a12; }
 :root[data-style='ow'][data-ow-theme='light'] .tpill.missed { background: rgba(110, 120, 140, 0.16); color: #5e6a80; }
 
-/* Выходные (сб, вс) без сделок: ячейка перечёркнута косой линией из угла в угол */
-.cal-day.rest { background: var(--surface-3); border-style: solid; }
-.cal-day.rest::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(to top left, transparent calc(50% - 0.75px), color-mix(in srgb, var(--text-3) 75%, transparent) calc(50% - 0.75px), color-mix(in srgb, var(--text-3) 75%, transparent) calc(50% + 0.75px), transparent calc(50% + 0.75px));
+/* Выходные (сб, вс) без сделок: мягкая косая штриховка */
+.cal-day.rest {
+  border-style: solid;
+  background-color: var(--surface-3);
+  background-image: repeating-linear-gradient(135deg,
+    color-mix(in srgb, var(--text-3) 26%, transparent) 0 1.5px, transparent 2.5px 9px);
 }
-.cal-day.rest .cal-n { opacity: 0.8; }
-:root[data-style='ow'] .cal-day.rest::after {
-  background: linear-gradient(to top left, transparent calc(50% - 1px), color-mix(in srgb, var(--text-3) 85%, transparent) calc(50% - 1px), color-mix(in srgb, var(--text-3) 85%, transparent) calc(50% + 1px), transparent calc(50% + 1px));
-}
+.cal-day.rest .cal-n { opacity: 0.85; }
