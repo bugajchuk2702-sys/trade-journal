@@ -1183,3 +1183,5 @@ tr.perf-row { cursor: pointer; }
 .recap-metrics .v .v-sub { display: inline-flex; align-items: baseline; gap: 8px; margin-left: 8px; font-weight: 600; white-space: nowrap; }
 .recap-metrics .v .v-sub, .recap-metrics .v .v-sub .tt-row, :root[data-style='ow'] .recap-metrics .v .v-sub .tt-row { font-size: inherit; font-weight: inherit; font-style: inherit; flex-wrap: nowrap; }
 .recap-metrics .v .v-sub > .tt-sep { font-weight: 400; font-style: normal; }
+/* Сводка: первой плитке (Trades + счётчики) больше места, чтобы не прилипала к соседней */
+@media (min-width: 1000px) { .mt-overview { grid-template-columns: 1.8fr repeat(6, minmax(0, 1fr)); column-gap: 24px; } }
