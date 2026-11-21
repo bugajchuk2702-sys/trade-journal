@@ -8,10 +8,12 @@ import { useAccounts, bucket } from './accounts.js'
 import { Ring, pct, sign, signed } from './ui.jsx'
 import TradeCounts from '../../components/TradeCounts.jsx'
 import { overviewOf } from './overview.js'
+import { SymbolIcon } from '../../components/Symbols.jsx'
 
 // Блоки в том же порядке, что и в Notion: две колонки, слева направо
 const pOf = (key) => PARAMS.find((p) => p.key === key)
 const GROUPS = [
+  { id: 'symbol', title: 'Пары', dynamic: true, get: (t) => t.symbol }, // список берётся из самих сделок
   { id: 'pointA', title: 'Point A', def: pOf('pointA'), get: (t) => t.params?.pointA },
   { id: 'pointB', title: 'Point B', def: pOf('pointB'), get: (t) => t.params?.pointB },
   { id: 'style', title: 'Trading Style', def: STYLE, get: (t) => t.style },
@@ -42,7 +44,12 @@ function Group({ g, trades, options }) {
   const by = bucket(trades, g.get)
   let rows
   if (g.fixed) rows = g.fixed.map(([v, label, tone]) => ({ v, label, tone }))
-  else {
+  else if (g.dynamic) {
+    // Пары: только те, что есть в сделках, чаще торгуемые выше
+    rows = [...by.keys()]
+      .map((v) => ({ v, label: v, n: stat(by.get(v)).n, all: by.get(v).length }))
+      .sort((a, b) => b.n - a.n || b.all - a.all || a.label.localeCompare(b.label))
+  } else {
     const known = options.map((v) => ({ v, label: v }))
     const extra = [...by.keys()].filter((v) => !options.includes(v)).map((v) => ({ v, label: v, extra: true }))
     rows = [...known, ...extra]
@@ -75,7 +82,7 @@ function Group({ g, trades, options }) {
           }
           return (
             <li key={r.v} className={'mt-row' + (s.n === 0 ? ' zero' : '')}>
-              <i className={'mt-dot ' + (r.tone || '')} />
+              {g.dynamic ? <span className="mt-ico"><SymbolIcon symbol={r.v} size={18} /></span> : <i className={'mt-dot ' + (r.tone || '')} />}
               <span className="mt-name" title={r.label}>{r.label}{r.extra && <span className="acc-note"> · нет в списке</span>}</span>
               <span className="mt-n">{s.n} {s.n === 1 ? 'Trade' : 'Trades'}</span>
               <span className={'mt-r ' + sign(s.avgR)} title="Средний R">{s.avgR == null ? '' : signed(s.avgR, 2) + ' R'}</span>
