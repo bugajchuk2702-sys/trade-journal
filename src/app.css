@@ -1250,3 +1250,9 @@ tr.perf-row { cursor: pointer; }
 /* Дата недели справа вверху карточки плана (вместо направления сделок) */
 .pcard-date { flex: none; max-width: 46%; text-align: right; font-size: 14px; font-weight: 600; line-height: 1.25; color: var(--text-2); }
 :root[data-style='ow'] .pcard-date { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.03em; font-size: 16px; }
+
+/* Название инструмента всегда видно целиком, дата — мелкая, в две строки */
+.pcard-meta { flex: none; max-width: 100%; }
+.pcard-name { overflow: visible; text-overflow: clip; }
+.pcard-date { flex: 1 1 0; min-width: 0; max-width: none; display: flex; flex-direction: column; align-items: flex-end; font-size: 12px; font-weight: 600; color: var(--text-3); }
+:root[data-style='ow'] .pcard-date { font-size: 12px; letter-spacing: 0.02em; }

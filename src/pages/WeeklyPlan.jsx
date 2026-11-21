@@ -287,7 +287,7 @@ function PlanCard({ plan, st, onOpen }) {
         <span className="pcard-meta">
           <span className="pcard-name">{plan.symbol || 'Общий план'}</span>
         </span>
-        <span className="pcard-date">{weekLabel(plan.weekStart).replace(/ \d{4}$/, '')}</span>
+        <span className="pcard-date">{weekLabel(plan.weekStart).replace(/ \d{4}$/, '').split(' – ').map((d, i) => <span key={i}>{i ? d : d + ' –'}</span>)}</span>
       </div>
       <div className="pcard-badges">
         <span className="pc-badge">
