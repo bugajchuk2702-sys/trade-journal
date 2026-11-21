@@ -275,11 +275,10 @@ const PERIODS = [['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 
 const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
 const NARRATIVE = { worked: ['Отработал', 'profit'], failed: ['Не отработал', 'loss'] }
 
-// Карточка плана в списке: инструмент, даты недели, краткий текст и итоги
+// Карточка плана в списке: инструмент, даты недели, скриншот «План (до)» и итоги
 function PlanCard({ plan, st, onOpen }) {
   const res = RESULT[plan.result]
   const narr = NARRATIVE[plan.narrative]
-  const text = (plan.weekNotes || '').trim() || (plan.updates || []).map((u) => (u.text || '').trim()).find(Boolean) || ''
   return (
     <button type="button" className="plan-card pcard" onClick={onOpen}>
       <div className="pcard-top">
@@ -299,7 +298,9 @@ function PlanCard({ plan, st, onOpen }) {
           <span className={'badge ' + (narr ? narr[1] : '')}>{narr ? narr[0] : 'Не выбран'}</span>
         </span>
       </div>
-      <div className="pcard-text">{text || 'Ещё ничего не написано — открой план и добавь скриншоты и заметки'}</div>
+      {plan.beforeImg
+        ? <div className="pcard-shot"><img src={plan.beforeImg} alt="План (до)" loading="lazy" /></div>
+        : <div className="pcard-text">Скриншот «План (до)» ещё не добавлен — открой план и вставь его</div>}
       <div className="pcard-foot">
         <TradeCounts compact {...(st || {})} />
         <span className="spacer" />
