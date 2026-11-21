@@ -116,7 +116,6 @@ const Bitcoin = () => (
 export const SYMBOLS = [
   { code: 'EUR/USD', icons: ['EU', 'US'] },
   { code: 'GBP/USD', icons: ['GB', 'US'] },
-  { code: 'GER40', icons: ['DE'] },
   { code: 'XAU/USD', icons: ['XAU'] },
   { code: 'BTC', icons: ['BTC'] },
   { code: 'JP225', icons: ['JP'] },
