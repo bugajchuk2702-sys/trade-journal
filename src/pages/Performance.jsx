@@ -3,7 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, uuid } from '../db.js'
 import { byOpenedDesc, calcTrade, fmt, hasResult, isMissed, summarize } from '../stats.js'
 import TradeCounts from '../components/TradeCounts.jsx'
-import RichEditor from '../components/RichEditor.jsx'
+import RichEditor, { cleanHtml } from '../components/RichEditor.jsx'
+import Lightbox from '../components/Lightbox.jsx'
 import { iso, weekLabel } from '../week.js'
 import { SymbolIcon } from '../components/Symbols.jsx'
 import DateInput from '../components/DateInput.jsx'
@@ -65,7 +66,7 @@ function labelOf(mode, from, to) {
 const ago = (ms) => new Date(ms).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
 
 // Рекап по дням недели: у каждого дня свой текст со скриншотами, хранится в базе по дате
-const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
+const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница']
 function Recap({ from }) {
   const rows = useLiveQuery(() => db.meta.where('key').startsWith('recap:').toArray(), [], [])
   const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value?.html || '']))
@@ -84,6 +85,49 @@ function Recap({ from }) {
           />
         </div>
       ))}
+    </section>
+  )
+}
+
+// Итоги периода (неделя / месяц / квартал): общий рекап и рекомендации на следующий период.
+// Рекомендации потом показываются в начале следующего периода.
+const NOTE_MODES = new Set(['week', 'month', 'quarter'])
+const NEXT_LABEL = { week: 'прошлой недели', month: 'прошлого месяца', quarter: 'прошлого квартала' }
+const useHtml = (key) => {
+  const row = useLiveQuery(() => db.meta.get(key), [key], undefined)
+  return [row?.value?.html || '', (html) => db.meta.put({ key, value: { html } })]
+}
+const sumKey = (mode, from) => `recapsum:${mode}:${iso(from)}`
+const recKey = (mode, from) => `recaprec:${mode}:${iso(from)}`
+
+function PeriodNotes({ mode, from }) {
+  const [sum, setSum] = useHtml(sumKey(mode, from))
+  const [rec, setRec] = useHtml(recKey(mode, from))
+  const k = `${mode}:${iso(from)}`
+  return (
+    <section className="card">
+      <div className="recap-field">
+        <div className="perf-log-title">Общий рекап</div>
+        <RichEditor key={'s' + k} value={sum} onChange={setSum} placeholder="Что получилось, что исправить, план на следующий период…" />
+      </div>
+      <div className="recap-field">
+        <div className="perf-log-title">Рекомендации на следующий период</div>
+        <RichEditor key={'r' + k} value={rec} onChange={setRec} placeholder="напр. улучшить входы, не закрывать рано…" />
+      </div>
+    </section>
+  )
+}
+
+// Рекомендации, написанные в прошлом периоде: напоминание в начале нового
+function PrevRecs({ mode, prevFrom }) {
+  const [rec] = useHtml(recKey(mode, prevFrom))
+  const [big, setBig] = useState(null)
+  if (!rec) return null
+  return (
+    <section className="card prev-recs">
+      <h2 style={{ marginTop: 0 }}>Рекомендации {NEXT_LABEL[mode]}</h2>
+      <div className="re-body re-read" onClick={(e) => { if (e.target.tagName === 'IMG') setBig(e.target.src) }} dangerouslySetInnerHTML={{ __html: cleanHtml(rec) }} />
+      {big && <Lightbox src={big} onClose={() => setBig(null)} />}
     </section>
   )
 }
@@ -240,6 +284,8 @@ export default function Performance({ go }) {
         )}
       </section>
 
+      {NOTE_MODES.has(mode) && <PrevRecs mode={mode} prevFrom={rangeOf(mode, shift(mode, anchor, -1), custom)[0]} />}
+
       <div className="perf-cols">
       <section className="card">
         <h2 style={{ marginTop: 0 }}>Планы за период</h2>
@@ -302,6 +348,8 @@ export default function Performance({ go }) {
       {mode === 'week' && <Recap from={from} />}
 
       <Log from={from} to={to} />
+
+      {NOTE_MODES.has(mode) && <PeriodNotes mode={mode} from={from} />}
     </>
   )
 }
