@@ -4,6 +4,7 @@ import { db } from '../db.js'
 import { toNum, summarize } from '../stats.js'
 import { weekLabel } from '../week.js'
 import { SymbolIcon, norm } from './Symbols.jsx'
+import { FIX } from '../arrows.js'
 
 // Параметры сделки: у каждого свой список вариантов. Список можно пополнять и чистить прямо в выпадашке,
 // он хранится в базе (meta) и общий для всех сделок.
@@ -12,7 +13,7 @@ export const PARAMS = [
   { key: 'pointB', label: 'Point B', defaults: ['0.5 DR D1', 'Fractal D1', 'FVG D1', '0.5 W1'] },
   { key: 'positionType', label: 'Position Type', defaults: ['Reversal', 'Continuation'] },
   { key: 'priceDelivery', label: 'Price Delivery', defaults: ['1st POI', 'OF', 'SOF'] },
-  { key: 'entryModel', label: 'Entry Model', defaults: ['DR H4 -> SNR H4', 'DR H4 -> SHIFT H4', 'SNR H4', 'SHIFT H4'] },
+  { key: 'entryModel', label: 'Entry Model', defaults: ['DR H4 → SNR H4', 'DR H4 → SHIFT H4', 'SNR H4', 'SHIFT H4'] },
   { key: 'entryTf', label: 'Entry TF', defaults: ['D1', 'H4'] },
 ]
 
@@ -25,6 +26,54 @@ export function useParamOptions() {
   const get = (p) => saved[p.key] || p.defaults
   const save = (key, list) => db.meta.put({ key: META_KEY, value: { ...saved, [key]: list } })
   return { get, save }
+}
+
+const valOf = (def, t) => (def.key === 'style' ? t.style : t.params?.[def.key])
+const setVal = (def, t, v) => (def.key === 'style' ? { style: v } : { params: { ...(t.params || {}), [def.key]: v } })
+const curList = async (def) => (await db.meta.get(META_KEY))?.value?.[def.key] || def.defaults
+const saveList = async (def, list) => {
+  const row = await db.meta.get(META_KEY)
+  await db.meta.put({ key: META_KEY, value: { ...(row?.value || {}), [def.key]: list } })
+}
+const tradesWith = async (def, v) => (await db.trades.toArray()).filter((t) => valOf(def, t) === v)
+
+// Сколько сделок (включая удалённые в корзину) используют вариант
+export const countOption = async (def, v) => (await tradesWith(def, v)).length
+
+// Переименовать вариант во всех сделках. Если такой вариант уже есть — варианты объединяются.
+export async function renameOption(def, from, to) {
+  const next = FIX((to || '').trim())
+  if (!next || next === from) return false
+  const list = await curList(def)
+  const merge = list.includes(next)
+  const used = await tradesWith(def, from)
+  if (merge && !confirm(`Объединить «${from}» и «${next}»? Сделок, которые станут «${next}»: ${used.length}.`)) return false
+  const out = merge ? list.filter((x) => x !== from) : list.includes(from) ? list.map((x) => (x === from ? next : x)) : [...list, next]
+  await saveList(def, out)
+  const now = Date.now()
+  for (const t of used) await db.trades.update(t.id, { ...setVal(def, t, next), updatedAt: now, synced: 0 })
+  return true
+}
+
+// Убрать вариант из списка. Если он уже стоит в сделках — они сохраняют значение («нет в списке»).
+export async function dropOption(def, v) {
+  const used = await tradesWith(def, v)
+  if (used.length && !confirm(`«${v}» убирается из списка. В ${used.length} сделках значение останется (появится пометка «нет в списке»), его можно будет объединить с другим вариантом. Убрать?`)) return
+  await saveList(def, (await curList(def)).filter((x) => x !== v))
+}
+
+// Стереть значение, которого нет в списке, из всех сделок
+export async function clearOption(def, v) {
+  const used = await tradesWith(def, v)
+  if (!confirm(`Очистить «${v}» в ${used.length} сделках? Поле станет пустым.`)) return
+  const now = Date.now()
+  for (const t of used) await db.trades.update(t.id, { ...setVal(def, t, ''), updatedAt: now, synced: 0 })
+}
+
+export async function addOption(def, v) {
+  const x = FIX((v || '').trim())
+  const list = await curList(def)
+  if (x && !list.includes(x)) await saveList(def, [...list, x])
 }
 
 export function ParamPicker({ label, value, options, onChange, onAdd, onRemove }) {

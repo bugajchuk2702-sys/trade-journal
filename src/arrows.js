@@ -3,7 +3,7 @@
 //  - уже написанные «->» один раз заменяются в сохранённых записях.
 import { db } from './db.js'
 
-const FIX = (s) => s.replace(/<-{1,2}>/g, '↔').replace(/-{1,2}>/g, '→')
+export const FIX = (s) => s.replace(/<-{1,2}>/g, '↔').replace(/-{1,2}>/g, '→')
 
 export function initArrows() {
   document.addEventListener('input', (e) => {
@@ -52,6 +52,25 @@ export async function migrateArrows() {
       if (st.changed) fix.push({ ...n, updatedAt: Date.now(), synced: 0 })
     }
     if (fix.length) await db[t].bulkPut(fix)
+  }
+  try { localStorage.setItem(KEY, '1') } catch { /* ignore */ }
+}
+
+// Списки вариантов параметров (Entry Model и др.): «->» -> «→», дубли склеиваем
+export async function migrateArrowsLists() {
+  const KEY = 'tj-arrows-v2'
+  try { if (localStorage.getItem(KEY)) return } catch { return }
+  const row = await db.meta.get('paramOptions.v2')
+  if (row?.value) {
+    const value = {}
+    let changed = false
+    for (const [k, list] of Object.entries(row.value)) {
+      if (!Array.isArray(list)) { value[k] = list; continue }
+      const next = [...new Set(list.map((x) => (typeof x === 'string' ? FIX(x) : x)))]
+      if (next.length !== list.length || next.some((x, i) => x !== list[i])) changed = true
+      value[k] = next
+    }
+    if (changed) await db.meta.put({ ...row, value })
   }
   try { localStorage.setItem(KEY, '1') } catch { /* ignore */ }
 }

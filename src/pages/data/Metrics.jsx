@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db.js'
 import { calcTrade, fmt, isMissed, summarize } from '../../stats.js'
 import AnimNum from '../../AnimNum.jsx'
-import { PARAMS, STYLE, useParamOptions } from '../../components/Params.jsx'
+import { PARAMS, STYLE, addOption, clearOption, dropOption, renameOption, useParamOptions } from '../../components/Params.jsx'
 import { useAccounts, bucket } from './accounts.js'
 import { Ring, pct, sign, signed } from './ui.jsx'
 
@@ -35,6 +35,8 @@ function stat(arr) {
 }
 
 function Group({ g, trades, options }) {
+  const [edit, setEdit] = useState(false)
+  const [draft, setDraft] = useState('')
   const by = bucket(trades, g.get)
   let rows
   if (g.fixed) rows = g.fixed.map(([v, label, tone]) => ({ v, label, tone }))
@@ -46,10 +48,29 @@ function Group({ g, trades, options }) {
   const unset = trades.filter((t) => { const v = g.get(t); return v == null || v === '' }).length
   return (
     <div className="mt-group">
-      <div className="mt-head"><span className="mt-pill">{g.title}</span></div>
+      <div className="mt-head">
+        <span className="mt-pill">{g.title}</span>
+        {g.def && <button type="button" className="ghost small mt-edit" onClick={() => setEdit((e) => !e)}>{edit ? 'Готово' : 'Править'}</button>}
+      </div>
       <ul className="mt-rows">
         {rows.map((r) => {
           const s = stat(by.get(r.v) || [])
+          if (edit && g.def) {
+            return (
+              <li key={r.v} className="mt-row mt-editing">
+                <input
+                  className="mt-input"
+                  defaultValue={r.v}
+                  aria-label={'Название: ' + r.v}
+                  onBlur={(e) => { if (e.target.value.trim() === r.v) return; renameOption(g.def, r.v, e.target.value).then((ok) => { if (!ok) e.target.value = r.v }) }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') { e.target.value = r.v; e.target.blur() } }}
+                />
+                {r.extra && <span className="acc-note">нет в списке</span>}
+                <span className="mt-n">{(by.get(r.v) || []).length} {(by.get(r.v) || []).length === 1 ? 'Trade' : 'Trades'}</span>
+                <button type="button" className="pdel" title={r.extra ? 'Очистить значение в сделках' : 'Убрать из списка'} aria-label={'Убрать ' + r.v} onClick={() => (r.extra ? clearOption(g.def, r.v) : dropOption(g.def, r.v))}>✕</button>
+              </li>
+            )
+          }
           return (
             <li key={r.v} className={'mt-row' + (s.n === 0 ? ' zero' : '')}>
               <i className={'mt-dot ' + (r.tone || '')} />
@@ -64,6 +85,13 @@ function Group({ g, trades, options }) {
         })}
         {rows.length === 0 && <li className="mt-empty">Вариантов пока нет</li>}
       </ul>
+      {edit && g.def && (
+        <div className="mt-add">
+          <input className="mt-input" value={draft} placeholder="Новый вариант" onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && draft.trim()) { addOption(g.def, draft); setDraft('') } }} />
+          <button type="button" className="small" disabled={!draft.trim()} onClick={() => { addOption(g.def, draft); setDraft('') }}>+</button>
+        </div>
+      )}
+      {edit && <div className="hint" style={{ marginTop: 6 }}>Переименуй вариант — он изменится во всех сделках. Дай существующее название — варианты объединятся.</div>}
       {unset > 0 && <div className="mt-unset">Не указано в {unset} {unset === 1 ? 'сделке' : 'сделках'}</div>}
     </div>
   )

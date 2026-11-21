@@ -1094,3 +1094,11 @@ tr.is-missed .symcell img, tr.is-missed .symcell svg { filter: grayscale(1); }
 .trash-kind { font-size: 12px; color: var(--text-2); min-width: 110px; }
 .trash-name { flex: 1; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 760px) { .trash-row { flex-wrap: wrap; } .trash-name { flex-basis: 100%; order: 3; } }
+
+/* Metrics: правка вариантов параметров */
+.mt-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mt-edit { padding: 3px 10px; font-size: 12px; }
+.mt-row.mt-editing { display: flex; align-items: center; gap: 10px; }
+.mt-input { flex: 1; min-width: 0; padding: 6px 10px; font-size: 14px; }
+.mt-add { display: flex; gap: 8px; margin-top: 8px; }
+.mt-row.mt-editing .pdel { opacity: 1; }
