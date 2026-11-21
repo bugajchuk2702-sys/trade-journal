@@ -31,10 +31,11 @@ function dayResults(trades) {
     if (!c.closed) continue
     const d = new Date(t.closedAt || t.openedAt)
     const k = dayId(d.getFullYear(), d.getMonth(), d.getDate())
-    const e = map.get(k) || { pct: 0, hasPct: false, usd: 0, n: 0 }
+    const e = map.get(k) || { pct: 0, hasPct: false, usd: 0, n: 0, win: 0, loss: 0, be: 0 }
     if (c.netPct != null) { e.pct += c.netPct; e.hasPct = true }
     e.usd += c.pnl || 0
     e.n += 1
+    if (c.res === 'win' || c.res === 'loss' || c.res === 'be') e[c.res] += 1
     map.set(k, e)
   }
   return map
@@ -42,6 +43,14 @@ function dayResults(trades) {
 
 // «1 сделка», «2 сделки», «5 сделок»
 const tradesWord = (n) => `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'сделка' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'сделки' : 'сделок'}`
+// Цвет дня по итогам сделок (BE, который выбрал трейдер, не красит день в минус или плюс):
+// только BE — нейтральный; есть win без loss — зелёный; loss без win — красный; оба — по сумме
+const dayTone = (e) => {
+  if (e.win && !e.loss) return 'win'
+  if (e.loss && !e.win) return 'loss'
+  if (e.win && e.loss) { const v = e.hasPct ? e.pct : e.usd; return v > 0 ? 'win' : v < 0 ? 'loss' : 'be' }
+  return 'be'
+}
 const dayValue = (e) => (e.hasPct ? e.pct : e.usd)
 const dayText = (e) => {
   const v = dayValue(e)
@@ -60,8 +69,7 @@ function PnlCalendar({ days, y, m }) {
   for (let d = 1; d <= count; d++) {
     const id = dayId(y, m, d)
     const e = days.get(id)
-    const v = e ? dayValue(e) : 0
-    const cls = 'cal-day' + (e ? (v > 0 ? ' win' : v < 0 ? ' loss' : ' be') : '') + (id === today ? ' today' : '')
+    const cls = 'cal-day' + (e ? ' ' + dayTone(e) : '') + (id === today ? ' today' : '')
     cells.push(
       <span key={d} className={cls}>
         <span className="cal-top">

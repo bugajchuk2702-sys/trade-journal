@@ -1311,3 +1311,7 @@ tr.perf-row { cursor: pointer; }
 .calendar .cal-cnt { font-size: 12.5px; }
 :root[data-style='ow'] .cal-cnt { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
 @media (max-width: 760px) { .calendar .cal-cnt { font-size: 10px; } }
+
+/* День только с безубыточными сделками */
+.cal-day.be { background: var(--orange-soft); border-color: color-mix(in srgb, var(--orange-fill) 40%, transparent); }
+.cal-day.be .cal-v { color: var(--orange); }
