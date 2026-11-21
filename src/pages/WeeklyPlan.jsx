@@ -295,12 +295,18 @@ function PlanCard({ plan, st, onOpen }) {
           <span className="pcard-kind">{weekLabel(plan.weekStart).replace(/ \d{4}$/, '')}</span>
           <span className="pcard-name">{plan.symbol || 'Общий план'}</span>
         </span>
-        <span className={'badge pcard-status ' + (res ? res[1] : '')}>{res ? res[0] : 'Планирование'}</span>
+        <span className="pc-badge">
+          <span className="pc-cap">Weekly Result</span>
+          <span className={'badge pcard-status ' + (res ? res[1] : '')}>{res ? res[0] : 'Не выбран'}</span>
+        </span>
       </div>
       <div className="pcard-dir">
         {dir}
         <span className="spacer" />
-        {narr && <span className={'badge ' + narr[1]} title="Narrative Result">{narr[0]}</span>}
+        <span className="pc-badge">
+          <span className="pc-cap">Narrative Result</span>
+          <span className={'badge ' + (narr ? narr[1] : '')}>{narr ? narr[0] : 'Не выбран'}</span>
+        </span>
       </div>
       <div className="pcard-text">{text || 'Ещё ничего не написано — открой план и добавь скриншоты и заметки'}</div>
       <div className="pcard-foot">

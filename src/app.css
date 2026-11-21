@@ -1217,3 +1217,6 @@ tr.perf-row { cursor: pointer; }
 .pcard-dir { align-items: center; }
 .pcard-dir .badge { text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
 .pcard-kind { letter-spacing: 0.02em; font-size: 11px; }
+
+.pcard-dir { align-items: flex-end; }
+.pcard-top .pc-badge, .pcard-dir .pc-badge { flex: none; }
