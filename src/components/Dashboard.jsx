@@ -75,6 +75,37 @@ function PnlCalendar({ days, y, m }) {
   )
 }
 
+// Отдельная карточка: календарь результатов за месяц с навигацией и суммой
+function CalendarCard({ trades }) {
+  const [cm, setCm] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() } })
+  const shiftMonth = (k) => setCm(({ y, m }) => { const d = new Date(y, m + k, 1); return { y: d.getFullYear(), m: d.getMonth() } })
+  const days = useMemo(() => dayResults(trades), [trades])
+  const monthTotal = useMemo(() => {
+    let pct = 0, usd = 0, hasPct = false, n = 0
+    for (const [k, e] of days) {
+      if (Math.floor(k / 100) !== cm.y * 100 + cm.m + 1) continue
+      pct += e.pct; usd += e.usd; hasPct = hasPct || e.hasPct; n += e.n
+    }
+    return { n, text: n ? dayText({ hasPct, pct, usd }) : '', cls: sign(hasPct ? pct : usd) }
+  }, [days, cm])
+  const now = new Date()
+  const isThisMonth = cm.y === now.getFullYear() && cm.m === now.getMonth()
+  return (
+    <div className="card calendar">
+      <div className="cal-head">
+        <span className="cal-nav">
+          <button type="button" className="ghost small" onClick={() => shiftMonth(-1)} aria-label="Предыдущий месяц">◀</button>
+          <strong>{MONTHS[cm.m]} {cm.y}</strong>
+          <button type="button" className="ghost small" onClick={() => shiftMonth(1)} aria-label="Следующий месяц">▶</button>
+          {!isThisMonth && <button type="button" className="ghost small" onClick={() => setCm({ y: now.getFullYear(), m: now.getMonth() })}>Сегодня</button>}
+        </span>
+        {monthTotal.n > 0 && <span className={'cal-total ' + monthTotal.cls} title="Итог за месяц">{monthTotal.text}</span>}
+      </div>
+      <PnlCalendar days={days} y={cm.y} m={cm.m} />
+    </div>
+  )
+}
+
 // Слева карточка со всеми метриками, справа кривая капитала.
 // Считается по всем сделкам.
 export default function Dashboard() {
@@ -91,22 +122,6 @@ export default function Dashboard() {
   const [range, setRange] = useState('all') // month | all
   const pc = useMemo(() => pctCurve(trades, range === 'month' ? monthStart : 0), [trades, range, monthStart])
   const last = pc.curve[pc.curve.length - 1].equity
-
-  // Календарь: месяц, который смотрим, и результаты по дням
-  const [view, setView] = useState('curve') // curve | cal
-  const [cm, setCm] = useState(() => { const d = new Date(); return { y: d.getFullYear(), m: d.getMonth() } })
-  const shiftMonth = (k) => setCm(({ y, m }) => { const d = new Date(y, m + k, 1); return { y: d.getFullYear(), m: d.getMonth() } })
-  const days = useMemo(() => dayResults(trades), [trades])
-  const monthTotal = useMemo(() => {
-    let pct = 0, usd = 0, hasPct = false, n = 0
-    for (const [k, e] of days) {
-      if (Math.floor(k / 100) !== cm.y * 100 + cm.m + 1) continue
-      pct += e.pct; usd += e.usd; hasPct = hasPct || e.hasPct; n += e.n
-    }
-    return { n, text: n ? dayText({ hasPct, pct, usd }) : '', cls: sign(hasPct ? pct : usd) }
-  }, [days, cm])
-  const nowD = new Date()
-  const isThisMonth = cm.y === nowD.getFullYear() && cm.m === nowD.getMonth()
   const tone = last < 0 ? 'var(--red-fill)' : 'var(--green-fill)'
 
   const hold = fmtHold
@@ -173,29 +188,11 @@ export default function Dashboard() {
 
         <div className="card curve" style={{ '--tone': tone }}>
           <div className="curve-head">
-            {view === 'cal' ? (
-              <span className="cal-nav">
-                <button type="button" className="ghost small" onClick={() => shiftMonth(-1)} aria-label="Предыдущий месяц">◀</button>
-                <strong>{MONTHS[cm.m]} {cm.y}</strong>
-                <button type="button" className="ghost small" onClick={() => shiftMonth(1)} aria-label="Следующий месяц">▶</button>
-                {!isThisMonth && <button type="button" className="ghost small" onClick={() => setCm({ y: nowD.getFullYear(), m: nowD.getMonth() })}>Сегодня</button>}
-                {monthTotal.n > 0 && <span className={'cal-total ' + monthTotal.cls}>{monthTotal.text}</span>}
-              </span>
-            ) : (
-              <>
-                <span className="curve-title">Рост счёта, %</span>
-                <RangeToggle value={range} onChange={setRange} />
-              </>
-            )}
-            <div className="chips view-toggle">
-              <button type="button" className={'chip' + (view === 'curve' ? ' active' : '')} onClick={() => setView('curve')}>Кривая</button>
-              <button type="button" className={'chip' + (view === 'cal' ? ' active' : '')} onClick={() => setView('cal')}>Календарь</button>
-            </div>
+            <span className="curve-title">Рост счёта, %</span>
+            <RangeToggle value={range} onChange={setRange} />
           </div>
           <div className="curve-plot">
-            {view === 'cal' ? (
-              <PnlCalendar days={days} y={cm.y} m={cm.m} />
-            ) : pc.count === 0 ? (
+            {pc.count === 0 ? (
               <div className="empty">{range === 'month' ? 'В этом месяце закрытых сделок пока нет' : 'Кривая появится после первой закрытой сделки'}</div>
             ) : pc.withPct === 0 ? (
               <div className="empty">Выбери счёт с размером в сделках — тогда кривая покажет проценты</div>
@@ -226,6 +223,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <h3 className="section-title">Календарь результатов</h3>
+      <CalendarCard trades={trades} />
     </section>
   )
 }

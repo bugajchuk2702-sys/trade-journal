@@ -1292,3 +1292,15 @@ tr.perf-row { cursor: pointer; }
 :root[data-style='ow'] .cal-nav strong { font-size: 19px; text-transform: uppercase; }
 :root[data-style='ow'] .cal-total { font-size: 18px; }
 :root[data-style='ow'] .cal-n { font-size: 12.5px; }
+
+/* Календарь — отдельная карточка на всю ширину под метриками и кривой */
+.calendar { padding: 16px 18px 18px; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; }
+.calendar .cal { height: auto; padding: 0; grid-template-rows: auto repeat(var(--rows), minmax(60px, 1fr)); gap: 8px; }
+.calendar .cal-wd { font-size: 13px; }
+.calendar .cal-day { padding: 8px 10px; }
+.calendar .cal-n { font-size: 13px; }
+.calendar .cal-v { font-size: 15px; }
+:root[data-style='ow'] .calendar .cal-v { font-size: 18px; }
+:root[data-style='ow'] .calendar .cal-n { font-size: 14px; }
+@media (max-width: 760px) { .calendar .cal { gap: 4px; grid-template-rows: auto repeat(var(--rows), minmax(54px, 1fr)); } .calendar .cal-v { font-size: 11px; } }
