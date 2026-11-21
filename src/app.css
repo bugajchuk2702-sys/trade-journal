@@ -1104,11 +1104,11 @@ tr.is-missed .symcell img, tr.is-missed .symcell svg { filter: grayscale(1); }
 .mt-row.mt-editing .pdel { opacity: 1; }
 
 /* Performance */
-.perf-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.perf-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-bottom: 16px; }
 .perf-cols > .card { margin: 0; min-width: 0; }
 @media (max-width: 900px) { .perf-cols { grid-template-columns: 1fr; } }
 .perf-plans, .perf-items { list-style: none; margin: 0; padding: 0; }
-.perf-plan { border-radius: 0; display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 0; background: transparent; border: 0; border-top: 1px solid var(--line, rgba(128,128,128,.2)); text-align: left; box-shadow: none; clip-path: none; color: inherit; transform: none; font: inherit; font-weight: 500; }
+.perf-plan { border-radius: 0; display: flex; flex-direction: column; align-items: stretch; gap: 4px; width: 100%; padding: 9px 0; background: transparent; border: 0; border-top: 1px solid var(--line, rgba(128,128,128,.2)); text-align: left; box-shadow: none; clip-path: none; color: inherit; transform: none; font: inherit; font-weight: 500; }
 .perf-plans li:first-child .perf-plan { border-top: 0; }
 .perf-plan:hover { background: transparent; filter: none; color: var(--accent); }
 .perf-plan-name { flex: 1; }
@@ -1130,3 +1130,10 @@ tr.perf-row { cursor: pointer; }
 .perf-logs { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
 .perf-logs .perf-log + .perf-log { margin-top: 0; }
 @media (max-width: 900px) { .perf-logs { grid-template-columns: 1fr; gap: 18px; } }
+
+.perf-plan-top, .perf-plan-res { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.perf-plan-sp { flex: 1; }
+.perf-plan-week { min-width: 0; }
+.perf-plan-n { min-width: 0; }
+.perf-cols table th, .perf-cols table td { padding-left: 8px; padding-right: 8px; }
+.perf-cols .tablewrap { margin: 0 -4px; }

@@ -215,6 +215,7 @@ export default function Performance({ go }) {
         )}
       </section>
 
+      <div className="perf-cols">
       <section className="card">
         <h2 style={{ marginTop: 0 }}>Планы за период</h2>
         {periodPlans.length === 0 ? <div className="subtle">Планов за этот период нет</div> : (
@@ -222,17 +223,20 @@ export default function Performance({ go }) {
             {periodPlans.map((p) => (
               <li key={p.id}>
                 <button type="button" className="perf-plan" onClick={() => go('plan', { weekStart: p.weekStart, planId: p.id })}>
-                  {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
-                  <span className="perf-plan-name">{p.symbol || 'Общий план'}</span>
-                  <span className="subtle perf-plan-week">{weekLabel(p.weekStart).replace(/ \d{4}$/, '')}</span>
+                  <span className="perf-plan-top">
+                    {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
+                    <span className="perf-plan-name">{p.symbol || 'Общий план'}</span>
+                    <span className="subtle perf-plan-week">{weekLabel(p.weekStart).replace(/ \d{4}$/, '')}</span>
+                  </span>
                   {(() => {
                     const { sm, rr } = planStats[p.id]
                     return (
-                      <>
+                      <span className="perf-plan-res">
                         <TradeCounts total={sm.total} win={sm.winCount} loss={sm.lossCount} be={sm.beCount} open={sm.open} missed={sm.missed} />
+                        <span className="perf-plan-sp" />
                         <span className={'perf-plan-n ' + sign(sm.pctTotal)} title="Net %">{sm.pctTotal == null ? '—' : signed(sm.pctTotal, 2, '%')}</span>
                         <span className={'perf-plan-n ' + sign(rr)} title="RR">{rr == null ? '—' : signed(rr, 2) + ' RR'}</span>
-                      </>
+                      </span>
                     )
                   })()}
                 </button>
@@ -247,7 +251,7 @@ export default function Performance({ go }) {
           <div className="tablewrap">
             <table>
               <thead>
-                <tr><th className="left">Дата</th><th className="left">Инструмент</th><th className="left">Сторона</th><th className="left">Result</th><th>PnL</th><th>Net</th><th>R</th></tr>
+                <tr><th className="left">Дата</th><th className="left">Инструмент</th><th className="left">Сторона</th><th className="left">Result</th><th>Net</th><th>R</th></tr>
               </thead>
               <tbody>
                 {inPeriod.map((t) => {
@@ -258,7 +262,6 @@ export default function Performance({ go }) {
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol || <span className="subtle">Не выбран</span>}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       <td className="left">{hasResult(t) ? <ResultPill c={c} /> : <span className="subtle">—</span>}</td>
-                      <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) + ' $' : '—'}</td>
                       <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>
                       <td className={sign(c.r)}>{c.r == null ? '—' : fmt(c.r)}</td>
                     </tr>
@@ -269,6 +272,7 @@ export default function Performance({ go }) {
           </div>
         )}
       </section>
+      </div>
 
       <Log from={from} to={to} />
     </>
