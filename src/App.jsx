@@ -49,6 +49,18 @@ function useTheme() {
   return [theme, next]
 }
 
+// Светлая / тёмная тема стиля Hero — хранится отдельно от темы Apple
+function useOwTheme() {
+  const [t, setT] = useState(() => {
+    try { return localStorage.getItem('ow-theme') === 'light' ? 'light' : 'dark' } catch { return 'dark' }
+  })
+  useEffect(() => {
+    document.documentElement.dataset.owTheme = t
+    try { localStorage.setItem('ow-theme', t) } catch {}
+  }, [t])
+  return [t, () => setT((x) => (x === 'light' ? 'dark' : 'light'))]
+}
+
 function useStyle() {
   const [style, setStyle] = useState(() => {
     try { const v = localStorage.getItem('style'); return v === 'ow' ? v : 'apple' } catch { return 'apple' }
@@ -66,6 +78,7 @@ export default function App() {
   const online = useOnline()
   const [style, setStyle] = useStyle()
   const [theme, nextTheme] = useTheme()
+  const [owTheme, toggleOwTheme] = useOwTheme()
   // Приложение всегда открывается на главной. params нужны, чтобы с карточки плана
   // сразу попасть в нужный план на странице Weekly Plan.
   const [view, setView] = useState({ tab: 'home', params: {} })
@@ -120,9 +133,15 @@ export default function App() {
           <button className={'tab' + (style === 'apple' ? ' active' : '')} onClick={() => setStyle('apple')}>Apple</button>
           <button className={'tab' + (style === 'ow' ? ' active' : '')} onClick={() => setStyle('ow')}>Hero</button>
         </div>
-        <button className="icon-btn theme-btn" onClick={nextTheme} title={'Тема: ' + ({ auto: 'как в системе', light: 'светлая', dark: 'тёмная' })[theme]}>
-          {THEME_ICON[theme]}
-        </button>
+        {style === 'ow' ? (
+          <button className="icon-btn theme-btn" onClick={toggleOwTheme} title={'Тема Hero: ' + (owTheme === 'light' ? 'светлая — нажми, чтобы включить тёмную' : 'тёмная — нажми, чтобы включить светлую')}>
+            {owTheme === 'light' ? 'Светлая' : 'Тёмная'}
+          </button>
+        ) : (
+          <button className="icon-btn theme-btn" onClick={nextTheme} title={'Тема: ' + ({ auto: 'как в системе', light: 'светлая', dark: 'тёмная' })[theme]}>
+            {THEME_ICON[theme]}
+          </button>
+        )}
       </header>
 
 

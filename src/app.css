@@ -510,7 +510,7 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
    Стиль «Hero» (в духе интерфейса Overwatch 2): data-style="ow".
    Тёмно-синий фон, оранжевый акцент, голубой для второстепенного,
    наклонные (параллелограммные) кнопки, курсивные узкие заголовки.
-   Всегда тёмный. Без свечения, чтобы глаза не уставали.
+   Тёмный по умолчанию, есть светлый вариант (data-ow-theme="light", ниже). Без свечения.
    ===================================================================== */
 :root[data-style='ow'] {
   color-scheme: dark;
@@ -555,7 +555,6 @@ form.trade input::placeholder, form.trade .pbtn:not(.set) { font-weight: 400; }
     linear-gradient(165deg, #0e182b, #080d18 70%);
   background-attachment: fixed;
 }
-:root[data-style='ow'] .theme-btn { display: none; }
 /* --- шрифты заголовков: узкий курсив, заглавные --- */
 :root[data-style='ow'] .page-title h2,
 :root[data-style='ow'] .section-title,
@@ -1370,3 +1369,65 @@ tr.perf-row { cursor: pointer; }
 .nc-paste.slim { min-height: 0; padding: 10px 14px; justify-content: flex-start; font-size: 13px; }
 .nc-paste:hover, .nc-paste:focus { color: var(--text-2); }
 .nc-shots .nc-paste button { flex: none; }
+
+/* =====================================================================
+   Hero — светлая тема (в духе светлого интерфейса Overwatch 2): data-ow-theme="light".
+   Светло-серо-голубой фон с диагональной штриховкой, белые панели,
+   тёмно-синий текст, тот же оранжевый акцент.
+   ===================================================================== */
+:root[data-style='ow'][data-ow-theme='light'] {
+  color-scheme: light;
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --surface-2: rgba(30, 70, 140, 0.075);
+  --surface-3: rgba(30, 70, 140, 0.04);
+  --text: #16202f;
+  --text-2: #4a5b77;
+  --text-3: #7d8aa3;
+  --line: rgba(30, 60, 110, 0.16);
+  --line-2: rgba(240, 138, 0, 0.6);
+
+  --accent: #f08a00;
+  --accent-text: #101722;
+  --accent-soft: rgba(240, 138, 0, 0.16);
+  --blue: #1b78d1;
+
+  --green: #0e9a60; --green-fill: #19b574; --green-soft: rgba(25, 181, 116, 0.16);
+  --red: #d42a40; --red-fill: #e63950; --red-soft: rgba(230, 57, 80, 0.13);
+  --orange: #1b78d1; --orange-fill: #2f8fe8; --orange-soft: rgba(47, 143, 232, 0.14);
+  --be: #c97700; --be-soft: rgba(245, 165, 36, 0.24);
+
+  --seg-active: #f08a00;
+  --nav-bg: rgba(244, 246, 250, 0.9);
+}
+:root[data-style='ow'][data-ow-theme='light'] body {
+  background:
+    repeating-linear-gradient(135deg, rgba(20, 50, 100, 0.04) 0 2px, transparent 2px 16px),
+    radial-gradient(ellipse 80% 50% at 15% -8%, #d9e4f5 0%, transparent 65%),
+    linear-gradient(165deg, #f5f7fb, #e5eaf2 70%);
+  background-attachment: fixed;
+}
+:root[data-style='ow'][data-ow-theme='light'] :is(.card, .plan-card) {
+  background: linear-gradient(180deg, #ffffff, #f8fafd);
+  box-shadow: inset 0 0 0 1px var(--line), 0 6px 18px rgba(30, 60, 110, 0.07);
+}
+:root[data-style='ow'][data-ow-theme='light'] .plan-card:hover { box-shadow: inset 0 0 0 1px var(--accent), inset 4px 0 0 var(--accent), 0 6px 18px rgba(30, 60, 110, 0.1); }
+:root[data-style='ow'][data-ow-theme='light'] :is(input, select, textarea) { background-color: rgba(30, 70, 140, 0.06); }
+:root[data-style='ow'][data-ow-theme='light'] :is(.netres-val, .pbtn, .lchip, .nc-box) { background-color: rgba(30, 70, 140, 0.06); }
+:root[data-style='ow'][data-ow-theme='light'] .pbtn:hover { background-color: rgba(30, 70, 140, 0.11); }
+:root[data-style='ow'][data-ow-theme='light'] option { background: #ffffff; color: var(--text); }
+:root[data-style='ow'][data-ow-theme='light'] :is(.symlist, .plist) { background: #ffffff; box-shadow: inset 0 0 0 1px var(--line), 0 18px 40px rgba(30, 60, 110, 0.22); }
+:root[data-style='ow'][data-ow-theme='light'] .modal { background: linear-gradient(180deg, #ffffff, #f2f5fa); box-shadow: inset 0 0 0 1px var(--line-2), 0 30px 80px rgba(20, 40, 80, 0.3); }
+:root[data-style='ow'][data-ow-theme='light'] .modal-back { background: rgba(20, 32, 56, 0.45); }
+:root[data-style='ow'][data-ow-theme='light'] .shot { background: rgba(30, 70, 140, 0.05); }
+:root[data-style='ow'][data-ow-theme='light'] .trow { background: rgba(30, 70, 140, 0.04); }
+:root[data-style='ow'][data-ow-theme='light'] .trow:hover { background: rgba(30, 70, 140, 0.09); }
+:root[data-style='ow'][data-ow-theme='light'] :is(button.ghost:hover, .chip:hover) { background: rgba(30, 70, 140, 0.13); }
+:root[data-style='ow'][data-ow-theme='light'] .acc-card, :root[data-style='ow'][data-ow-theme='light'] .acc-form { background: rgba(30, 70, 140, 0.04); }
+:root[data-style='ow'][data-ow-theme='light'] tr.grp td { background: rgba(30, 70, 140, 0.06); }
+:root[data-style='ow'][data-ow-theme='light'] .ring-track { stroke: rgba(30, 70, 140, 0.18); }
+:root[data-style='ow'][data-ow-theme='light'] .ring.bad .ring-track { stroke: rgba(230, 57, 80, 0.3); }
+:root[data-style='ow'][data-ow-theme='light'] .pcard-ico { background: rgba(30, 70, 140, 0.07); }
+:root[data-style='ow'][data-ow-theme='light'] * { scrollbar-color: #b4c0d6 transparent; }
+:root[data-style='ow'][data-ow-theme='light'] .rdot.be { background: #e59a12; }
+:root[data-style='ow'][data-ow-theme='light'] .tpill.missed { background: rgba(110, 120, 140, 0.16); color: #5e6a80; }
