@@ -1220,3 +1220,29 @@ tr.perf-row { cursor: pointer; }
 
 .pcard-dir { align-items: flex-end; }
 .pcard-top .pc-badge, .pcard-dir .pc-badge { flex: none; }
+
+/* Карточки планов крупнее: на неделю их не больше 6, два ряда занимают экран */
+.pcards { gap: 20px; }
+.pcard { height: max(300px, calc((100vh - 244px) / 2)); }
+.pcard-top { padding: 20px 22px 8px; gap: 14px; }
+.pcard-ico { min-width: 56px; height: 56px; border-radius: 14px; padding: 0 8px; }
+.pcard-kind { font-size: 12px; }
+.pcard-name { font-size: 25px; }
+.pcard-dir { padding: 8px 22px 16px; font-size: 13px; }
+.pcard-text { flex: 1; min-height: 0; display: block; overflow: hidden; padding: 16px 22px; font-size: 15.5px; line-height: 1.5; -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
+.pcard-foot { padding: 14px 22px; }
+.pcard-foot .tt-row { font-size: 16px; }
+.pcard-open { font-size: 14px; }
+:root[data-style='ow'] .pcard-name { font-size: 32px; }
+:root[data-style='ow'] .pcard-kind { font-size: 14px; }
+:root[data-style='ow'] .pcard-text { font-size: 16.5px; }
+:root[data-style='ow'] .pcard-foot .tt-row { font-size: 18px; }
+:root[data-style='ow'] .pcard-open { font-size: 17px; }
+
+/* Карточка плана: бейджи итогов в отдельной строке, чтобы название не обрезалось */
+.pcard-top { align-items: center; }
+.pcard-top .pcard-dir { padding: 0; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; font-size: 12px; }
+.pcard-badges { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 8px 22px 16px; }
+.pcard-badges .pc-badge { align-items: stretch; }
+.pcard-badges .pc-cap { text-align: left; }
+.pcard-badges .pc-badge .badge, :root[data-style='ow'] .pcard-badges .pc-badge .badge { width: auto; }

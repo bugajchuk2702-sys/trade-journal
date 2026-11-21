@@ -285,7 +285,7 @@ function PlanCard({ plan, st, onOpen }) {
     ? <><span className="pos">↑ Лонг</span><span className="neg">↓ Шорт</span></>
     : long ? <span className="pos">↑ Лонг</span>
     : short ? <span className="neg">↓ Шорт</span>
-    : <span className="subtle">Сделок ещё нет</span>
+    : null
   const text = (plan.weekNotes || '').trim() || (plan.updates || []).map((u) => (u.text || '').trim()).find(Boolean) || ''
   return (
     <button type="button" className="plan-card pcard" onClick={onOpen}>
@@ -295,14 +295,13 @@ function PlanCard({ plan, st, onOpen }) {
           <span className="pcard-kind">{weekLabel(plan.weekStart).replace(/ \d{4}$/, '')}</span>
           <span className="pcard-name">{plan.symbol || 'Общий план'}</span>
         </span>
+        {dir && <span className="pcard-dir">{dir}</span>}
+      </div>
+      <div className="pcard-badges">
         <span className="pc-badge">
           <span className="pc-cap">Weekly Result</span>
-          <span className={'badge pcard-status ' + (res ? res[1] : '')}>{res ? res[0] : 'Не выбран'}</span>
+          <span className={'badge ' + (res ? res[1] : '')}>{res ? res[0] : 'Не выбран'}</span>
         </span>
-      </div>
-      <div className="pcard-dir">
-        {dir}
-        <span className="spacer" />
         <span className="pc-badge">
           <span className="pc-cap">Narrative Result</span>
           <span className={'badge ' + (narr ? narr[1] : '')}>{narr ? narr[0] : 'Не выбран'}</span>
