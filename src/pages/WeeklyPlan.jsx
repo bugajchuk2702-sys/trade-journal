@@ -275,27 +275,19 @@ const PERIODS = [['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 
 const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
 const NARRATIVE = { worked: ['Отработал', 'profit'], failed: ['Не отработал', 'loss'] }
 
-// Карточка плана в списке: инструмент, статус, направление сделок, краткий текст и итоги
+// Карточка плана в списке: инструмент, даты недели, краткий текст и итоги
 function PlanCard({ plan, st, onOpen }) {
   const res = RESULT[plan.result]
   const narr = NARRATIVE[plan.narrative]
-  const long = st?.long || 0
-  const short = st?.short || 0
-  const dir = long && short
-    ? <><span className="pos">↑ Лонг</span><span className="neg">↓ Шорт</span></>
-    : long ? <span className="pos">↑ Лонг</span>
-    : short ? <span className="neg">↓ Шорт</span>
-    : null
   const text = (plan.weekNotes || '').trim() || (plan.updates || []).map((u) => (u.text || '').trim()).find(Boolean) || ''
   return (
     <button type="button" className="plan-card pcard" onClick={onOpen}>
       <div className="pcard-top">
         <span className="pcard-ico">{plan.symbol ? <SymbolIcon symbol={plan.symbol} size={30} /> : '··'}</span>
         <span className="pcard-meta">
-          <span className="pcard-kind">{weekLabel(plan.weekStart).replace(/ \d{4}$/, '')}</span>
           <span className="pcard-name">{plan.symbol || 'Общий план'}</span>
         </span>
-        {dir && <span className="pcard-dir">{dir}</span>}
+        <span className="pcard-date">{weekLabel(plan.weekStart).replace(/ \d{4}$/, '')}</span>
       </div>
       <div className="pcard-badges">
         <span className="pc-badge">
