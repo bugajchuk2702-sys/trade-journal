@@ -106,6 +106,7 @@ function PeriodNotes({ mode, from }) {
   const k = `${mode}:${iso(from)}`
   return (
     <section className="card">
+      <div className="perf-logs">
       <div className="recap-field">
         <div className="perf-log-title">Общий рекап</div>
         <RichEditor key={'s' + k} value={sum} onChange={setSum} placeholder="Что получилось, что исправить, план на следующий период…" />
@@ -113,6 +114,7 @@ function PeriodNotes({ mode, from }) {
       <div className="recap-field">
         <div className="perf-log-title">Рекомендации на следующий период</div>
         <RichEditor key={'r' + k} value={rec} onChange={setRec} placeholder="напр. улучшить входы, не закрывать рано…" />
+      </div>
       </div>
     </section>
   )

@@ -1161,6 +1161,7 @@ tr.perf-row { cursor: pointer; }
 .recap-day { margin-bottom: 14px; }
 .recap-day h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; text-transform: none; font-style: normal; letter-spacing: 0; }
 .recap-day.today h3::after { content: 'сегодня'; margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--accent); }
-.recap-field + .recap-field { margin-top: 16px; }
+.recap-field { min-width: 0; }
+@media (max-width: 900px) { .recap-field + .recap-field { margin-top: 4px; } }
 .prev-recs .re-read { min-height: 0; background: transparent; border-color: transparent; padding: 0; cursor: default; }
 .prev-recs { border-left: 3px solid var(--accent); }
