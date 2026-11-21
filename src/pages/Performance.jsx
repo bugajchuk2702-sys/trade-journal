@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db, uuid } from '../db.js'
 import { byOpenedDesc, calcTrade, fmt, hasResult, isMissed, summarize } from '../stats.js'
 import TradeCounts from '../components/TradeCounts.jsx'
+import RichEditor from '../components/RichEditor.jsx'
 import { iso, weekLabel } from '../week.js'
 import { SymbolIcon } from '../components/Symbols.jsx'
 import DateInput from '../components/DateInput.jsx'
@@ -62,6 +63,30 @@ function labelOf(mode, from, to) {
 }
 
 const ago = (ms) => new Date(ms).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+
+// Рекап по дням недели: у каждого дня свой текст со скриншотами, хранится в базе по дате
+const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
+function Recap({ from }) {
+  const rows = useLiveQuery(() => db.meta.where('key').startsWith('recap:').toArray(), [], [])
+  const byKey = Object.fromEntries(rows.map((r) => [r.key, r.value?.html || '']))
+  const today = iso(new Date())
+  const days = DAYS.map((name, i) => { const d = new Date(from); d.setDate(from.getDate() + i); return { name, date: iso(d) } })
+  return (
+    <section className="recap">
+      <h2 className="section-title">Рекап</h2>
+      {days.map((d) => (
+        <div className={'card recap-day' + (d.date === today ? ' today' : '')} key={d.date}>
+          <h3>{d.name} · {d.date}</h3>
+          <RichEditor
+            value={byKey['recap:' + d.date] || ''}
+            placeholder="Заметки за день… вставь скриншот прямо в текст."
+            onChange={(html) => db.meta.put({ key: 'recap:' + d.date, value: { html } })}
+          />
+        </div>
+      ))}
+    </section>
+  )
+}
 
 // Ошибки и заметки периода: хранятся в базе одним списком, к периоду относятся по дате записи
 function Log({ from, to }) {
@@ -273,6 +298,8 @@ export default function Performance({ go }) {
         )}
       </section>
       </div>
+
+      {mode === 'week' && <Recap from={from} />}
 
       <Log from={from} to={to} />
     </>

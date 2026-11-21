@@ -18,6 +18,8 @@ export const DEFAULT_REPO = 'bugajchuk2702-sys/dashboard-data'
 const API = (typeof window !== 'undefined' && window.GH_API) || 'https://api.github.com'
 const TABLES = ['trades', 'plans', 'notes', 'payouts']
 const IMG_RE = /^data:image\/(png|jpeg|jpg|webp|gif);base64,/
+const EMBED_RE = /data:image\/(?:png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+/=]+/g
+const EMBED_REF_RE = /gh-img:[0-9a-f]{64}\.(?:png|jpg|webp|gif)/g
 const MIME = { png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' }
 
 const read = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null') } catch { return null } }
@@ -97,7 +99,14 @@ async function sha256(s) {
 async function externalize(v, uploads) {
   if (typeof v === 'string') {
     const m = IMG_RE.exec(v)
-    if (!m) return v
+    if (!m) {
+      // Картинки внутри HTML (рекап): data URL в src заменяем на ссылки
+      if (!v.includes('data:image/')) return v
+      const found = [...new Set(v.match(EMBED_RE) || [])]
+      let out = v
+      for (const u of found) out = out.split(u).join(await externalize(u, uploads))
+      return out
+    }
     const name = (await sha256(v)) + '.' + (m[1] === 'jpeg' ? 'jpg' : m[1])
     uploads.set(name, v)
     return 'gh-img:' + name
@@ -119,7 +128,13 @@ async function fetchImg(name) {
 
 // Обратно: ссылки «gh-img:имя» → data URL
 async function inflate(v) {
-  if (typeof v === 'string') return v.startsWith('gh-img:') ? fetchImg(v.slice(7)) : v
+  if (typeof v === 'string') {
+    if (v.startsWith('gh-img:')) return fetchImg(v.slice(7))
+    if (!v.includes('gh-img:')) return v
+    let out = v
+    for (const r of new Set(v.match(EMBED_REF_RE) || [])) out = out.split(r).join(await fetchImg(r.slice(7)))
+    return out
+  }
   if (Array.isArray(v)) return Promise.all(v.map(inflate))
   if (v && typeof v === 'object') {
     const o = {}

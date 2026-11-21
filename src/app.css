@@ -1137,3 +1137,27 @@ tr.perf-row { cursor: pointer; }
 .perf-plan-n { min-width: 0; }
 .perf-cols table th, .perf-cols table td { padding-left: 8px; padding-right: 8px; }
 .perf-cols .tablewrap { margin: 0 -4px; }
+
+/* Редактор рекапа */
+.re { display: flex; flex-direction: column; gap: 8px; }
+.re-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.re-btn { background: transparent; color: var(--text-2); border: 0; box-shadow: none; clip-path: none; transform: none; min-width: 30px; height: 28px; padding: 0 6px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; text-transform: none; letter-spacing: 0; font-style: normal; }
+.re-btn:hover { background: var(--surface-2); color: var(--text); filter: none; }
+.re-btn sub { font-size: 9px; }
+.re-pop { position: relative; display: inline-flex; }
+.re-colors { position: absolute; top: 32px; left: 0; z-index: 20; display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: var(--surface); border: 1px solid var(--line-2); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.re-sw { width: 20px; height: 20px; min-width: 20px; padding: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); box-shadow: none; clip-path: none; transform: none; }
+.re-body { min-height: 96px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); outline: none; line-height: 1.55; overflow-wrap: anywhere; }
+.re-body:focus { border-color: var(--accent); }
+.re-body:empty::before { content: attr(data-placeholder); color: var(--text-3); pointer-events: none; }
+.re-body h2 { font-size: 1.25em; margin: .6em 0 .3em; text-transform: none; font-style: normal; letter-spacing: 0; }
+.re-body h3 { font-size: 1.08em; margin: .5em 0 .25em; text-transform: none; font-style: normal; letter-spacing: 0; }
+.re-body ul, .re-body ol { margin: .3em 0; padding-left: 1.4em; }
+.re-body ul { list-style: disc; } .re-body ol { list-style: decimal; }
+.re-body blockquote { margin: .4em 0; padding: 2px 12px; border-left: 3px solid var(--line-2); color: var(--text-2); }
+.re-body .callout { margin: .4em 0; padding: 8px 12px; border-radius: 8px; background: rgba(245,165,36,.14); border: 1px solid rgba(245,165,36,.35); }
+.re-body img { display: block; max-width: 100%; max-height: 420px; margin: 8px 0; border-radius: 8px; cursor: zoom-in; }
+.re-body img:focus, .re-body img.selected { outline: 2px solid var(--accent); }
+.recap-day { margin-bottom: 14px; }
+.recap-day h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; text-transform: none; font-style: normal; letter-spacing: 0; }
+.recap-day.today h3::after { content: 'сегодня'; margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--accent); }
