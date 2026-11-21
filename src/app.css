@@ -1104,7 +1104,7 @@ tr.is-missed .symcell img, tr.is-missed .symcell svg { filter: grayscale(1); }
 .mt-row.mt-editing .pdel { opacity: 1; }
 
 /* Performance */
-.perf-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-bottom: 16px; }
+.perf-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; margin-bottom: 16px; }
 .perf-cols > .card { margin: 0; min-width: 0; }
 @media (max-width: 900px) { .perf-cols { grid-template-columns: 1fr; } }
 .perf-plans, .perf-items { list-style: none; margin: 0; padding: 0; }
@@ -1175,3 +1175,8 @@ tr.perf-row { cursor: pointer; }
 .perf-bottom .perf-add { flex-direction: column; align-items: stretch; }
 @media (max-width: 1000px) { .perf-bottom { grid-template-columns: 1fr; } }
 .perf-more { margin-top: 10px; width: 100%; }
+
+/* Планы и сделки — карточки одной высоты, кнопка «Показать ещё» прижата к низу */
+.perf-cols > .card { display: flex; flex-direction: column; }
+.perf-cols .perf-plans, .perf-cols .tablewrap { margin-bottom: 12px; }
+.perf-cols .perf-more { margin-top: auto; }
