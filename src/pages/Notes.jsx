@@ -164,6 +164,7 @@ function NoteEditor({ note, trades, plans, go, onDelete }) {
         <div className="shot-head"><h2>{title}</h2></div>
         <NotesCard
           bare
+          shotsOnly={key === 'example'}
           text={f[key]}
           imgs={f[key + 'Imgs']}
           placeholder={ph}
