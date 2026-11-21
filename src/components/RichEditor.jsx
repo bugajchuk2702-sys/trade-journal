@@ -28,7 +28,44 @@ export function cleanHtml(html) {
     }
   }
   walk(doc.body)
+  groupImages(doc.body)
   return doc.body.innerHTML
+}
+
+// Скриншоты, идущие подряд (в том числе вставленные раньше по одному), собираем в галерею — они встают рядом
+const onlyImgs = (n) => {
+  if (n.nodeType === 3) return !n.textContent.trim()
+  if (n.nodeType !== 1) return true
+  if (n.tagName === 'IMG' || n.tagName === 'BR') return true
+  if (n.tagName !== 'DIV' && n.tagName !== 'P') return false
+  if (n.classList.contains('callout')) return false
+  return [...n.childNodes].every(onlyImgs)
+}
+const isImgBlock = (n) => n.nodeType === 1 && (n.tagName === 'IMG' || n.querySelector('img')) && onlyImgs(n)
+const isBlank = (n) => (n.nodeType === 3 && !n.textContent.trim()) || (n.nodeType === 1 && n.tagName !== 'IMG' && !n.querySelector('img') && !n.textContent.trim() && /^(DIV|P|BR)$/.test(n.tagName))
+function groupImages(root) {
+  const kids = [...root.childNodes]
+  for (let i = 0; i < kids.length; i++) {
+    const first = kids[i]
+    if (!isImgBlock(first)) continue
+    const run = [first]
+    let j = i + 1
+    // дальше берём картинки и пустые строки между ними; пустые строки в конце не трогаем
+    let lastImg = i
+    while (j < kids.length && (isImgBlock(kids[j]) || isBlank(kids[j]))) {
+      if (isImgBlock(kids[j])) lastImg = j
+      j++
+    }
+    for (let k = i + 1; k <= lastImg; k++) run.push(kids[k])
+    const imgs = []
+    for (const n of run) { if (n.tagName === 'IMG') imgs.push(n); else if (n.nodeType === 1) imgs.push(...n.querySelectorAll('img')) }
+    const gal = root.ownerDocument.createElement('div')
+    gal.className = 're-gal'
+    first.before(gal)
+    for (const im of imgs) gal.appendChild(im)
+    for (const n of run) if (n.tagName !== 'IMG') n.remove()
+    i = lastImg
+  }
 }
 
 const COLORS = [['Красный', '#e5484d'], ['Оранжевый', '#f5a524'], ['Зелёный', '#30a46c'], ['Синий', '#3b82f6'], ['Серый', '#8f98a8']]
@@ -56,8 +93,9 @@ export default function RichEditor({ value, onChange, placeholder }) {
     const v = value || ''
     if (v === last.current) return
     if (document.activeElement === el && last.current !== '') return
-    el.innerHTML = cleanHtml(v)
-    last.current = v
+    const c = cleanHtml(v)
+    el.innerHTML = c
+    last.current = c
   }, [value])
 
   useEffect(() => () => { if (timer.current) { clearTimeout(timer.current); push() } }, []) // eslint-disable-line react-hooks/exhaustive-deps
