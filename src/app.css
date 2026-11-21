@@ -1185,3 +1185,35 @@ tr.perf-row { cursor: pointer; }
 .recap-metrics .v .v-sub > .tt-sep { font-weight: 400; font-style: normal; }
 /* Сводка: первой плитке (Trades + счётчики) больше места, чтобы не прилипала к соседней */
 @media (min-width: 1000px) { .mt-overview { grid-template-columns: 1.8fr repeat(6, minmax(0, 1fr)); column-gap: 24px; } }
+
+/* ===== Weekly Plan: список карточек планов ===== */
+.pcards { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.plan-period { margin-top: -8px; }
+.pcard { gap: 0; padding: 0; overflow: hidden; cursor: pointer; }
+.pcard-top { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px 6px; }
+.pcard-ico { min-width: 44px; height: 44px; padding: 0 6px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--surface-2); color: var(--text-3); font-weight: 700; }
+.pcard-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.pcard-kind { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pcard-name { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard-status { flex: none; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
+.pcard-dir { display: flex; gap: 12px; padding: 4px 18px 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.pcard-dir .pos { color: var(--green); } .pcard-dir .neg { color: var(--red); }
+.pcard-text { padding: 12px 18px; border-top: 1px solid var(--line); color: var(--text-2); font-size: 14px; line-height: 1.45; min-height: 64px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line; }
+.pcard-foot { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-top: 1px solid var(--line); }
+.pcard-foot .tt-row { font-size: 14px; }
+.pcard-open { color: var(--accent); font-size: 13px; font-weight: 600; white-space: nowrap; }
+:root[data-style='ow'] .pcard-ico { border-radius: 4px; background: rgba(255, 255, 255, 0.06); }
+:root[data-style='ow'] .pcard-name { font-family: var(--font-display); font-style: italic; text-transform: uppercase; font-size: 24px; letter-spacing: 0.02em; }
+:root[data-style='ow'] .pcard-kind { font-family: var(--font-display); font-style: italic; font-size: 13px; }
+:root[data-style='ow'] .pcard-open { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.05em; font-size: 15px; }
+:root[data-style='ow'] .pcard-foot .tt-row { font-size: 16px; }
+@media (max-width: 760px) { .pcards { grid-template-columns: 1fr; } }
+
+.pcard-dir .subtle, :root[data-style='ow'] .pcard-dir .subtle { font-size: 12px; font-weight: 600; color: var(--text-3); letter-spacing: 0.05em; }
+.pcard-foot { flex-wrap: wrap; row-gap: 8px; }
+.pcard-foot .tt-row { flex-wrap: nowrap; white-space: nowrap; }
+.pcard-foot .spacer { flex: 1; }
+
+.pcard-dir { align-items: center; }
+.pcard-dir .badge { text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
+.pcard-kind { letter-spacing: 0.02em; font-size: 11px; }

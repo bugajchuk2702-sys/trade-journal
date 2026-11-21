@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, createPlan, savePlan, removePlan, addTrade, updateTrade, uuid } from '../db.js'
 import { byOpened, byOpenedDesc, calcTrade, fmt, hasResult } from '../stats.js'
 import { newTradeData, tradeToForm } from './Trades.jsx'
 import TradeModal from '../components/TradeModal.jsx'
-import { mondayOf, shiftWeek, weekLabel } from '../week.js'
+import { mondayOf, weekLabel } from '../week.js'
+import { fromIso, labelOf, planInRange, rangeOf, shift } from '../period.js'
+import { usePlanStats } from '../planStats.js'
+import TradeCounts from '../components/TradeCounts.jsx'
 import ShotCard from '../components/ShotCard.jsx'
 import WeeklyRecap from '../components/WeeklyRecap.jsx'
 import NotesCard from '../components/NotesCard.jsx'
@@ -268,105 +271,180 @@ function PlanEditor({ plan, onDelete, go }) {
   )
 }
 
-export default function WeeklyPlan({ params = {}, go }) {
-  const [ws, setWs] = useState(params.weekStart || mondayOf())
-  const [selId, setSelId] = useState(params.planId || null)
-  const [adding, setAdding] = useState(!!params.create)
-  const [newSym, setNewSym] = useState('')
-  const current = mondayOf()
+const PERIODS = [['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 'Квартал'], ['year', 'Год'], ['all', 'Всё']]
+const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
+const NARRATIVE = { worked: ['Отработал', 'profit'], failed: ['Не отработал', 'loss'] }
 
-  const plans = useLiveQuery(
-    () => db.plans.where('weekStart').equals(ws).and((p) => !p.deleted).sortBy('createdAt'),
-    [ws],
-    []
+// Карточка плана в списке: инструмент, статус, направление сделок, краткий текст и итоги
+function PlanCard({ plan, st, onOpen }) {
+  const res = RESULT[plan.result]
+  const narr = NARRATIVE[plan.narrative]
+  const long = st?.long || 0
+  const short = st?.short || 0
+  const dir = long && short
+    ? <><span className="pos">↑ Лонг</span><span className="neg">↓ Шорт</span></>
+    : long ? <span className="pos">↑ Лонг</span>
+    : short ? <span className="neg">↓ Шорт</span>
+    : <span className="subtle">Сделок ещё нет</span>
+  const text = (plan.weekNotes || '').trim() || (plan.updates || []).map((u) => (u.text || '').trim()).find(Boolean) || ''
+  return (
+    <button type="button" className="plan-card pcard" onClick={onOpen}>
+      <div className="pcard-top">
+        <span className="pcard-ico">{plan.symbol ? <SymbolIcon symbol={plan.symbol} size={30} /> : '··'}</span>
+        <span className="pcard-meta">
+          <span className="pcard-kind">{weekLabel(plan.weekStart).replace(/ \d{4}$/, '')}</span>
+          <span className="pcard-name">{plan.symbol || 'Общий план'}</span>
+        </span>
+        <span className={'badge pcard-status ' + (res ? res[1] : '')}>{res ? res[0] : 'Планирование'}</span>
+      </div>
+      <div className="pcard-dir">
+        {dir}
+        <span className="spacer" />
+        {narr && <span className={'badge ' + narr[1]} title="Narrative Result">{narr[0]}</span>}
+      </div>
+      <div className="pcard-text">{text || 'Ещё ничего не написано — открой план и добавь скриншоты и заметки'}</div>
+      <div className="pcard-foot">
+        <TradeCounts compact {...(st || {})} />
+        <span className="spacer" />
+        <span className="pcard-open">Открыть →</span>
+      </div>
+    </button>
   )
-  const selected = plans.find((p) => p.id === selId) || plans[0] || null
-  // Сколько сделок привязано к каждому плану — показываем на вкладке плана
-  const counts = useLiveQuery(
-    () => db.trades.filter((t) => !t.deleted && t.planId).toArray().then((a) => a.reduce((m, t) => ((m[t.planId] = (m[t.planId] || 0) + 1), m), {})),
-    [],
-    {}
-  )
-  const showForm = adding || plans.length === 0
+}
 
-  const changeWeek = (next) => {
-    setWs(next)
-    setSelId(null)
-    setAdding(false)
-  }
-
-  const create = async (e) => {
+// Форма создания плана; неделя — та, к которой он добавляется
+function NewPlanForm({ week, hasPlans, onCreate, onCancel }) {
+  const [sym, setSym] = useState('')
+  const submit = (e) => {
     e?.preventDefault()
-    const s = newSym.trim().toUpperCase()
-    if (!s) return
-    const plan = await createPlan(ws, s)
-    setSelId(plan.id)
-    setNewSym('')
-    setAdding(false)
+    const v = sym.trim().toUpperCase()
+    if (v) onCreate(v)
+  }
+  return (
+    <form className="card newplan" onSubmit={submit}>
+      <h2>{hasPlans ? 'Новый план' : 'План на эту неделю ещё не создан'}</h2>
+      <div className="addrow">
+        <SymbolInput autoFocus style={{ flex: 1 }} value={sym} onChange={setSym} placeholder="Выбери инструмент" />
+        <button type="submit">Создать план</button>
+        <button type="button" className="ghost" onClick={onCancel}>Отмена</button>
+      </div>
+      <div className="hint" style={{ marginTop: 6 }}>План создаётся на неделю {weekLabel(week)}. Для каждого инструмента на неделю — отдельный план.</div>
+    </form>
+  )
+}
+
+export default function WeeklyPlan({ params = {}, go }) {
+  // Страница открывается списком планов; сам план — только по клику (или по ссылке с главной / из сделки)
+  const [mode, setMode] = useState('week')
+  const [anchor, setAnchor] = useState(() => (params.weekStart ? fromIso(params.weekStart) : new Date()))
+  const [openId, setOpenId] = useState(params.planId || null)
+  const [addWeek, setAddWeek] = useState(params.create ? params.weekStart || mondayOf() : null)
+
+  const all = useLiveQuery(() => db.plans.filter((p) => !p.deleted).toArray(), [], undefined)
+  const stats = usePlanStats()
+  const [from, to] = rangeOf(mode, anchor)
+  const isCurrent = from.getTime() === rangeOf(mode, new Date())[0].getTime()
+
+  const list = useMemo(
+    () =>
+      (all || [])
+        .filter((p) => planInRange(p.weekStart, from, to))
+        .sort((a, b) => (a.weekStart < b.weekStart ? 1 : a.weekStart > b.weekStart ? -1 : (a.createdAt || 0) - (b.createdAt || 0))),
+    [all, from.getTime(), to.getTime()] // eslint-disable-line react-hooks/exhaustive-deps
+  )
+
+  if (all === undefined) return null
+  const opened = openId ? all.find((p) => p.id === openId) : null
+  // Неделя, на которую создаётся новый план: у открытого плана — его неделя, в списке — просматриваемая
+  const weekForNew = opened ? opened.weekStart : mode === 'week' ? mondayOf(from) : mondayOf()
+
+  const create = async (symbol) => {
+    const plan = await createPlan(addWeek || weekForNew, symbol)
+    setAddWeek(null)
+    setOpenId(plan.id)
+  }
+  const newForm = addWeek && (
+    <NewPlanForm week={addWeek} hasPlans={all.length > 0} onCreate={create} onCancel={() => setAddWeek(null)} />
+  )
+
+  // ----- открытый план -----
+  if (opened) {
+    const siblings = all.filter((p) => p.weekStart === opened.weekStart).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+    return (
+      <>
+        <div className="page-title">
+          <button className="ghost small" onClick={() => { setOpenId(null); setAddWeek(null) }}>← Все планы</button>
+          <h2>Weekly Plan</h2>
+          <strong>{weekLabel(opened.weekStart)}</strong>
+          <span className="hint">сохраняется автоматически</span>
+        </div>
+
+        <div className="chips">
+          {siblings.map((p) => (
+            <button key={p.id} className={'chip' + (p.id === opened.id && !addWeek ? ' active' : '')} onClick={() => { setOpenId(p.id); setAddWeek(null) }}>
+              {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
+              {p.result && <span className={'rdot ' + p.result} />}
+              {p.symbol || 'Общий'}
+              {stats[p.id]?.total > 0 && <span className="chip-n" title="Сделок в плане">{stats[p.id].total}</span>}
+            </button>
+          ))}
+          {!addWeek && <button className="chip add" onClick={() => setAddWeek(opened.weekStart)}>+ Новый план</button>}
+        </div>
+
+        {newForm}
+
+        {!addWeek && (
+          <PlanEditor
+            key={opened.id}
+            plan={opened}
+            go={go}
+            onDelete={async () => {
+              await removePlan(opened.id)
+              setOpenId(null)
+            }}
+          />
+        )}
+      </>
+    )
   }
 
+  // ----- список планов -----
+  const move = (n) => setAnchor(shift(mode, anchor, n))
   return (
     <>
       <div className="page-title">
         <h2>Weekly Plan</h2>
-        <button className="ghost small" onClick={() => changeWeek(shiftWeek(ws, -1))}>◀</button>
-        <strong>{weekLabel(ws)}</strong>
-        <button className="ghost small" onClick={() => changeWeek(shiftWeek(ws, 1))}>▶</button>
-        {ws !== current && <button className="ghost small" onClick={() => changeWeek(current)}>Текущая неделя</button>}
-        <span className="hint">сохраняется автоматически</span>
+        <span className="spacer" />
+        <div className="tabs seg" role="tablist" aria-label="Период">
+          {PERIODS.map(([k, label]) => (
+            <button key={k} type="button" role="tab" aria-selected={mode === k} className={'tab' + (mode === k ? ' active' : '')} onClick={() => { setMode(k); setAnchor(new Date()) }}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <button onClick={() => setAddWeek(weekForNew)}>+ Новый план</button>
       </div>
 
-      <div className="chips">
-        {plans.map((p) => (
-          <button
-            key={p.id}
-            className={'chip' + (selected && p.id === selected.id && !adding ? ' active' : '')}
-            onClick={() => {
-              setSelId(p.id)
-              setAdding(false)
-            }}
-          >
-            {p.symbol && <SymbolIcon symbol={p.symbol} size={18} />}
-            {p.result && <span className={'rdot ' + p.result} />}
-            {p.symbol || 'Общий'}
-            {counts[p.id] > 0 && <span className="chip-n" title="Сделок в плане">{counts[p.id]}</span>}
-          </button>
-        ))}
-        {plans.length > 0 && !adding && (
-          <button className="chip add" onClick={() => setAdding(true)}>+ Новый план</button>
-        )}
-      </div>
-
-      {showForm && (
-        <form className="card newplan" onSubmit={create}>
-          <h2>{plans.length === 0 ? 'План на эту неделю ещё не создан' : 'Новый план'}</h2>
-          <div className="addrow">
-            <SymbolInput
-              autoFocus
-              style={{ flex: 1 }}
-              value={newSym}
-              onChange={setNewSym}
-              placeholder="Выбери инструмент"
-            />
-            <button type="submit">Создать план</button>
-            {adding && plans.length > 0 && (
-              <button type="button" className="ghost" onClick={() => setAdding(false)}>Отмена</button>
-            )}
-          </div>
-          <div className="hint" style={{ marginTop: 6 }}>Для каждого инструмента на неделю — отдельный план. Они появятся карточками на главной.</div>
-        </form>
+      {mode !== 'all' && (
+        <div className="page-title plan-period">
+          <button className="ghost small" onClick={() => move(-1)} aria-label="Предыдущий период">◀</button>
+          <strong>{labelOf(mode, from, to)}</strong>
+          <button className="ghost small" onClick={() => move(1)} aria-label="Следующий период">▶</button>
+          {!isCurrent && <button className="ghost small" onClick={() => setAnchor(new Date())}>Сейчас</button>}
+        </div>
       )}
 
-      {selected && !adding && (
-        <PlanEditor
-          key={selected.id}
-          plan={selected}
-          go={go}
-          onDelete={async () => {
-            await removePlan(selected.id)
-            setSelId(null)
-          }}
-        />
+      {newForm}
+
+      {list.length === 0 && !addWeek ? (
+        <div className="card empty">
+          Планов за этот период нет.
+          <div style={{ marginTop: 10 }}><button onClick={() => setAddWeek(weekForNew)}>+ Новый план</button></div>
+        </div>
+      ) : (
+        <div className="plan-cards pcards">
+          {list.map((p) => <PlanCard key={p.id} plan={p} st={stats[p.id]} onOpen={() => setOpenId(p.id)} />)}
+        </div>
       )}
     </>
   )

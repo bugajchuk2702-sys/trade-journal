@@ -6,6 +6,7 @@ import TradeCounts from '../components/TradeCounts.jsx'
 import RichEditor, { cleanHtml } from '../components/RichEditor.jsx'
 import Lightbox from '../components/Lightbox.jsx'
 import { iso, weekLabel } from '../week.js'
+import { labelOf, planInRange, rangeOf, shift } from '../period.js'
 import { SymbolIcon } from '../components/Symbols.jsx'
 import DateInput from '../components/DateInput.jsx'
 import AnimNum from '../AnimNum.jsx'
@@ -18,51 +19,6 @@ import { sign, signed } from './data/ui.jsx'
 const MODES = [['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 'Квартал'], ['custom', 'Свой']]
 const LOG_KEY = 'perfLog'
 const LIMIT = 5 // сколько планов и сделок видно сразу, остальные сворачиваются
-
-const dayStart = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x }
-const fromIso = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d) }
-
-function rangeOf(mode, anchor, custom) {
-  const a = dayStart(anchor)
-  if (mode === 'week') {
-    const s = new Date(a); s.setDate(a.getDate() - ((a.getDay() + 6) % 7))
-    const e = new Date(s); e.setDate(s.getDate() + 7)
-    return [s, e]
-  }
-  if (mode === 'month') return [new Date(a.getFullYear(), a.getMonth(), 1), new Date(a.getFullYear(), a.getMonth() + 1, 1)]
-  if (mode === 'quarter') { const q = Math.floor(a.getMonth() / 3) * 3; return [new Date(a.getFullYear(), q, 1), new Date(a.getFullYear(), q + 3, 1)] }
-  const s = custom.from ? fromIso(custom.from) : a
-  const e = custom.to ? fromIso(custom.to) : s
-  const [lo, hi] = s <= e ? [s, e] : [e, s]
-  const end = new Date(hi); end.setDate(hi.getDate() + 1)
-  return [lo, end]
-}
-
-function shift(mode, anchor, n) {
-  const x = new Date(anchor)
-  if (mode === 'week') x.setDate(x.getDate() + 7 * n)
-  else if (mode === 'month') x.setMonth(x.getMonth() + n, 1)
-  else x.setMonth(x.getMonth() + 3 * n, 1)
-  return x
-}
-
-// Номер недели по ISO (как в «Неделя 47 · 2026»)
-function isoWeek(d) {
-  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
-  const day = t.getUTCDay() || 7
-  t.setUTCDate(t.getUTCDate() + 4 - day)
-  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1))
-  return [Math.ceil(((t - y0) / 864e5 + 1) / 7), t.getUTCFullYear()]
-}
-
-function labelOf(mode, from, to) {
-  if (mode === 'week') { const [w, y] = isoWeek(from); return `Неделя ${w} · ${y}` }
-  if (mode === 'month') return from.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '').replace(/^./, (c) => c.toUpperCase())
-  if (mode === 'quarter') return `Q${Math.floor(from.getMonth() / 3) + 1} · ${from.getFullYear()}`
-  const last = new Date(to); last.setDate(to.getDate() - 1)
-  const f = (d) => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })
-  return `${f(from)} – ${f(last)}`
-}
 
 const ago = (ms) => new Date(ms).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
 
@@ -231,9 +187,8 @@ export default function Performance({ go }) {
 
   // План относится к периоду, если его неделя (пн–вс) пересекается с периодом
   const periodPlans = useMemo(() => {
-    const lo = new Date(from); lo.setDate(lo.getDate() - 6)
     return plans
-      .filter((p) => { const w = fromIso(p.weekStart); return w >= lo && w < to })
+      .filter((p) => planInRange(p.weekStart, from, to))
       .sort((a, b) => (a.weekStart < b.weekStart ? 1 : a.weekStart > b.weekStart ? -1 : (a.createdAt || 0) - (b.createdAt || 0)))
   }, [plans, from.getTime(), to.getTime()]) // eslint-disable-line react-hooks/exhaustive-deps
 
