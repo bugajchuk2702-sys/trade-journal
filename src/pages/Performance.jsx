@@ -106,7 +106,7 @@ function PeriodNotes({ mode, from }) {
   const k = `${mode}:${iso(from)}`
   return (
     <section className="card">
-      <div className="perf-logs">
+      <div className="recap-fields">
       <div className="recap-field">
         <div className="perf-log-title">Общий рекап</div>
         <RichEditor key={'s' + k} value={sum} onChange={setSum} placeholder="Что получилось, что исправить, план на следующий период…" />
@@ -349,9 +349,10 @@ export default function Performance({ go }) {
 
       {mode === 'week' && <Recap from={from} />}
 
-      <Log from={from} to={to} />
-
-      {NOTE_MODES.has(mode) && <PeriodNotes mode={mode} from={from} />}
+      <div className={NOTE_MODES.has(mode) ? 'perf-bottom' : undefined}>
+        {NOTE_MODES.has(mode) && <PeriodNotes mode={mode} from={from} />}
+        <Log from={from} to={to} />
+      </div>
     </>
   )
 }

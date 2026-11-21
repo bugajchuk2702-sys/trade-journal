@@ -1165,3 +1165,12 @@ tr.perf-row { cursor: pointer; }
 @media (max-width: 900px) { .recap-field + .recap-field { margin-top: 4px; } }
 .prev-recs .re-read { min-height: 0; background: transparent; border-color: transparent; padding: 0; cursor: default; }
 .prev-recs { border-left: 3px solid var(--accent); }
+
+/* Низ страницы: рекап слева, ошибки и заметки сбоку */
+.perf-bottom { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
+.perf-bottom > .card { margin: 0; min-width: 0; }
+.perf-bottom .perf-logs { grid-template-columns: 1fr; gap: 18px; }
+.perf-bottom .perf-log + .perf-log { margin-top: 0; }
+.recap-fields { display: flex; flex-direction: column; gap: 18px; }
+.perf-bottom .perf-add { flex-direction: column; align-items: stretch; }
+@media (max-width: 1000px) { .perf-bottom { grid-template-columns: 1fr; } }
