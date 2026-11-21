@@ -7,7 +7,7 @@ export function overviewOf(trades) {
   const s = summarize(trades)
   const rSum = trades.map(calcTrade).filter((c) => c.closed && c.r != null).reduce((x, c) => x + c.r, 0)
   return [
-    ['Trades', String(s.count), ''],
+    ['Trades', String(s.count), '', { win: s.winCount, loss: s.lossCount, be: s.beCount }],
     ['Winrate', s.winrate == null ? '—' : pct(s.winrate, 1), ''],
     ['PnL', s.pctTotal == null ? '—' : signed(s.pctTotal, 2) + '%', sign(s.pctTotal)],
     ['RR', s.avgR == null ? '—' : signed(rSum, 2), sign(rSum)],

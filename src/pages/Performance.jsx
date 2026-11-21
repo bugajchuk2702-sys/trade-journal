@@ -290,10 +290,11 @@ export default function Performance({ go }) {
           <div className="empty">Нет сделок за этот период</div>
         ) : (
           <div className="recap-metrics acc-overview mt-overview" style={{ marginBottom: 0 }}>
-            {overview.map(([label, value, cls]) => (
+            {overview.map(([label, value, cls, sub]) => (
               <div className="m" key={label}>
                 <div className="l">{label}</div>
                 <div className={'v ' + cls}><AnimNum value={value} /></div>
+                {sub && <div className="m-sub"><TradeCounts compact short win={sub.win} loss={sub.loss} be={sub.be} /></div>}
               </div>
             ))}
           </div>

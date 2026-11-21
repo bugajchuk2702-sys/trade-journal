@@ -1180,3 +1180,5 @@ tr.perf-row { cursor: pointer; }
 .perf-cols > .card { display: flex; flex-direction: column; }
 .perf-cols .perf-plans, .perf-cols .tablewrap { margin-bottom: 12px; }
 .perf-cols .perf-more { margin-top: auto; }
+.m-sub { margin-top: 2px; } .m-sub .tt-row { font-size: 13px; }
+:root[data-style='ow'] .m-sub .tt-row { font-size: 14px; }

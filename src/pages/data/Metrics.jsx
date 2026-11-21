@@ -6,6 +6,7 @@ import AnimNum from '../../AnimNum.jsx'
 import { PARAMS, STYLE, addOption, clearOption, dropOption, renameOption, useParamOptions } from '../../components/Params.jsx'
 import { useAccounts, bucket } from './accounts.js'
 import { Ring, pct, sign, signed } from './ui.jsx'
+import TradeCounts from '../../components/TradeCounts.jsx'
 import { overviewOf } from './overview.js'
 
 // Блоки в том же порядке, что и в Notion: две колонки, слева направо
@@ -129,10 +130,11 @@ export default function Metrics() {
 
       <section className="card">
         <div className="recap-metrics acc-overview mt-overview">
-          {overview.map(([label, value, cls]) => (
+          {overview.map(([label, value, cls, sub]) => (
             <div className="m" key={label}>
               <div className="l">{label}</div>
               <div className={'v ' + cls}><AnimNum value={value} /></div>
+              {sub && <div className="m-sub"><TradeCounts compact short win={sub.win} loss={sub.loss} be={sub.be} /></div>}
             </div>
           ))}
         </div>
