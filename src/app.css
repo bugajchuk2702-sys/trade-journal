@@ -1260,3 +1260,7 @@ tr.perf-row { cursor: pointer; }
 /* Превью «План (до)» вместо текста */
 .pcard-shot { flex: 1; min-height: 0; border-top: 1px solid var(--line); background: var(--surface-2); overflow: hidden; }
 .pcard-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+/* Карточка без текста и скриншота: компактная, высота по содержимому */
+.pcard { height: auto; }
+.pcard-badges { padding-bottom: 20px; }
