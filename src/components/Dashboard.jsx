@@ -40,6 +40,8 @@ function dayResults(trades) {
   return map
 }
 
+// «1 сделка», «2 сделки», «5 сделок»
+const tradesWord = (n) => `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'сделка' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'сделки' : 'сделок'}`
 const dayValue = (e) => (e.hasPct ? e.pct : e.usd)
 const dayText = (e) => {
   const v = dayValue(e)
@@ -61,8 +63,11 @@ function PnlCalendar({ days, y, m }) {
     const v = e ? dayValue(e) : 0
     const cls = 'cal-day' + (e ? (v > 0 ? ' win' : v < 0 ? ' loss' : ' be') : '') + (id === today ? ' today' : '')
     cells.push(
-      <span key={d} className={cls} title={e ? `${e.n} ${e.n === 1 ? 'сделка' : 'сделок'}` : undefined}>
-        <span className="cal-n">{d}</span>
+      <span key={d} className={cls}>
+        <span className="cal-top">
+          <span className="cal-n">{d}</span>
+          {e && <span className="cal-cnt">{tradesWord(e.n)}</span>}
+        </span>
         {e && <span className="cal-v">{dayText(e)}</span>}
       </span>
     )

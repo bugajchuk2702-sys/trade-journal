@@ -1304,3 +1304,10 @@ tr.perf-row { cursor: pointer; }
 :root[data-style='ow'] .calendar .cal-v { font-size: 18px; }
 :root[data-style='ow'] .calendar .cal-n { font-size: 14px; }
 @media (max-width: 760px) { .calendar .cal { gap: 4px; grid-template-rows: auto repeat(var(--rows), minmax(54px, 1fr)); } .calendar .cal-v { font-size: 11px; } }
+
+/* Количество сделок за день */
+.cal-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; min-width: 0; }
+.cal-cnt { font-size: 11.5px; line-height: 1; color: var(--text-2); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.calendar .cal-cnt { font-size: 12.5px; }
+:root[data-style='ow'] .cal-cnt { font-family: var(--font-display); font-style: italic; text-transform: uppercase; letter-spacing: 0.03em; font-size: 13px; }
+@media (max-width: 760px) { .calendar .cal-cnt { font-size: 10px; } }
