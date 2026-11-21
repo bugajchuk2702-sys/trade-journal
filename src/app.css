@@ -1431,3 +1431,9 @@ tr.perf-row { cursor: pointer; }
 :root[data-style='ow'][data-ow-theme='light'] * { scrollbar-color: #b4c0d6 transparent; }
 :root[data-style='ow'][data-ow-theme='light'] .rdot.be { background: #e59a12; }
 :root[data-style='ow'][data-ow-theme='light'] .tpill.missed { background: rgba(110, 120, 140, 0.16); color: #5e6a80; }
+
+/* Выходные (сб, вс) без сделок: прочерк */
+.cal-day.rest { background: var(--surface-3); border-style: dashed; }
+.cal-rest { align-self: flex-end; font-size: 15px; font-weight: 700; line-height: 1; color: var(--text-3); }
+.calendar .cal-rest { font-size: 18px; }
+:root[data-style='ow'] .cal-day.rest { border-style: solid; }

@@ -69,7 +69,9 @@ function PnlCalendar({ days, y, m }) {
   for (let d = 1; d <= count; d++) {
     const id = dayId(y, m, d)
     const e = days.get(id)
-    const cls = 'cal-day' + (e ? ' ' + dayTone(e) : '') + (id === today ? ' today' : '')
+    // Суббота и воскресенье — выходные: без сделок отмечаем прочерком
+    const rest = !e && (first + d - 1) % 7 >= 5
+    const cls = 'cal-day' + (e ? ' ' + dayTone(e) : '') + (rest ? ' rest' : '') + (id === today ? ' today' : '')
     cells.push(
       <span key={d} className={cls}>
         <span className="cal-top">
@@ -77,6 +79,7 @@ function PnlCalendar({ days, y, m }) {
           {e && <span className="cal-cnt">{tradesWord(e.n)}</span>}
         </span>
         {e && <span className="cal-v">{dayText(e)}</span>}
+        {rest && <span className="cal-rest" aria-label="Выходной">—</span>}
       </span>
     )
   }
