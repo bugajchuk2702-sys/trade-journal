@@ -15,7 +15,7 @@ import '@fontsource/fira-sans-extra-condensed/latin-800-italic.css'
 import '@fontsource/fira-sans-extra-condensed/cyrillic-800-italic.css'
 import './app.css'
 import { initArrows, migrateArrows, migrateArrowsLists } from './arrows.js'
-import { retireGer40 } from './retire.js'
+import { restoreGer40 } from './restore.js'
 
 // Автообновление: когда на сайте выходит новая версия, приложение само
 // подтягивает её и перезагружается. Проверка — при открытии, при возврате
@@ -33,5 +33,5 @@ registerSW({
 })
 
 initArrows()
-migrateArrows().then(migrateArrowsLists).then(retireGer40)
+migrateArrows().then(migrateArrowsLists).then(restoreGer40)
 createRoot(document.getElementById('root')).render(<App />)
