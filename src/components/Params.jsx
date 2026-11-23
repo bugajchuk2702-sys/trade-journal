@@ -133,10 +133,12 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove, 
     pick(v)
   }
 
-  const row = (o, uncat) => (
+  // num: порядковый номер в категории (когда в ней больше одного варианта) — так проще выбирать и называть
+  const optText = (o, num) => (num ? <><span className="pnum">{num}</span><span className="ptxt">{o}</span></> : o)
+  const row = (o, num) => (
     <div className="prow" key={o}>
-      <button type="button" role="option" aria-selected={o === value} className={'popt' + (o === value ? ' sel' : '')} onClick={() => pick(o)}>{o}</button>
-      {cats && !uncat && <button type="button" className="pdel pcat-mv" title="Сменить категорию" aria-label={'Сменить категорию: ' + o} onClick={() => cats.onSet(o, nextCat(cats.list, cats.map[o]))}>⇄</button>}
+      <button type="button" role="option" aria-selected={o === value} className={'popt' + (num ? ' popt-n' : '') + (o === value ? ' sel' : '')} onClick={() => pick(o)}>{optText(o, num)}</button>
+      {cats && <button type="button" className="pdel pcat-mv" title="Сменить категорию" aria-label={'Сменить категорию: ' + o} onClick={() => cats.onSet(o, nextCat(cats.list, cats.map[o]))}>⇄</button>}
       <button type="button" className="pdel" title="Удалить вариант" aria-label={'Удалить ' + o} onClick={() => onRemove(o)}>✕</button>
     </div>
   )
@@ -160,7 +162,7 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove, 
               ? groups.map((g) => (g.c || g.items.length) ? (
                 <div className="pgroup" key={g.c || 'none'}>
                   <div className="pcat-h">{g.c || 'Без категории'}</div>
-                  {g.items.map((o) => (g.c ? row(o) : (
+                  {g.items.map((o, i) => (g.c ? row(o, g.items.length > 1 ? i + 1 : 0) : (
                     <div className="prow pcat-pick" key={o}>
                       <button type="button" role="option" aria-selected={o === value} className={'popt' + (o === value ? ' sel' : '')} onClick={() => pick(o)}>{o}</button>
                       <span className="pcat-set" role="group" aria-label={'Категория: ' + o}>

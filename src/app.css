@@ -1501,3 +1501,8 @@ form.trade .pbox { justify-content: flex-start; }
 .plist-cat .pcat-chip { padding: 6px 8px; }
 .plist-cat .pcat-chip.wide { padding: 8px 6px; font-size: 12px; }
 :root[data-style='ow'] .plist-cat .popt.sel ~ .pdel { background: var(--accent); color: #101722; }
+/* Нумерация вариантов внутри категории */
+.popt-n { display: flex; align-items: flex-start; gap: 10px; }
+.popt-n .pnum { flex: none; min-width: 1.3em; color: var(--text-3); font-weight: 700; font-variant-numeric: tabular-nums; }
+.popt-n .ptxt { flex: 1; min-width: 0; }
+.popt-n.sel .pnum { color: inherit; opacity: 0.7; }
