@@ -153,7 +153,7 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove, 
         <svg viewBox="0 0 12 8" width="12" height="8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>
       {open && (
-        <div className="plist" role="listbox">
+        <div className={'plist' + (cats ? ' plist-cat' : '')} role="listbox">
           <div className="plist-items">
             {value && <button type="button" className="popt clear" onClick={() => pick('')}>Очистить</button>}
             {groups

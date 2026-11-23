@@ -1475,3 +1475,29 @@ form.trade .pbox { justify-content: flex-start; }
 :root[data-style='ow'] .mt-sub { color: var(--accent); }
 .mt-add select { flex: 0 0 auto; width: 128px; }
 .mt-add .mt-input { min-width: 90px; }
+
+/* Список с категориями: шире и просторнее, кнопки действий не отнимают место у текста */
+.plist.plist-cat { width: 420px; max-width: calc(100vw - 32px); padding: 10px; }
+.plist-cat .plist-items { max-height: 340px; padding-right: 2px; }
+.plist-cat .popt { padding: 10px 12px; line-height: 1.4; }
+.plist-cat .popt.clear { padding: 8px 12px; }
+.plist-cat .prow { position: relative; margin-bottom: 2px; }
+.plist-cat .prow .pdel { position: absolute; top: 50%; transform: translateY(-50%); right: 4px; padding: 6px 8px; background: transparent; border-radius: 6px; opacity: 0; }
+.plist-cat .prow .pdel.pcat-mv { right: 34px; }
+.plist-cat .prow:hover .pdel, .plist-cat .prow:focus-within .pdel { opacity: 1; }
+.plist-cat .prow:hover .popt { padding-right: 70px; }
+.plist-cat .pcat-pick .pdel { right: 4px; }
+.plist-cat .pcat-pick { flex-wrap: wrap; }
+.plist-cat .pcat-pick .popt { flex: 1 1 100%; padding-bottom: 4px; }
+.plist-cat .pcat-pick .pcat-set { padding: 0 12px 8px; }
+.plist-cat .pcat-pick:hover .popt { padding-right: 40px; }
+.plist-cat .pcat-h { padding: 14px 12px 6px; font-size: 12px; letter-spacing: 0.04em; }
+.plist-cat .pgroup + .pgroup { margin-top: 8px; padding-top: 2px; }
+.plist-cat .pcat-empty { padding: 2px 12px 8px; }
+.plist-cat .padd { margin-top: 10px; padding: 12px 2px 0; gap: 8px; }
+.plist-cat .padd input { padding: 10px 12px; }
+.plist-cat .padd button { padding: 8px 16px; }
+.plist-cat .pcat-new { padding: 10px 2px 2px; gap: 8px; }
+.plist-cat .pcat-chip { padding: 6px 8px; }
+.plist-cat .pcat-chip.wide { padding: 8px 6px; font-size: 12px; }
+:root[data-style='ow'] .plist-cat .popt.sel ~ .pdel { background: var(--accent); color: #101722; }
