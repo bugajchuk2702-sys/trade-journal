@@ -17,6 +17,31 @@ export const PARAMS = [
   { key: 'entryTf', label: 'Entry TF', defaults: ['D1', 'H4'] },
 ]
 
+// Категории вариантов: у Entry Model варианты делятся на три группы. Сами варианты и сделки по-прежнему
+// хранят просто название, а кто в какой категории — лежит отдельно (meta), поэтому ничего не мигрируется.
+export const ENTRY_CATS = ['Continuation', 'Reversal', 'Retracement']
+const CATS_KEY = 'paramCats.v1'
+export const CAT_PARAMS = { entryModel: ENTRY_CATS }
+
+export function useParamCats() {
+  const row = useLiveQuery(() => db.meta.get(CATS_KEY), [], undefined)
+  return row?.value || {}
+}
+export const catOf = (all, key, opt) => {
+  const c = all?.[key]?.[opt]
+  return (CAT_PARAMS[key] || []).includes(c) ? c : ''
+}
+export async function setCat(key, opt, cat) {
+  const row = await db.meta.get(CATS_KEY)
+  const value = { ...(row?.value || {}) }
+  const m = { ...(value[key] || {}) }
+  if (cat) m[opt] = cat
+  else delete m[opt]
+  value[key] = m
+  await db.meta.put({ key: CATS_KEY, value })
+}
+const nextCat = (list, c) => list[(list.indexOf(c) + 1) % list.length]
+
 // v2: списки по умолчанию заменены на настоящие; старые (черновые) варианты не подхватываются
 const META_KEY = 'paramOptions.v2'
 
@@ -50,6 +75,12 @@ export async function renameOption(def, from, to) {
   if (merge && !confirm(`Объединить «${from}» и «${next}»? Сделок, которые станут «${next}»: ${used.length}.`)) return false
   const out = merge ? list.filter((x) => x !== from) : list.includes(from) ? list.map((x) => (x === from ? next : x)) : [...list, next]
   await saveList(def, out)
+  const oldCat = ((await db.meta.get(CATS_KEY))?.value || {})[def.key]?.[from]
+  if (oldCat) {
+    const have = ((await db.meta.get(CATS_KEY))?.value || {})[def.key]?.[next]
+    if (!have) await setCat(def.key, next, oldCat)
+    await setCat(def.key, from, '')
+  }
   const now = Date.now()
   for (const t of used) await db.trades.update(t.id, { ...setVal(def, t, next), updatedAt: now, synced: 0 })
   return true
@@ -70,15 +101,18 @@ export async function clearOption(def, v) {
   for (const t of used) await db.trades.update(t.id, { ...setVal(def, t, ''), updatedAt: now, synced: 0 })
 }
 
-export async function addOption(def, v) {
+export async function addOption(def, v, cat) {
   const x = FIX((v || '').trim())
   const list = await curList(def)
   if (x && !list.includes(x)) await saveList(def, [...list, x])
+  if (x && cat) await setCat(def.key, x, cat)
 }
 
-export function ParamPicker({ label, value, options, onChange, onAdd, onRemove }) {
+export function ParamPicker({ label, value, options, onChange, onAdd, onRemove, cats }) {
+  // cats: { list: ['Continuation', …], map: { вариант: категория }, onSet(вариант, категория) } — если есть, список делится на группы
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState('')
+  const [newCat, setNewCat] = useState(cats?.list?.[0] || '')
   const wrap = useRef(null)
 
   useEffect(() => {
@@ -94,10 +128,22 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove }
   const add = () => {
     const v = draft.trim()
     if (!v) return
-    onAdd(v)
+    onAdd(v, newCat)
     setDraft('')
     pick(v)
   }
+
+  const row = (o, uncat) => (
+    <div className="prow" key={o}>
+      <button type="button" role="option" aria-selected={o === value} className={'popt' + (o === value ? ' sel' : '')} onClick={() => pick(o)}>{o}</button>
+      {cats && !uncat && <button type="button" className="pdel pcat-mv" title="Сменить категорию" aria-label={'Сменить категорию: ' + o} onClick={() => cats.onSet(o, nextCat(cats.list, cats.map[o]))}>⇄</button>}
+      <button type="button" className="pdel" title="Удалить вариант" aria-label={'Удалить ' + o} onClick={() => onRemove(o)}>✕</button>
+    </div>
+  )
+
+  const groups = cats
+    ? [{ c: '', items: options.filter((o) => !cats.list.includes(cats.map[o])) }, ...cats.list.map((c) => ({ c, items: options.filter((o) => cats.map[o] === c) }))]
+    : null
 
   return (
     <div className="pbox" ref={wrap}>
@@ -110,12 +156,23 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove }
         <div className="plist" role="listbox">
           <div className="plist-items">
             {value && <button type="button" className="popt clear" onClick={() => pick('')}>Очистить</button>}
-            {options.map((o) => (
-              <div className="prow" key={o}>
-                <button type="button" role="option" aria-selected={o === value} className={'popt' + (o === value ? ' sel' : '')} onClick={() => pick(o)}>{o}</button>
-                <button type="button" className="pdel" title="Удалить вариант" aria-label={'Удалить ' + o} onClick={() => onRemove(o)}>✕</button>
-              </div>
-            ))}
+            {groups
+              ? groups.map((g) => (g.c || g.items.length) ? (
+                <div className="pgroup" key={g.c || 'none'}>
+                  <div className="pcat-h">{g.c || 'Без категории'}</div>
+                  {g.items.map((o) => (g.c ? row(o) : (
+                    <div className="prow pcat-pick" key={o}>
+                      <button type="button" role="option" aria-selected={o === value} className={'popt' + (o === value ? ' sel' : '')} onClick={() => pick(o)}>{o}</button>
+                      <span className="pcat-set" role="group" aria-label={'Категория: ' + o}>
+                        {cats.list.map((c) => <button key={c} type="button" className="pcat-chip" title={'В категорию ' + c} onClick={() => cats.onSet(o, c)}>{c.slice(0, 3)}</button>)}
+                      </span>
+                      <button type="button" className="pdel" title="Удалить вариант" aria-label={'Удалить ' + o} onClick={() => onRemove(o)}>✕</button>
+                    </div>
+                  )))}
+                  {g.c && g.items.length === 0 && <div className="pcat-empty">пусто</div>}
+                </div>
+              ) : null)
+              : options.map((o) => row(o))}
           </div>
           <div className="padd">
             <input
@@ -126,6 +183,11 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove }
             />
             <button type="button" className="small" onClick={add} disabled={!draft.trim()}>+</button>
           </div>
+          {cats && (
+            <div className="pcat-new" role="group" aria-label="Категория нового варианта">
+              {cats.list.map((c) => <button key={c} type="button" className={'pcat-chip wide' + (newCat === c ? ' on' : '')} onClick={() => setNewCat(c)}>{c}</button>)}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -134,6 +196,7 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove }
 
 export default function ParamsBlock({ value, onChange }) {
   const { get, save } = useParamOptions()
+  const allCats = useParamCats()
   const [fold, setFold] = useState(false)
   const v = value || {}
   return (
@@ -153,8 +216,9 @@ export default function ParamsBlock({ value, onChange }) {
                 value={v[p.key] || ''}
                 options={opts}
                 onChange={(x) => onChange({ ...v, [p.key]: x })}
-                onAdd={(x) => !opts.includes(x) && save(p.key, [...opts, x])}
+                onAdd={(x, c) => { if (!opts.includes(x)) save(p.key, [...opts, x]); if (c && CAT_PARAMS[p.key]) setCat(p.key, x, c) }}
                 onRemove={(x) => save(p.key, opts.filter((o) => o !== x))}
+                cats={CAT_PARAMS[p.key] ? { list: CAT_PARAMS[p.key], map: Object.fromEntries(opts.map((o) => [o, catOf(allCats, p.key, o)])), onSet: (o, c) => setCat(p.key, o, c) } : undefined}
               />
             )
           })}

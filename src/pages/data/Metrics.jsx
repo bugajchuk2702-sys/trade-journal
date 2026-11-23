@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../../db.js'
 import { calcTrade, fmt, isMissed } from '../../stats.js'
 import AnimNum from '../../AnimNum.jsx'
-import { PARAMS, STYLE, addOption, clearOption, dropOption, renameOption, useParamOptions } from '../../components/Params.jsx'
+import { PARAMS, STYLE, CAT_PARAMS, addOption, catOf, clearOption, dropOption, renameOption, setCat, useParamCats, useParamOptions } from '../../components/Params.jsx'
 import { useAccounts, bucket } from './accounts.js'
 import { Ring, pct, sign, signed } from './ui.jsx'
 import TradeCounts from '../../components/TradeCounts.jsx'
@@ -38,9 +38,11 @@ function stat(arr) {
   }
 }
 
-function Group({ g, trades, options }) {
+function Group({ g, trades, options, allCats }) {
   const [edit, setEdit] = useState(false)
   const [draft, setDraft] = useState('')
+  const catList = g.def ? CAT_PARAMS[g.def.key] : null
+  const [newCat, setNewCat] = useState(catList ? catList[0] : '')
   const by = bucket(trades, g.get)
   let rows
   if (g.fixed) rows = g.fixed.map(([v, label, tone]) => ({ v, label, tone }))
@@ -54,6 +56,19 @@ function Group({ g, trades, options }) {
     const extra = [...by.keys()].filter((v) => !options.includes(v)).map((v) => ({ v, label: v, extra: true }))
     rows = [...known, ...extra]
   }
+  // Категории: строки идут группами, перед каждой — заголовок с итогами по категории
+  if (catList) {
+    const catRows = (c) => rows.filter((r) => catOf(allCats, g.def.key, r.v) === c)
+    const out = []
+    for (const c of [...catList, '']) {
+      const rs = catRows(c)
+      if (!rs.length && c === '') continue
+      const sum = stat(rs.flatMap((r) => by.get(r.v) || []))
+      out.push({ head: true, c, sum })
+      out.push(...rs)
+    }
+    rows = out
+  }
   const unset = trades.filter((t) => { const v = g.get(t); return v == null || v === '' }).length
   return (
     <div className="mt-group">
@@ -63,6 +78,14 @@ function Group({ g, trades, options }) {
       </div>
       <ul className="mt-rows">
         {rows.map((r) => {
+          if (r.head) {
+            return (
+              <li key={'h:' + r.c} className="mt-sub">
+                {r.c || 'Без категории'}
+                <span className="mt-sub-n">{r.sum.n ? `${r.sum.n} ${r.sum.n === 1 ? 'Trade' : 'Trades'} · ${pct(r.sum.winrate)}${r.sum.avgR == null ? '' : ' · ' + signed(r.sum.avgR, 2) + ' R'}` : ''}</span>
+              </li>
+            )
+          }
           const s = stat(by.get(r.v) || [])
           if (edit && g.def) {
             return (
@@ -75,6 +98,7 @@ function Group({ g, trades, options }) {
                   onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); if (e.key === 'Escape') { e.target.value = r.v; e.target.blur() } }}
                 />
                 {r.extra && <span className="acc-note">нет в списке</span>}
+                {catList && <button type="button" className="mt-cat" title="Сменить категорию" onClick={() => { const cur = catOf(allCats, g.def.key, r.v); setCat(g.def.key, r.v, catList[(catList.indexOf(cur) + 1) % catList.length]) }}>⇄ {(catOf(allCats, g.def.key, r.v) || 'без категории').slice(0, 3)}</button>}
                 <span className="mt-n">{(by.get(r.v) || []).length} {(by.get(r.v) || []).length === 1 ? 'Trade' : 'Trades'}</span>
                 <button type="button" className="pdel" title={r.extra ? 'Очистить значение в сделках' : 'Убрать из списка'} aria-label={'Убрать ' + r.v} onClick={() => (r.extra ? clearOption(g.def, r.v) : dropOption(g.def, r.v))}>✕</button>
               </li>
@@ -96,8 +120,9 @@ function Group({ g, trades, options }) {
       </ul>
       {edit && g.def && (
         <div className="mt-add">
-          <input className="mt-input" value={draft} placeholder="Новый вариант" onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && draft.trim()) { addOption(g.def, draft); setDraft('') } }} />
-          <button type="button" className="small" disabled={!draft.trim()} onClick={() => { addOption(g.def, draft); setDraft('') }}>+</button>
+          <input className="mt-input" value={draft} placeholder="Новый вариант" onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && draft.trim()) { addOption(g.def, draft, newCat); setDraft('') } }} />
+          {catList && <select value={newCat} onChange={(e) => setNewCat(e.target.value)} aria-label="Категория">{catList.map((c) => <option key={c} value={c}>{c}</option>)}</select>}
+          <button type="button" className="small" disabled={!draft.trim()} onClick={() => { addOption(g.def, draft, newCat); setDraft('') }}>+</button>
         </div>
       )}
       {edit && <div className="hint" style={{ marginTop: 6 }}>Переименуй вариант — он изменится во всех сделках. Дай существующее название — варианты объединятся.</div>}
@@ -108,6 +133,7 @@ function Group({ g, trades, options }) {
 
 export default function Metrics() {
   const { get } = useParamOptions()
+  const allCats = useParamCats()
   const { list } = useAccounts()
   const all = useLiveQuery(() => db.trades.where('deleted').equals(0).toArray(), [], [])
   const [acc, setAcc] = useState('') // '' = все счета
@@ -155,7 +181,7 @@ export default function Metrics() {
           <div className="empty">{acc ? 'По этому счёту сделок пока нет' : 'Сделок пока нет'}</div>
         ) : (
           <div className="mt-grid">
-            {GROUPS.map((g) => <Group key={g.id} g={g} trades={trades} options={g.def ? get(g.def) : []} />)}
+            {GROUPS.map((g) => <Group key={g.id} g={g} trades={trades} options={g.def ? get(g.def) : []} allCats={allCats} />)}
           </div>
         )}
       </section>
