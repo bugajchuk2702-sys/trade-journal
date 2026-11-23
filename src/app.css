@@ -1440,3 +1440,13 @@ tr.perf-row { cursor: pointer; }
     color-mix(in srgb, var(--text-3) 26%, transparent) 0 1.5px, transparent 2.5px 9px);
 }
 .cal-day.rest .cal-n { opacity: 0.85; }
+
+/* Длинные варианты (Entry Model и др.) переносятся на новую строку, а не обрезаются */
+.pbtn { align-items: center; }
+.pbtn > span { flex: 1; min-width: 0; overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; line-height: 1.3; }
+.popt { min-width: 0; white-space: normal; overflow-wrap: anywhere; line-height: 1.35; }
+.plist-items { overflow-x: hidden; }
+.pdel { flex: none; }
+:root[data-style='ow'] .pbtn > span, :root[data-style='ow'] .popt { white-space: normal; }
+form.trade .pbtn { height: auto; min-height: 42px; padding-top: 7px; padding-bottom: 7px; }
+form.trade .pbox { justify-content: flex-start; }
