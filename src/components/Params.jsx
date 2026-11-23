@@ -124,6 +124,13 @@ export function ParamPicker({ label, value, options, onChange, onAdd, onRemove, 
     return () => { document.removeEventListener('mousedown', off); document.removeEventListener('keydown', esc, true) }
   }, [open])
 
+  // Список с категориями показывает все варианты сразу (без внутренней прокрутки) — докручиваем страницу, чтобы он влез целиком
+  useEffect(() => {
+    if (!open || !cats) return
+    const t = setTimeout(() => wrap.current?.querySelector('.plist')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30)
+    return () => clearTimeout(t)
+  }, [open, cats && options.length])
+
   const pick = (v) => { onChange(v); setOpen(false) }
   const add = () => {
     const v = draft.trim()

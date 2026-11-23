@@ -1506,3 +1506,4 @@ form.trade .pbox { justify-content: flex-start; }
 .popt-n .pnum { flex: none; min-width: 1.3em; color: var(--text-3); font-weight: 700; font-variant-numeric: tabular-nums; }
 .popt-n .ptxt { flex: 1; min-width: 0; }
 .popt-n.sel .pnum { color: inherit; opacity: 0.7; }
+.plist-cat .plist-items { max-height: none; overflow: visible; }
