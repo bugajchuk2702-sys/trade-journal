@@ -187,7 +187,7 @@ export function TradeForm({ initial, tradeId, go, onSave, onClose, hidePlan }) {
         <ShotCard title="W1" img={f.w1} onImg={(v) => upd({ w1: v })} />
         <ShotCard title="D1" img={f.d1} onImg={(v) => upd({ d1: v })} />
         <ShotCard title="H4" img={f.h4} onImg={(v) => upd({ h4: v })} />
-        <ShotCard title="H1" img={f.h1} onImg={(v) => upd({ h1: v })} />
+        <ShotCard title="Entry" img={f.h1} onImg={(v) => upd({ h1: v })} />
         <ShotCard title="Result" img={f.resultImg} onImg={(v) => upd({ resultImg: v })} />
       </div>
       <div className="wide field-block">
