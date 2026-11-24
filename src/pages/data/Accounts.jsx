@@ -97,7 +97,11 @@ export default function Accounts() {
     const balance = active.reduce((s, r) => s + r.balance, 0)
     const pnl = active.reduce((s, r) => s + r.st.pnl, 0)
     const paidAll = payouts.reduce((s, p) => s + (toNum(p.amount) || 0), 0)
-    return { balance, pnl, paidAll }
+    // Общий PnL в % — от суммарного размера счетов (взвешенно), а не сумма процентов
+    const sized = active.filter((r) => r.size > 0)
+    const sizeSum = sized.reduce((s, r) => s + r.size, 0)
+    const pnlPct = sizeSum > 0 ? (sized.reduce((s, r) => s + r.st.pnl, 0) / sizeSum) * 100 : active.reduce((s, r) => s + (r.st.pnlPct || 0), 0)
+    return { balance, pnl, pnlPct, paidAll }
   }, [active, payouts])
 
   /* ---------- действия ---------- */
@@ -155,7 +159,7 @@ export default function Accounts() {
   const overview = [
     ['Accounts', String(active.length), ''],
     ['Balance', money(total.balance, 2), ''],
-    ['PnL', signed(total.pnl, 2) + ' $', sign(total.pnl)],
+    ['PnL', signed(total.pnlPct, 2, '%'), sign(total.pnl)],
     ['Payouts', money(total.paidAll, 2), total.paidAll > 0 ? 'pos' : ''],
   ]
 
