@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { requestPersistentStorage } from './db.js'
 import Home from './pages/Home.jsx'
 import WeeklyPlan from './pages/WeeklyPlan.jsx'
@@ -61,6 +61,28 @@ function useOwTheme() {
   return [t, () => setT((x) => (x === 'light' ? 'dark' : 'light'))]
 }
 
+// Бегунок под активной вкладкой в шапке (как у сегментированного переключателя в iOS): плавно переезжает на новую вкладку.
+// Двигаем только CSS-переменные; рисует бегунок CSS (стиль Apple), в Hero переменные не используются.
+function useSegThumb(dep) {
+  useLayoutEffect(() => {
+    const boxes = [...document.querySelectorAll('.nav .tabs')]
+    const upd = () => boxes.forEach((b) => {
+      const a = b.querySelector('.tab.active')
+      b.style.setProperty('--to', a ? '1' : '0')
+      if (!a) return
+      b.style.setProperty('--tx', a.offsetLeft + 'px')
+      b.style.setProperty('--ty', a.offsetTop + 'px')
+      b.style.setProperty('--tw', a.offsetWidth + 'px')
+      b.style.setProperty('--th', a.offsetHeight + 'px')
+    })
+    upd()
+    const ro = new ResizeObserver(upd)
+    boxes.forEach((b) => ro.observe(b))
+    const raf = requestAnimationFrame(() => boxes.forEach((b) => { b.dataset.thumb = 'on' }))
+    return () => { ro.disconnect(); cancelAnimationFrame(raf) }
+  }, [dep])
+}
+
 function useStyle() {
   const [style, setStyle] = useState(() => {
     try { const v = localStorage.getItem('style'); return v === 'ow' ? v : 'apple' } catch { return 'apple' }
@@ -101,6 +123,8 @@ export default function App() {
     setView({ tab, params })
     document.querySelector('.main')?.scrollTo({ top: 0 })
   }
+
+  useSegThumb(view.tab + style)
 
   const Page = view.tab === 'home' ? Home : TABS.find((t) => t.id === view.tab).Page
 

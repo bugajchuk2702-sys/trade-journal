@@ -1507,3 +1507,73 @@ form.trade .pbox { justify-content: flex-start; }
 .popt-n .ptxt { flex: 1; min-width: 0; }
 .popt-n.sel .pnum { color: inherit; opacity: 0.7; }
 .plist-cat .plist-items { max-height: none; overflow: visible; }
+
+/* =====================================================================
+   Apple: движение как в iOS — пружинные кривые, нажатие с «упругим» откликом,
+   бегунок на вкладках, листы и всплывающие меню. Только для Apple; без движения,
+   если в системе включено «уменьшить движение».
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-style='ow']) { --ios: cubic-bezier(0.32, 0.72, 0, 1); --spring: cubic-bezier(0.34, 1.45, 0.64, 1); }
+
+  @keyframes ios-rise { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+  @keyframes ios-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ios-sheet { from { opacity: 0; transform: translateY(28px) scale(0.95); } to { opacity: 1; transform: none; } }
+  @keyframes ios-pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: none; } }
+  @keyframes ios-bump { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: none; } }
+
+  /* порядок появления среди соседей: первые восемь */
+  :root:not([data-style='ow']) :is(.card, .plan-card, .acc-card, .trow, .note-item, .m, .mt-group, .shotcard):nth-child(2) { --ai: 1; }
+  :root:not([data-style='ow']) :is(.card, .plan-card, .acc-card, .trow, .note-item, .m, .mt-group, .shotcard):nth-child(3) { --ai: 2; }
+  :root:not([data-style='ow']) :is(.card, .plan-card, .acc-card, .trow, .note-item, .m, .mt-group, .shotcard):nth-child(4) { --ai: 3; }
+  :root:not([data-style='ow']) :is(.card, .plan-card, .acc-card, .trow, .note-item, .m, .mt-group, .shotcard):nth-child(5) { --ai: 4; }
+  :root:not([data-style='ow']) :is(.card, .plan-card, .acc-card, .trow, .note-item, .m, .mt-group, .shotcard):nth-child(6) { --ai: 5; }
+  :root:not([data-style='ow']) :is(.card, .plan-card, .acc-card, .trow, .note-item, .m, .mt-group, .shotcard):nth-child(7) { --ai: 6; }
+  :root:not([data-style='ow']) :is(.card, .plan-card, .acc-card, .trow, .note-item, .m, .mt-group, .shotcard):nth-child(n + 8) { --ai: 7; }
+
+  /* смена страницы и появление блоков */
+  :root:not([data-style='ow']) .main-inner { animation: ios-fade 0.35s var(--ios); }
+  :root:not([data-style='ow']) :is(.card:not(.modal), .plan-card, .acc-card, .acc-new, .mt-group) { animation: ios-rise 0.55s var(--ios) backwards; animation-delay: calc(var(--ai, 0) * 45ms); }
+  :root:not([data-style='ow']) :is(.trow, .note-item, .tablewrap tbody tr) { animation: ios-rise 0.45s var(--ios) backwards; animation-delay: calc(var(--ai, 0) * 35ms); }
+  :root:not([data-style='ow']) :is(.m) { animation: ios-rise 0.5s var(--ios) backwards; animation-delay: calc(0.05s + var(--ai, 0) * 45ms); }
+  :root:not([data-style='ow']) .chips .chip { animation: ios-pop 0.4s var(--spring) backwards; animation-delay: calc(var(--ai, 0) * 30ms); }
+  :root:not([data-style='ow']) .shot img { animation: ios-fade 0.4s var(--ios) backwards; }
+  :root:not([data-style='ow']) :is(.badge, .tpill.win, .tpill.loss, .tpill.be) { animation: ios-bump 0.45s var(--spring) 0.15s backwards; }
+
+  /* нажатие: кнопка чуть проваливается и пружинит обратно */
+  :root:not([data-style='ow']) :is(button, .chip, .tab, .trow, .note-item, .plan-card, .acc-card, .acc-new, .cal-day) { transition: transform 0.4s var(--spring), background-color 0.2s, color 0.2s, box-shadow 0.3s var(--ios), filter 0.15s, opacity 0.2s; }
+  :root:not([data-style='ow']) :is(button, .chip, .tab, .acc-new):active { transform: scale(0.94); transition-duration: 0.12s; }
+  :root:not([data-style='ow']) :is(.trow, .note-item, .plan-card, .acc-card):active { transform: scale(0.985); transition-duration: 0.12s; }
+  :root:not([data-style='ow']) :is(.icon-btn):active { transform: scale(0.9); }
+
+  /* бегунок под активной вкладкой в шапке — как у iOS-сегментов */
+  :root:not([data-style='ow']) .nav .tabs { position: relative; }
+  :root:not([data-style='ow']) .nav .tabs .tab { position: relative; z-index: 1; }
+  :root:not([data-style='ow']) .nav .tabs .tab.active { background: transparent; box-shadow: none; }
+  :root:not([data-style='ow']) .nav .tabs::before {
+    content: ''; position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none;
+    width: var(--tw, 0); height: var(--th, 0); border-radius: 8px; opacity: var(--to, 0);
+    background: var(--seg-active); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+    transform: translate(var(--tx, 0), var(--ty, 0));
+  }
+  :root:not([data-style='ow']) .nav .tabs.stylesw::before { border-radius: 7px; }
+  :root:not([data-style='ow']) .nav .tabs[data-thumb='on']::before { transition: transform 0.5s var(--spring), width 0.5s var(--spring), height 0.3s var(--ios), opacity 0.2s; }
+
+  /* выпадающие списки: раскрываются из кнопки с лёгким пружинным пересвистом */
+  :root:not([data-style='ow']) :is(.symlist, .plist) { transform-origin: top center; animation: ios-pop 0.34s var(--spring); }
+  :root:not([data-style='ow']) .pbtn svg, :root:not([data-style='ow']) .symbox-chev { transition: transform 0.35s var(--spring); }
+  :root:not([data-style='ow']) .pbtn[aria-expanded='true'] svg { transform: rotate(180deg); }
+  :root:not([data-style='ow']) :is(.symopt, .popt) { transition: background-color 0.15s, transform 0.3s var(--spring); }
+  :root:not([data-style='ow']) :is(.symopt, .popt):active { transform: scale(0.97); }
+
+  /* окна и просмотр картинок выезжают снизу, фон мягко проявляется */
+  :root:not([data-style='ow']) .modal-back { animation: ios-fade 0.3s var(--ios); }
+  :root:not([data-style='ow']) .modal { animation: ios-sheet 0.5s var(--ios); }
+  :root:not([data-style='ow']) .lightbox { animation: ios-fade 0.25s var(--ios); }
+  :root:not([data-style='ow']) .lightbox img { animation: ios-pop 0.45s var(--spring); }
+  :root:not([data-style='ow']) .acc-form { animation: ios-rise 0.4s var(--ios); }
+  :root:not([data-style='ow']) .acc-bar i { transition: width 0.7s var(--ios); }
+
+  /* календарь: день чуть «всплывает» при наведении */
+  :root:not([data-style='ow']) .cal-day:not(.pad):hover { transform: scale(1.06); }
+}
