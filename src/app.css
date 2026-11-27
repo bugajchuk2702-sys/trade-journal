@@ -1594,3 +1594,10 @@ form.trade .pbox { justify-content: flex-start; }
 :root[data-style='ow'] .mt-col > :nth-child(3) { --i: 2; }
 :root[data-style='ow'] .mt-col > :nth-child(4) { --i: 3; }
 :root[data-style='ow'] .mt-col > :nth-child(n + 5) { --i: 4; }
+
+/* Narrative Result: «В процессе отработки» — план ещё жив, новый создавать не нужно */
+.badge.prog { background: rgba(59, 148, 224, 0.16); color: #2f86d4; }
+select.res.prog { background-color: rgba(59, 148, 224, 0.16); color: #2f86d4; }
+select.res option[value='progress'] { color: #2f86d4 !important; }
+:root[data-style='ow'] .badge.prog, :root[data-style='ow'] select.res.prog { color: #5bb4ff; }
+:root[data-style='ow'] select.res option[value='progress'] { color: #5bb4ff !important; }

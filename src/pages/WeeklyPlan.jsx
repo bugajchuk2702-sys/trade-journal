@@ -18,7 +18,7 @@ import { SymbolInput, SymbolIcon, norm } from '../components/Symbols.jsx'
 // остаются в базе нетронутыми, просто не показываются на странице.
 const FIELDS = [
   'symbol', 'result',
-  'narrative', // Narrative Result: '' | 'worked' | 'failed'
+  'narrative', // Narrative Result: '' | 'worked' | 'failed' | 'progress'
   'w1Img', 'w1Text', 'd1Img', 'd1Text', 'h4Img', 'h4Text',
   'beforeImg', 'beforeText', 'afterImg', 'afterText',
   'updates', // [{ id, createdAt, img, text }] — карточки, созданные кнопкой Update
@@ -180,16 +180,17 @@ function PlanEditor({ plan, onDelete, go }) {
             <option value="be">Безубыточная</option>
           </select>
         </label>
-        <label style={{ width: 200 }}>
+        <label style={{ width: 240 }}>
           Narrative Result
           <select
-            className={'res ' + ({ worked: 'profit', failed: 'loss' }[p.narrative] || '')}
+            className={'res ' + ({ worked: 'profit', failed: 'loss', progress: 'prog' }[p.narrative] || '')}
             value={p.narrative}
             onChange={(e) => update({ narrative: e.target.value })}
           >
             <option value="">Не выбран</option>
             <option value="worked">Отработал</option>
             <option value="failed">Не отработал</option>
+            <option value="progress">В процессе отработки</option>
           </select>
         </label>
         <span className="spacer" />
@@ -269,7 +270,7 @@ function PlanEditor({ plan, onDelete, go }) {
 
 const PERIODS = [['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 'Квартал'], ['year', 'Год'], ['all', 'Всё']]
 const RESULT = { profit: ['Прибыльная', 'profit'], loss: ['Убыточная', 'loss'], be: ['Безубыточная', 'be'] }
-const NARRATIVE = { worked: ['Отработал', 'profit'], failed: ['Не отработал', 'loss'] }
+const NARRATIVE = { worked: ['Отработал', 'profit'], failed: ['Не отработал', 'loss'], progress: ['В процессе', 'prog'] }
 
 // Карточка плана в списке: инструмент, даты недели, итоги
 function PlanCard({ plan, st, onOpen }) {
