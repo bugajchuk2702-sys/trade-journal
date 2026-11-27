@@ -60,29 +60,47 @@ const saveList = async (def, list) => {
   const row = await db.meta.get(META_KEY)
   await db.meta.put({ key: META_KEY, value: { ...(row?.value || {}), [def.key]: list } })
 }
-const tradesWith = async (def, v) => (await db.trades.toArray()).filter((t) => valOf(def, t) === v)
+// Сравниваем без лишних пробелов и в нормализованном виде (-> и →), чтобы сделка со «слегка другой» записью не выпадала из переименования
+const same = (a, b) => typeof a === 'string' && typeof b === 'string' && FIX(a.trim()) === FIX(b.trim())
+const tradesWith = async (def, v) => (await db.trades.toArray()).filter((t) => same(valOf(def, t), v))
 
 // Сколько сделок (включая удалённые в корзину) используют вариант
 export const countOption = async (def, v) => (await tradesWith(def, v)).length
 
 // Переименовать вариант во всех сделках. Если такой вариант уже есть — варианты объединяются.
+// Всё делается одной транзакцией: список, категория и сделки меняются разом и по свежим данным,
+// поэтому сделка просто получает новое название — без промежуточных состояний и без затирания других полей.
 export async function renameOption(def, from, to) {
   const next = FIX((to || '').trim())
   if (!next || next === from) return false
-  const list = await curList(def)
-  const merge = list.includes(next)
-  const used = await tradesWith(def, from)
-  if (merge && !confirm(`Объединить «${from}» и «${next}»? Сделок, которые станут «${next}»: ${used.length}.`)) return false
-  const out = merge ? list.filter((x) => x !== from) : list.includes(from) ? list.map((x) => (x === from ? next : x)) : [...list, next]
-  await saveList(def, out)
-  const oldCat = ((await db.meta.get(CATS_KEY))?.value || {})[def.key]?.[from]
-  if (oldCat) {
-    const have = ((await db.meta.get(CATS_KEY))?.value || {})[def.key]?.[next]
-    if (!have) await setCat(def.key, next, oldCat)
-    await setCat(def.key, from, '')
+  const merge = (await curList(def)).includes(next)
+  if (merge) {
+    const n = (await tradesWith(def, from)).length
+    if (!confirm(`Объединить «${from}» и «${next}»? Сделок, которые станут «${next}»: ${n}.`)) return false
   }
-  const now = Date.now()
-  for (const t of used) await db.trades.update(t.id, { ...setVal(def, t, next), updatedAt: now, synced: 0 })
+  await db.transaction('rw', db.meta, db.trades, async () => {
+    const row = await db.meta.get(META_KEY)
+    const cur = row?.value?.[def.key] || def.defaults
+    const out = merge ? cur.filter((x) => x !== from) : cur.includes(from) ? cur.map((x) => (x === from ? next : x)) : [...cur, next]
+    await db.meta.put({ key: META_KEY, value: { ...(row?.value || {}), [def.key]: out } })
+
+    const crow = await db.meta.get(CATS_KEY)
+    const cmap = crow?.value?.[def.key]
+    if (cmap && cmap[from]) {
+      const m = { ...cmap }
+      if (!m[next]) m[next] = m[from]
+      delete m[from]
+      await db.meta.put({ key: CATS_KEY, value: { ...crow.value, [def.key]: m } })
+    }
+
+    const now = Date.now()
+    await db.trades.toCollection().filter((t) => same(valOf(def, t), from)).modify((t) => {
+      if (def.key === 'style') t.style = next
+      else t.params = { ...(t.params || {}), [def.key]: next }
+      t.updatedAt = now
+      t.synced = 0
+    })
+  })
   return true
 }
 
