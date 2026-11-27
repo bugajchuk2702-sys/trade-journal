@@ -148,6 +148,21 @@ export default function Metrics() {
 
   const overview = useMemo(() => overviewOf(trades), [trades])
 
+  // Карточки раскладываются в две колонки без дыр: каждая следующая идёт в ту колонку, где пока меньше строк
+  const columns = useMemo(() => {
+    const cols = [[], []]
+    const load = [0, 0]
+    for (const g of GROUPS) {
+      const set = new Set(g.def ? get(g.def) : [])
+      for (const t of trades) { const v = g.get(t); if (v) set.add(v) }
+      const w = 3 + set.size + (g.def && CAT_PARAMS[g.def.key] ? 4 : 0)
+      const i = load[1] < load[0] ? 1 : 0
+      cols[i].push(g)
+      load[i] += w
+    }
+    return cols
+  }, [trades, get]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <>
       {names.length > 0 && (
@@ -181,7 +196,11 @@ export default function Metrics() {
           <div className="empty">{acc ? 'По этому счёту сделок пока нет' : 'Сделок пока нет'}</div>
         ) : (
           <div className="mt-grid">
-            {GROUPS.map((g) => <Group key={g.id} g={g} trades={trades} options={g.def ? get(g.def) : []} allCats={allCats} />)}
+            {columns.map((col, i) => (
+              <div className="mt-col" key={i}>
+                {col.map((g) => <Group key={g.id} g={g} trades={trades} options={g.def ? get(g.def) : []} allCats={allCats} />)}
+              </div>
+            ))}
           </div>
         )}
       </section>
