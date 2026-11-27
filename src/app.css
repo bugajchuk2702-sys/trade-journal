@@ -1577,3 +1577,9 @@ form.trade .pbox { justify-content: flex-start; }
   /* календарь: день чуть «всплывает» при наведении */
   :root:not([data-style='ow']) .cal-day:not(.pad):hover { transform: scale(1.06); }
 }
+
+/* Цифры BE-сделок — оранжевые, как плашка BE */
+.be-num { color: var(--orange); }
+:root[data-style='ow'] .be-num, :root[data-style='ow'] td.be-num { color: var(--be); }
+.trow-meta .be-num { color: var(--orange); }
+:root[data-style='ow'] .trow-meta .be-num { color: var(--be); }

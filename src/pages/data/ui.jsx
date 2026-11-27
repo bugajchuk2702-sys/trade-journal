@@ -2,6 +2,8 @@ import React from 'react'
 import { fmt } from '../../stats.js'
 
 export const sign = (n) => (n > 0 ? 'pos' : n < 0 ? 'neg' : '')
+// Цвет цифр сделки: BE — оранжевый (как плашка), иначе по знаку
+export const numCls = (c, n) => (c && c.closed && c.res === 'be' ? 'be-num' : sign(n))
 export const signed = (n, d = 2, suffix = '') => (n == null || !isFinite(n) ? '—' : (n > 0 ? '+' : '') + fmt(n, d) + suffix)
 export const money = (n, d = 0) => (n == null || !isFinite(n) ? '—' : fmt(n, d) + ' $')
 export const pct = (n, d = 0) => (n == null || !isFinite(n) ? '—' : fmt(n, d) + '%')

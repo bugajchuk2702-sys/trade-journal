@@ -13,7 +13,7 @@ import AnimNum from '../AnimNum.jsx'
 import { ResultPill } from './Trades.jsx'
 import { useAccounts } from './data/accounts.js'
 import { overviewOf } from './data/overview.js'
-import { sign, signed } from './data/ui.jsx'
+import { numCls, sign, signed } from './data/ui.jsx'
 
 // Performance: итоги за период — сводка, планы, ошибки/заметки и сделки
 const MODES = [['week', 'Неделя'], ['month', 'Месяц'], ['quarter', 'Квартал'], ['custom', 'Свой']]
@@ -386,8 +386,8 @@ export default function Performance({ go }) {
                       <td className="left"><span className="symcell"><SymbolIcon symbol={t.symbol} size={20} />{t.symbol || <span className="subtle">Не выбран</span>}</span></td>
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       <td className="left">{hasResult(t) ? <ResultPill c={c} /> : <span className="subtle">—</span>}</td>
-                      <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>
-                      <td className={sign(c.r)}>{c.r == null ? '—' : fmt(c.r)}</td>
+                      <td className={numCls(c, c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>
+                      <td className={numCls(c, c.r)}>{c.r == null ? '—' : fmt(c.r)}</td>
                     </tr>
                   )
                 })}

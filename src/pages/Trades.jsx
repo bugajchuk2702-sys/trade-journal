@@ -52,6 +52,8 @@ export function ResultPill({ c }) {
 const RES_LABEL = { win: 'Win', loss: 'Loss', be: 'BE', missed: 'Missed' }
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
+// BE — цифры оранжевые, как плашка результата
+const numCls = (c, n) => (c && c.closed && c.res === 'be' ? 'be-num' : sign(n))
 
 // Данные сделки из базы -> значения полей формы
 export const tradeToForm = (t) => ({
@@ -403,9 +405,9 @@ export default function Trades({ params = {}, go }) {
                       <td className={'left ' + t.side}>{t.side === 'long' ? 'Лонг' : 'Шорт'}</td>
                       {hasNums && <td className="left">{hasResult(t) ? <ResultPill c={c} /> : <span className="subtle">—</span>}</td>}
                       {hasNums && <td>{toNum(t.riskPct) == null ? '—' : String(+toNum(t.riskPct).toFixed(2)).replace('.', ',') + '%'}</td>}
-                      {hasNums && <td className={sign(c.pnl)}>{c.closed ? fmt(c.pnl) + ' $' : '—'}</td>}
-                      {hasNums && <td className={sign(c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>}
-                      {hasNums && <td className={sign(c.r)}>{fmt(c.r)}</td>}
+                      {hasNums && <td className={numCls(c, c.pnl)}>{c.closed ? fmt(c.pnl) + ' $' : '—'}</td>}
+                      {hasNums && <td className={numCls(c, c.netPct)}>{c.netPct == null ? '—' : signed(c.netPct, 2, '%')}</td>}
+                      {hasNums && <td className={numCls(c, c.r)}>{fmt(c.r)}</td>}
                       <td>
                         <button className="ghost small" onClick={() => openEdit(t)}>Изм.</button>{' '}
                         <button className="danger small" onClick={() => confirm('Удалить сделку?') && removeTrade(t.id)}>✕</button>

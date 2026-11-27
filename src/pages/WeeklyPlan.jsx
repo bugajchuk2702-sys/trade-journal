@@ -66,9 +66,9 @@ function TradeRow({ t, n, onOpen }) {
       {hasNums && <span className={'tpill ' + res}><i />{label}</span>}
       {hasNums && c.closed && (
         <span className="trow-meta">
-          <span className={sign(c.r)}>{c.r == null ? '—' : fmt(c.r, 1) + 'RR'}</span>
+          <span className={numCls(c, c.r)}>{c.r == null ? '—' : fmt(c.r, 1) + 'RR'}</span>
           {' / '}
-          <span className={sign(c.pnl)}>{c.closed ? money(c.pnl) : '—'}</span>
+          <span className={numCls(c, c.pnl)}>{c.closed ? money(c.pnl) : '—'}</span>
         </span>
       )}
       <span className="trow-side">{t.side === 'long' ? 'Лонг' : 'Шорт'}</span>
@@ -96,6 +96,8 @@ function TradesList({ trades, onAdd, onOpen }) {
 }
 
 const sign = (n) => (n == null ? '' : n > 0 ? 'pos' : n < 0 ? 'neg' : '')
+// BE — цифры оранжевые, как плашка результата
+const numCls = (c, n) => (c && c.closed && c.res === 'be' ? 'be-num' : sign(n))
 
 function PlanEditor({ plan, onDelete, go }) {
   const [p, setP] = useState(() => pick(plan))
