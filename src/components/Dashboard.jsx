@@ -29,7 +29,8 @@ function dayResults(trades) {
     if (isMissed(t)) continue
     const c = calcTrade(t)
     if (!c.closed) continue
-    const d = new Date(t.closedAt || t.openedAt)
+    // День — по открытию сделки: позиция, открытая 26-го и закрытая 27-го, записывается на 26-е
+    const d = new Date(t.openedAt || t.closedAt)
     const k = dayId(d.getFullYear(), d.getMonth(), d.getDate())
     const e = map.get(k) || { pct: 0, hasPct: false, usd: 0, n: 0, win: 0, loss: 0, be: 0 }
     if (c.netPct != null) { e.pct += c.netPct; e.hasPct = true }
