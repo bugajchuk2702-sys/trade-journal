@@ -32,6 +32,25 @@ export function cleanHtml(html) {
   return doc.body.innerHTML
 }
 
+// Галерея: картинки в строке подгоняем по пропорциям так, чтобы у обеих была одинаковая высота, а строка занимала всю ширину.
+// Ширина ставится только в DOM (при сохранении стили вычищаются) — на лету, по реальным размерам картинок.
+const GAP = 8.5
+function balanceGalleries(root) {
+  root.querySelectorAll('.re-gal').forEach((g) => {
+    const imgs = [...g.children].filter((n) => n.tagName === 'IMG')
+    for (let i = 0; i < imgs.length; i += 2) {
+      const a = imgs[i]
+      const b = imgs[i + 1]
+      if (!b) { a.style.width = ''; continue }
+      const ra = a.naturalWidth / a.naturalHeight
+      const rb = b.naturalWidth / b.naturalHeight
+      if (!(ra > 0 && rb > 0)) continue // ещё не загрузились — подгоним по событию load
+      a.style.width = `calc((100% - ${GAP}px) * ${ra / (ra + rb)})`
+      b.style.width = `calc((100% - ${GAP}px) * ${rb / (ra + rb)})`
+    }
+  })
+}
+
 // Скриншоты, идущие подряд (в том числе вставленные раньше по одному), собираем в галерею — они встают рядом
 const onlyImgs = (n) => {
   if (n.nodeType === 3) return !n.textContent.trim()
@@ -99,6 +118,18 @@ export default function RichEditor({ value, onChange, placeholder }) {
   }, [value])
 
   useEffect(() => () => { if (timer.current) { clearTimeout(timer.current); push() } }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let raf = 0
+    const sched = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; balanceGalleries(el) }) }
+    const mo = new MutationObserver(sched)
+    mo.observe(el, { childList: true, subtree: true })
+    el.addEventListener('load', sched, true)
+    sched()
+    return () => { mo.disconnect(); el.removeEventListener('load', sched, true); if (raf) cancelAnimationFrame(raf) }
+  }, [])
 
   const push = () => {
     timer.current = null
